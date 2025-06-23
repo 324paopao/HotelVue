@@ -96,7 +96,7 @@
 </template>
 <script setup lang="ts">
 import type { FormInstance } from "element-plus";
-import { LocationQuery, RouteLocationRaw, useRoute } from "vue-router";
+import { LocationQuery, RouteLocationRaw } from "vue-router";
 import { useI18n } from "vue-i18n";
 import AuthAPI, { type LoginFormData } from "@/api/auth.api";
 import router from "@/router";
@@ -106,7 +106,7 @@ import { Auth } from "@/utils/auth";
 
 const { t } = useI18n();
 const userStore = useUserStore();
-const route = useRoute();
+
 
 onMounted(() => getCaptcha());
 
@@ -192,17 +192,16 @@ async function handleLoginSubmit() {
     console.log("登录成功:", res);
     ElMessage.success("登录成功");
     await userStore.login(loginFormData.value);
-    ElMessage.success("登录成功");
     // 3. 获取用户信息（包含用户角色，用于路由生成）
     //await userStore.getUserInfo();
 
     // 4. 登录成功，让路由守卫处理跳转逻辑
     // 解析目标地址，但不直接跳转
-    // const redirect = resolveRedirectTarget(route.query);
-    // console.log("🎉 Login successful, target redirect:", redirect);
+    const redirect = resolveRedirectTarget(route.query);
+    console.log("🎉 Login successful, target redirect:", redirect);
 
     // // 通过替换当前路由触发路由守卫，让守卫处理后续的路由生成和跳转
-    // await router.replace(redirect);
+    await router.replace(redirect);
 
     // 5. 记住我功能已实现，根据用户选择决定token的存储方式:
     // - 选中"记住我": token存储在localStorage中，浏览器关闭后仍然有效

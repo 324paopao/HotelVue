@@ -4,6 +4,7 @@ import { useUserStoreHook } from "@/store/modules/user.store";
 import { ResultEnum } from "@/enums/api/result.enum";
 import { Auth } from "@/utils/auth";
 import router from "@/router";
+import { number } from "echarts";
 
 /**
  * 创建 HTTP 请求实例
@@ -50,12 +51,13 @@ httpRequest.interceptors.response.use(
     const { code, data, msg } = response.data;
 
     // 请求成功
-    if (Number(code) === 1) {
+    if (code === "1") {
       return data;
     }
 
     // 业务错误
-    ElMessage.error(msg || "系统出错");
+    const errorMessage = msg || "系统出错";
+    ElMessage.error(errorMessage);
     return Promise.reject(new Error(msg || "Business Error"));
   },
   async (error) => {
