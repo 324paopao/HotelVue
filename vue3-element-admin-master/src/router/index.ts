@@ -69,6 +69,12 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/static-page.vue"),
         meta: { title: "静态页面" },
       },
+      {
+        path: "listroomtype",
+        name: "listroomtype",
+        component: () => import("@/views/RoomType/ListRoomType.vue"),
+        meta: { title: "我的通知", icon: "user", hidden: true },
+      },
     ],
   },
 ];
