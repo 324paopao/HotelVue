@@ -22,17 +22,19 @@ export const useUserStore = defineStore("user", () => {
    */
   function login(LoginFormData: LoginFormData) {
     return new Promise<void>((resolve, reject) => {
-      AuthAPI.login(LoginFormData)
-        .then((data) => {
-          const { accessToken, refreshToken } = data;
-          // 保存记住我状态和token
-          rememberMe.value = LoginFormData.rememberMe;
-          Auth.setTokens(accessToken, refreshToken, rememberMe.value);
-          resolve();
-        })
-        .catch((error) => {
-          reject(error);
-        });
+      // 只做登录状态标记，不处理 token
+      // AuthAPI.login(LoginFormData)
+      //   .then((data) => {
+      //     const { accessToken, refreshToken } = data;
+      //     // 保存记住我状态和token
+      //     rememberMe.value = LoginFormData.rememberMe;
+      //     Auth.setTokens(accessToken, refreshToken, rememberMe.value);
+      //     resolve();
+      //   })
+      //   .catch((error) => {
+      //     reject(error);
+      //   });
+      resolve();
     });
   }
 
@@ -43,18 +45,8 @@ export const useUserStore = defineStore("user", () => {
    */
   function getUserInfo() {
     return new Promise<UserInfo>((resolve, reject) => {
-      UserAPI.getInfo()
-        .then((data) => {
-          if (!data) {
-            reject("Verification failed, please Login again.");
-            return;
-          }
-          Object.assign(userInfo.value, { ...data });
-          resolve(data);
-        })
-        .catch((error) => {
-          reject(error);
-        });
+      // 不再请求用户信息，直接返回空对象
+      resolve({} as UserInfo);
     });
   }
 
@@ -63,15 +55,16 @@ export const useUserStore = defineStore("user", () => {
    */
   function logout() {
     return new Promise<void>((resolve, reject) => {
-      AuthAPI.logout()
-        .then(() => {
-          // 重置所有系统状态
-          resetAllState();
-          resolve();
-        })
-        .catch((error) => {
-          reject(error);
-        });
+      // 不再处理登出逻辑
+      // AuthAPI.logout()
+      //   .then(() => {
+      //     resetAllState();
+      //     resolve();
+      //   })
+      //   .catch((error) => {
+      //     reject(error);
+      //   });
+      resolve();
     });
   }
 
@@ -80,21 +73,8 @@ export const useUserStore = defineStore("user", () => {
    * 统一处理所有清理工作，包括用户凭证、路由、缓存等
    */
   function resetAllState() {
-    // 1. 重置用户状态
+    // 只重置用户信息
     resetUserState();
-
-    // 2. 重置其他模块状态
-    // 重置路由
-    usePermissionStoreHook().resetRouter();
-    // 清除字典缓存
-    useDictStoreHook().clearDictCache();
-    // 清除标签视图
-    useTagsViewStore().delAllViews();
-
-    // 3. 清理 WebSocket 连接
-    cleanupWebSocket();
-    console.log("[UserStore] WebSocket connections cleaned up");
-
     return Promise.resolve();
   }
 
@@ -103,9 +83,7 @@ export const useUserStore = defineStore("user", () => {
    * 仅处理用户模块内的状态
    */
   function resetUserState() {
-    // 清除用户凭证
-    Auth.clearAuth();
-    // 重置用户信息
+    // 只重置用户信息，不清理 token
     userInfo.value = {} as UserInfo;
   }
 
@@ -113,25 +91,8 @@ export const useUserStore = defineStore("user", () => {
    * 刷新 token
    */
   function refreshToken() {
-    const refreshToken = Auth.getRefreshToken();
-
-    if (!refreshToken) {
-      return Promise.reject(new Error("没有有效的刷新令牌"));
-    }
-
-    return new Promise<void>((resolve, reject) => {
-      AuthAPI.refreshToken(refreshToken)
-        .then((data) => {
-          const { accessToken, refreshToken: newRefreshToken } = data;
-          // 更新令牌，保持当前记住我状态
-          Auth.setTokens(accessToken, newRefreshToken, Auth.getRememberMe());
-          resolve();
-        })
-        .catch((error) => {
-          console.log(" refreshToken  刷新失败", error);
-          reject(error);
-        });
-    });
+    // 不再处理 token 刷新
+    return Promise.reject(new Error("没有有效的刷新令牌"));
   }
 
   return {
