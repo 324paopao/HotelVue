@@ -4,6 +4,7 @@ import { useUserStoreHook } from "@/store/modules/user.store";
 import { ResultEnum } from "@/enums/api/result.enum";
 import { Auth } from "@/utils/auth";
 import router from "@/router";
+import { number } from "echarts";
 
 /**
  * 创建 HTTP 请求实例
@@ -16,19 +17,17 @@ const httpRequest = axios.create({
 });
 
 /**
- * 请求拦截器 - 添加 Authorization 头
+ * 请求拦截器 - 不再添加 Authorization 头
  */
 httpRequest.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const accessToken = Auth.getAccessToken();
-
-    // 如果 Authorization 设置为 no-auth，则不携带 Token
-    if (config.headers.Authorization !== "no-auth" && accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    } else {
-      delete config.headers.Authorization;
-    }
-
+    // 不再处理 token
+    // const accessToken = Auth.getAccessToken();
+    // if (config.headers.Authorization !== "no-auth" && accessToken) {
+    //   config.headers.Authorization = `Bearer ${accessToken}`;
+    // } else {
+    //   delete config.headers.Authorization;
+    // }
     return config;
   },
   (error) => {
@@ -55,7 +54,8 @@ httpRequest.interceptors.response.use(
     }
 
     // 业务错误
-    ElMessage.error(msg || "系统出错");
+    const errorMessage = msg || "系统出错";
+    ElMessage.error(errorMessage);
     return Promise.reject(new Error(msg || "Business Error"));
   },
   async (error) => {
@@ -74,11 +74,11 @@ httpRequest.interceptors.response.use(
     switch (code) {
       case ResultEnum.ACCESS_TOKEN_INVALID:
         // Access Token 过期，尝试刷新
-        return refreshTokenAndRetry(config);
+        // return refreshTokenAndRetry(config);
 
       case ResultEnum.REFRESH_TOKEN_INVALID:
         // Refresh Token 过期，跳转登录页
-        await redirectToLogin("登录已过期，请重新登录");
+        // await redirectToLogin("登录已过期，请重新登录");
         return Promise.reject(new Error(msg || "Refresh Token Invalid"));
 
       default:
@@ -94,81 +94,17 @@ httpRequest.interceptors.response.use(
 type RetryCallback = () => void;
 
 // Token 刷新相关状态
-let isRefreshingToken = false;
-const pendingRequests: RetryCallback[] = [];
+// let isRefreshingToken = false;
+// const pendingRequests: RetryCallback[] = [];
 
 /**
  * 刷新 Token 并重试请求
  */
-async function refreshTokenAndRetry(config: InternalAxiosRequestConfig): Promise<any> {
-  return new Promise((resolve, reject) => {
-    // 封装需要重试的请求
-    const retryRequest = () => {
-      const newToken = Auth.getAccessToken();
-      if (newToken && config.headers) {
-        config.headers.Authorization = `Bearer ${newToken}`;
-      }
-      httpRequest(config).then(resolve).catch(reject);
-    };
-
-    // 将请求加入等待队列
-    pendingRequests.push(retryRequest);
-
-    // 如果没有正在刷新，则开始刷新流程
-    if (!isRefreshingToken) {
-      isRefreshingToken = true;
-
-      useUserStoreHook()
-        .refreshToken()
-        .then(() => {
-          // 刷新成功，重试所有等待的请求
-          pendingRequests.forEach((callback) => {
-            try {
-              callback();
-            } catch (error) {
-              console.error("Retry request error:", error);
-            }
-          });
-          // 清空队列
-          pendingRequests.length = 0;
-        })
-        .catch(async (error) => {
-          console.error("Token refresh failed:", error);
-          // 刷新失败，清空队列并跳转登录页
-          pendingRequests.length = 0;
-          await redirectToLogin("登录状态已失效，请重新登录");
-          // 拒绝所有等待的请求
-          pendingRequests.forEach(() => {
-            reject(new Error("Token refresh failed"));
-          });
-        })
-        .finally(() => {
-          isRefreshingToken = false;
-        });
-    }
-  });
-}
+// async function refreshTokenAndRetry(config: InternalAxiosRequestConfig): Promise<any> { ... }
 
 /**
  * 重定向到登录页面
  */
-async function redirectToLogin(message: string = "请重新登录"): Promise<void> {
-  try {
-    ElNotification({
-      title: "提示",
-      message,
-      type: "warning",
-      duration: 3000,
-    });
-
-    await useUserStoreHook().resetAllState();
-
-    // 跳转到登录页，保留当前路由用于登录后跳转
-    const currentPath = router.currentRoute.value.fullPath;
-    await router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
-  } catch (error) {
-    console.error("Redirect to login error:", error);
-  }
-}
+// async function redirectToLogin(message: string = "请重新登录"): Promise<void> { ... }
 
 export default httpRequest;

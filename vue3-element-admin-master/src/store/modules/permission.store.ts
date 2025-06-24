@@ -4,6 +4,9 @@ import { store } from "@/store";
 import router from "@/router";
 
 import MenuAPI, { type RouteVO } from "@/api/system/menu.api";
+import { log } from "console";
+import { Icon } from "vxe-table";
+import { after } from "lodash-es";
 const modules = import.meta.glob("../../views/**/**.vue");
 const Layout = () => import("@/layouts/index.vue");
 
@@ -21,24 +24,41 @@ export const usePermissionStore = defineStore("permission", () => {
    * @returns Promise<RouteRecordRaw[]> 解析后的动态路由列表
    */
   function generateRoutes() {
-    return new Promise<RouteRecordRaw[]>((resolve, reject) => {
-      MenuAPI.getRoutes()
-        .then((data) => {
-          const dynamicRoutes = parseDynamicRoutes(data);
+    return new Promise<RouteRecordRaw[]>((resolve) => {
+      console.log("生成静态菜单");
 
-          routes.value = [...constantRoutes, ...dynamicRoutes];
-          routesLoaded.value = true;
-
-          resolve(dynamicRoutes);
-        })
-        .catch((error) => {
-          console.error("❌ Failed to generate routes:", error);
-
-          // 即使失败也要设置状态，避免无限重试
-          routesLoaded.value = false;
-
-          reject(error);
-        });
+      //定义静态路由
+      const staticRoutes = [
+        {
+          path: "/dashboard",
+          component: Layout,
+          redirect: "/dashboard/index",
+          children: [
+            {
+              path: "/index",
+              name: "Dashboard",
+              component: () => import("@/views/dashboard/index.vue"),
+              meta: {
+                title: "仪表盘", icon: "ep:home-filled", affix: true
+              },
+            },
+          ],
+        },
+        {
+          path: "/system",
+          component: Layout,
+          redirect: "/system/user",
+          meta: { title: "系统管理", icon: "ep:setting" },
+          children: [
+            {
+              path: "/system/user",
+              name: "User",
+              component: () => import("@/views/system/user/index.vue"),
+              meta: { title: "用户管理", icon: "ep:user" },
+            }
+          ]
+        },
+      ]
     });
   }
 
@@ -101,7 +121,7 @@ const parseDynamicRoutes = (rawRoutes: RouteVO[]): RouteRecordRaw[] => {
       normalizedRoute.component?.toString() === "Layout"
         ? Layout
         : modules[`../../views/${normalizedRoute.component}.vue`] ||
-          modules["../../views/error-page/404.vue"];
+        modules["../../views/error-page/404.vue"];
 
     // 递归解析子路由
     if (normalizedRoute.children) {
