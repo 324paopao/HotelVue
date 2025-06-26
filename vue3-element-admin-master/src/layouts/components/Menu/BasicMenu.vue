@@ -31,6 +31,24 @@
             <span>Navigator Four</span>
           </el-menu-item>
         </el-sub-menu>
+        <el-sub-menu index="2">
+          <template #title>
+            <el-icon><Location /></el-icon>
+            <span>客户</span>
+          </template>
+          <el-menu-item index="/getcustomerlist">
+            <el-icon><IconMenu /></el-icon>
+            <span>客户列表</span>
+          </el-menu-item>
+          <el-menu-item index="3">
+            <el-icon><Document /></el-icon>
+            <span>Navigator Three</span>
+          </el-menu-item>
+          <el-menu-item index="4">
+            <el-icon><Setting /></el-icon>
+            <span>Navigator Four</span>
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-col>
   </div>
@@ -39,10 +57,10 @@
 <script lang="ts" setup>
 import { Document, Menu as IconMenu, Location, Setting } from "@element-plus/icons-vue";
 import { ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 const route = useRoute();
-const router = useRouter();
 const activeIndex = ref(route.path);
+//const router = useRouter();
 
 watch(
   () => route.path,
