@@ -31,6 +31,24 @@
             <span>Navigator Four</span>
           </el-menu-item>
         </el-sub-menu>
+        <el-sub-menu index="3">
+          <template #title>
+            <el-icon><Location /></el-icon>
+            <span>业务</span>
+          </template>
+          <el-menu-item index="/businessRoomtype">
+            <el-icon><IconMenu /></el-icon>
+            <span>房型设置</span>
+          </el-menu-item>
+          <el-menu-item index="">
+            <el-icon><Document /></el-icon>
+            <span>房号管理</span>
+          </el-menu-item>
+          <el-menu-item index="">
+            <el-icon><Setting /></el-icon>
+            <span>Navigator Four</span>
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-col>
   </div>
