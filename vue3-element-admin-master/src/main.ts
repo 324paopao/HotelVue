@@ -9,7 +9,7 @@ import "vxe-table/lib/style.css";
 import "@/styles/dark/css-vars.css";
 import "@/styles/index.scss";
 import "uno.css";
-
+import ElementPlus from 'element-plus'
 // 过渡动画
 import "animate.css";
 
@@ -17,6 +17,13 @@ import "animate.css";
 import "default-passive-events";
 
 const app = createApp(App);
+
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+
+
+app.use(ElementPlus, {
+  locale: zhCn,
+})
 // 注册插件
 app.use(setupPlugins);
 app.mount("#app");

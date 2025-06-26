@@ -47,6 +47,7 @@ httpRequest.interceptors.response.use(
     }
 
     const { code, data, msg } = response.data;
+    //const res = response;
 
     // 请求成功
     if (Number(code) === 1) {
