@@ -75,9 +75,22 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/RoomType/ListRoomType.vue"),
         meta: { title: "我的通知", icon: "user", hidden: true },
       },
+      {
+        path: "ReserveRoomList",
+        name: "ReserveRoomList",
+        component: () => import("@/views/ReserveRoomList.vue"),
+        meta: { title: "办理预订", icon: "user", hidden: true },
+      },
+      {
+        path: "ReserverGetlist",
+        name: "ReserverGetlist",
+        component: () => import("@/views/ReserverGetlist.vue"),
+        meta: { title: "办理预订", icon: "user", hidden: true },
+      },
     ],
   },
 ];
+
 
 /**
  * 创建路由
