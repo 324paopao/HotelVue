@@ -15,9 +15,14 @@
             批量删除
           </el-button>
         </div>
-        <el-input placeholder="房型名称" style="width: 200px">
+        <el-input
+          v-model="Query.Name"
+          placeholder="房型名称"
+          style="width: 200px"
+          @keyup.enter="GetListRoomType()"
+        >
           <template #append>
-            <el-button icon="el-icon-search" />
+            <el-button icon="el-icon-search" @click="GetListRoomType()" />
           </template>
         </el-input>
       </div>
@@ -298,11 +303,15 @@ async function handleDelete(id: any) {
 let editId = "";
 
 function onEdit(row: any) {
-  // 反填当前行数据到form
+  // 反填所有字段
   Object.assign(form, row);
-  // 处理 displayChannels 字段
+  // 反填标签
   if (typeof row.displayChannels === "string") {
-    form.displayChannels = row.displayChannels ? row.displayChannels.split(",") : [];
+    form.displayChannelses = row.displayChannels ? row.displayChannels.split(",") : [];
+  } else if (Array.isArray(row.displayChannels)) {
+    form.displayChannelses = row.displayChannels;
+  } else {
+    form.displayChannelses = [];
   }
   editId = row.id;
   drawerVisible.value = true;
@@ -342,16 +351,13 @@ function removeTag(tag: string) {
 }
 
 async function submitForm() {
-  let res: any;
-  form.displayChannels = form.displayChannels.toString();
+  let res;
+  form.displayChannels = form.displayChannelses.join(",");
   if (editId == "") {
-    console.log("form", form);
-
     res = await RoomTypeAPI.AddRoomTypeAxios(form);
   } else {
     res = await RoomTypeAPI.UpdataRoomTypeAxios(editId, form);
   }
-
   if (res != null) {
     ElMessage.success(editId ? "修改成功" : "新增成功");
     drawerVisible.value = false;
@@ -386,8 +392,8 @@ function handleDrawerClose() {
 const showTagDialog = ref(false);
 const tagForm = reactive({ value: "" });
 function confirmAddTag() {
-  if (tagForm.value && !form.displayChannels.includes(tagForm.value)) {
-    form.displayChannels.push(tagForm.value);
+  if (tagForm.value && !form.displayChannelses.includes(tagForm.value)) {
+    form.displayChannelses.push(tagForm.value);
   }
   showTagDialog.value = false;
   tagForm.value = "";
