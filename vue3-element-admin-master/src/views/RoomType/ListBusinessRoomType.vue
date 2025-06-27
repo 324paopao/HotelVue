@@ -51,7 +51,9 @@
         <el-table-column label="操作" width="220">
           <template #default="scope">
             <el-link type="primary" @click="onEdit(scope.row)">编辑</el-link>
-            <el-link type="primary" style="margin-left: 8px">设置房号</el-link>
+            <el-link type="primary" style="margin-left: 8px" @click="openRoomNumDialog(scope.row)">
+              设置房号
+            </el-link>
             <el-link type="primary" style="margin-left: 8px">投放</el-link>
             <el-link type="danger" style="margin-left: 8px" @click="handleDelete(scope.row.id)">
               删除
@@ -237,6 +239,62 @@
         <el-button type="primary" @click="confirmAddTag">确认</el-button>
       </template>
     </el-dialog>
+    <!-- 房号设置弹窗 -->
+    <el-dialog
+      v-model="roomNumDialogVisible"
+      :title="`设置房号(${currentRoomTypeName})`"
+      width="600px"
+    >
+      <el-button type="primary" style="margin-bottom: 12px" @click="openAddRoomNumDialog">
+        新增房号
+      </el-button>
+      <el-table :data="roomNumList" border>
+        <el-table-column prop="roomNum" label="房号" />
+        <el-table-column prop="order" label="排序" />
+        <el-table-column prop="description" label="备注" />
+        <el-table-column label="操作" width="120">
+          <template #default="scope">
+            <el-link type="primary" @click="UpdataRoomNum(scope.row)">修改</el-link>
+            <el-link type="danger" style="margin-left: 8px" @click="DeleteRoomNum(scope.row.id)">
+              删除
+            </el-link>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        v-model:current-page="roomNumQuery.PageIndex"
+        v-model:page-size="roomNumQuery.PageSize"
+        :page-sizes="[1, 3, 5, 10]"
+        :background="true"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="roomNumQuery.totleCount"
+        @size-change="handleSizeRoomNumChange"
+        @current-change="handleCurrentRoomNumChange"
+      />
+    </el-dialog>
+
+    <!-- 新增房号弹窗 -->
+    <el-dialog v-model="addRoomNumDialogVisible" title="新增房号" width="500px">
+      <el-form :model="addRoomNumForm" label-width="80px">
+        <el-form-item label="房号" required>
+          <el-input v-model="addRoomNumForm.roomNum" maxlength="10" />
+        </el-form-item>
+        <el-form-item label="排序" required>
+          <el-input v-model.number="addRoomNumForm.order" type="number" min="0" />
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input
+            v-model="addRoomNumForm.description"
+            maxlength="9"
+            placeholder="备注不超过9个字符"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="addRoomNumDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitAddRoomNum">确认</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -249,6 +307,88 @@ import type { UploadProps } from "element-plus";
 onMounted(() => {
   GetListRoomType();
 });
+
+function DeleteRoomNum(Row: any) {
+  ElMessageBox.confirm("确认删除已选中的数据项?", "警告", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(
+    async () => {
+      // 删除逻辑
+      await RoomTypeAPI.DeleteRoomNumAxios(Row).then((res: any) => {
+        if (res != null) {
+          ElMessage.success("删除成功");
+          getRoomNumList();
+        }
+      });
+        }
+
+
+  );
+}
+
+// 新增房号弹窗相关
+let numid = "";
+const addRoomNumDialogVisible = ref(false);
+const addRoomNumForm = reactive({
+  roomTypeId: "",
+  roomNum: 0,
+  state: true,
+  order: 0,
+  description: "",
+});
+function openAddRoomNumDialog() {
+  addRoomNumForm.roomNum = 0;
+  addRoomNumForm.order = 0;
+  addRoomNumForm.description = "";
+  addRoomNumForm.state = true;
+  addRoomNumDialogVisible.value = true;
+}
+function UpdataRoomNum(row: any) {
+  Object.assign(addRoomNumForm, row);
+  if (typeof addRoomNumForm.state !== "boolean") {
+    addRoomNumForm.state = true;
+  }
+  numid = row.id;
+
+  addRoomNumDialogVisible.value = true;
+}
+
+async function submitAddRoomNum() {
+  if (!addRoomNumForm.roomNum) {
+    ElMessage.error("房号不能为空");
+    return;
+  }
+  const payload = {
+    RoomTypeId: roomNumQuery.RoomTypeId,
+    roomNum: addRoomNumForm.roomNum,
+    state: addRoomNumForm.state,
+    order: addRoomNumForm.order,
+    description: addRoomNumForm.description,
+  };
+
+  if (numid != "") {
+    console.log("numid", numid);
+    console.log("payload", payload);
+
+    await RoomTypeAPI.UpdataRoomNumAxios(numid, payload);
+
+    numid = "";
+  } else {
+    console.log("addRoomNumForm", addRoomNumForm);
+    await RoomTypeAPI.AddRoomNumAxios(payload);
+  }
+
+  addRoomNumDialogVisible.value = false;
+  getRoomNumList();
+  ElMessage.success(numid !== "" ? "修改房号成功" : "新增房号成功");
+  addRoomNumForm.roomNum = 0;
+  addRoomNumForm.order = 0;
+  addRoomNumForm.description = "";
+  addRoomNumForm.state = true;
+}
+
 const tableData = ref([]);
 const drawerVisible = ref(false);
 
@@ -349,14 +489,21 @@ function addTag() {
 function removeTag(tag: string) {
   form.displayChannelses = form.displayChannelses.filter((t: string) => t !== tag);
 }
-
+//新增/修改房型
 async function submitForm() {
   let res;
   form.displayChannels = form.displayChannelses.join(",");
   if (editId == "") {
     res = await RoomTypeAPI.AddRoomTypeAxios(form);
   } else {
-    res = await RoomTypeAPI.UpdataRoomTypeAxios(editId, form);
+    res = await RoomTypeAPI.UpdataRoomTypeAxios(editId, {
+      ...form,
+      id: editId,
+      lastModificationTime: "",
+      lastModifierId: null,
+      creationTime: "",
+      creatorId: null,
+    });
   }
   if (res != null) {
     ElMessage.success(editId ? "修改成功" : "新增成功");
@@ -463,6 +610,45 @@ async function saveOrder(row: any) {
   ElMessage.success("排序修改成功");
   GetListRoomType();
 }
+
+// 房号设置相关
+const roomNumDialogVisible = ref(false);
+const roomNumList = ref([]);
+const roomNumQuery = reactive({
+  PageIndex: 1,
+  PageSize: 10,
+  RoomTypeId: "",
+  totleCount: 0,
+  totlePage: 0,
+});
+const currentRoomTypeName = ref("");
+
+async function openRoomNumDialog(row: any) {
+  currentRoomTypeName.value = row.name;
+  roomNumQuery.RoomTypeId = row.id;
+  roomNumQuery.PageIndex = 1;
+  roomNumDialogVisible.value = true;
+  await getRoomNumList();
+}
+
+async function getRoomNumList() {
+  const res: any = await RoomTypeAPI.GetRoomNumListAxios(roomNumQuery);
+  if (res) {
+    roomNumList.value = res.data;
+    roomNumQuery.totleCount = res.totleCount;
+    roomNumQuery.totlePage = res.totlePage;
+  }
+}
+//分页获取页容量
+const handleSizeRoomNumChange = (val: number) => {
+  roomNumQuery.PageSize = val;
+  getRoomNumList();
+};
+// 分页获取当前页
+const handleCurrentRoomNumChange = (val: number) => {
+  roomNumQuery.PageIndex = val;
+  getRoomNumList();
+};
 </script>
 
 <style scoped>

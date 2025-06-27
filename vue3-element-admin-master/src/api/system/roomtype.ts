@@ -1,11 +1,12 @@
 import request from "@/utils/request";
-const AUTH_BASE_URL = "/api/app/room-type";
+const RoomTypeUrl = "/api/app/room-type";
+const RoomNumUrl = "/api/app/room-numm-services";
 
 const RoomTypeAPI = {
   /** 获取房型列表 */
   GetRoomTypeAxios(Query: any) {
     return request<any, RoomTypeSeach>({
-      url: `${AUTH_BASE_URL}/show`,
+      url: `${RoomTypeUrl}/show`,
       method: "get",
       params: Query,
     });
@@ -13,14 +14,14 @@ const RoomTypeAPI = {
   /** 删除房型 */
   DeleteRoomTypeAxios(Query: any) {
     return request<any>({
-      url: `${AUTH_BASE_URL}/${Query}/room-type-del`,
+      url: `${RoomTypeUrl}/${Query}/room-type-del`,
       method: "delete",
     });
   },
   /** 新增房型 */
   AddRoomTypeAxios(data: any) {
     return request<any>({
-      url: `${AUTH_BASE_URL}/add`,
+      url: `${RoomTypeUrl}/add`,
       method: "post",
       data,
       headers: { "Content-Type": "application/json" },
@@ -30,29 +31,65 @@ const RoomTypeAPI = {
   BatchDeleteRoomTypeAxios(ids: string[]) {
     const params = ids.map((id) => `ids=${id}`).join("&");
     return request<any>({
-      url: `${AUTH_BASE_URL}/batch-room-type?${params}`,
+      url: `${RoomTypeUrl}/batch-room-type?${params}`,
       method: "delete",
     });
   },
   /** 修改房型 */
   UpdataRoomTypeAxios(id: string, data: RoomTypeUpdate) {
     return request<any>({
-      url: `${AUTH_BASE_URL}/${id}/room-type`,
+      url: `${RoomTypeUrl}/${id}/room-type`,
       method: "put",
       data,
     });
   },
   UpdataRoomTypeOrder(data: any) {
     return request<any>({
-      url: `${AUTH_BASE_URL}/room-type-order`,
+      url: `${RoomTypeUrl}/room-type-order`,
       method: "put",
       data,
+    });
+  },
+  // 获取房号列表根据房型id
+  GetRoomNumListAxios(Query: any) {
+    return request<any, RoomNumToRoomTypeId>({
+      url: `${RoomNumUrl}/to-room-type-id`,
+      method: "get",
+      params: Query,
+    });
+  },
+
+  // 添加房号
+  AddRoomNumAxios(data: any) {
+    return request<any>({
+      url: `${RoomNumUrl}/room-num-add`,
+      method: "post",
+      data,
+    });
+  },
+  // 修改房号
+  UpdataRoomNumAxios(Id: string, data: any) {
+    return request<any>({
+      url: `${RoomNumUrl}/room-numm/${Id}`,
+      method: "put",
+      data,
+    });
+  },
+  DeleteRoomNumAxios(Id: string) {
+    return request<any>({
+      url: `${RoomNumUrl}/room-num/${Id}`,
+      method: "delete",
     });
   },
 };
 
 export default RoomTypeAPI;
 export interface RoomTypeSeach {
+  totleCount: number;
+  totlePage: number;
+  data: [];
+}
+export interface RoomNumToRoomTypeId {
   totleCount: number;
   totlePage: number;
   data: [];
@@ -82,3 +119,12 @@ export interface RoomTypeUpdate {
     id: string;
   };
 }
+/* export interface RoomNumUpdate {
+  id: "";
+  roomTypeId: "";
+  roomNum: 0;
+  state: true;
+  order: 0;
+  description: "";
+}
+ */
