@@ -1,5 +1,5 @@
 <template>
-  <el-card class="query-card" shadow="never" style="margin-bottom: 24px">
+  <el-card class="query-card" shadow="never" style="margin-bottom: 24px; width: 100%">
     <div class="filter-card">
       <el-form :inline="true" class="filter-form" label-width="100px">
         <template v-if="isExpand">
@@ -29,8 +29,12 @@
               style="width: 180px; margin-left: 16px; height: 45px"
             >
               <el-option label="不限" value="" />
-              <el-option label="普通用户" value="normal" />
-              <el-option label="会员" value="vip" />
+              <el-option
+                v-for="item in customerTypeOptions"
+                :key="item.id"
+                :label="item.customerTypeName"
+                :value="item.id"
+              />
             </el-select>
           </div>
           <!-- 第二行label -->
@@ -55,7 +59,7 @@
               start-placeholder="开始时间"
               end-placeholder="结束时间"
               class="open-card-date"
-              style="margin-left: 20px; height: 45px"
+              style="width: 120px; margin-left: 20px; height: 45px"
               :clearable="true"
               :editable="false"
               range-separator="~"
@@ -66,7 +70,7 @@
             <div>
               <el-button>导出会员数据</el-button>
               <el-button>打标签</el-button>
-              <el-button>修改等级</el-button>
+              <el-button @click="openEditLevelDialog">修改等级</el-button>
               <el-button>冻结</el-button>
               <el-button>解冻</el-button>
               <el-button type="primary" @click="showAddDialog = true">添加客户</el-button>
@@ -111,7 +115,7 @@
           <div class="filter-row ops-row">
             <el-button>导出会员数据</el-button>
             <el-button>打标签</el-button>
-            <el-button>修改等级</el-button>
+            <el-button @click="openEditLevelDialog">修改等级</el-button>
             <el-button>冻结</el-button>
             <el-button>解冻</el-button>
             <el-button type="primary" @click="showAddDialog = true">添加客户</el-button>
@@ -124,7 +128,12 @@
 
   <el-card class="table-card" shadow="never">
     <!-- 客户信息表格 -->
-    <el-table :data="tableData" border style="width: 100%">
+    <el-table
+      :data="tableData"
+      border
+      style="width: 100%"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" width="50" />
       <el-table-column label="客户信息" width="180">
         <template #default="scope">
@@ -140,7 +149,11 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="身份等级" prop="customerTypeName" width="120" />
+      <el-table-column label="身份等级" width="120">
+        <template #default="scope">
+          {{ scope.row.customerTypeName }}
+        </template>
+      </el-table-column>
       <el-table-column label="标签" width="120">
         <template #default="">
           <el-link type="primary">添加标签</el-link>
@@ -281,13 +294,43 @@
       <el-button type="primary" @click="submitAddForm">确定</el-button>
     </template>
   </el-dialog>
+
+  <el-dialog v-model="showEditLevelDialog" title="会员等级" width="400px">
+    <el-form
+      ref="editLevelFormRef"
+      :model="editLevelForm"
+      :rules="editLevelRules"
+      label-width="100px"
+    >
+      <el-form-item label="请选择会员等级" prop="customerType" required>
+        <el-select v-model="editLevelForm.customerType" placeholder="请选择">
+          <el-option
+            v-for="item in customerTypeOptions"
+            :key="item.id"
+            :label="item.customerTypeName"
+            :value="item.id"
+          />
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="showEditLevelDialog = false">取消</el-button>
+      <el-button type="primary" @click="submitEditLevel(editLevelFormRef)">确定</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { addCustomer, getCustomerList } from "@/api/system/customer.api";
+import {
+  addCustomer,
+  getCustomerList,
+  getCustomerTypeList,
+  updateCustomerLevel,
+} from "@/api/system/customer.api";
 import { regionData } from "element-china-area-data";
 import Pagination from "@/components/Pagination/index.vue";
+import { ElMessage } from "element-plus";
 
 const customerKindGuid = {
   member: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -315,6 +358,15 @@ const filters = ref({
 
 const tableData = ref([]);
 const total = ref(0);
+
+const customerTypeOptions = ref();
+
+const fetchCustomerTypeOptions = async () => {
+  const res = await getCustomerTypeList();
+  if (res) {
+    customerTypeOptions.value = res;
+  }
+};
 
 function buildQueryParams() {
   const params = { ...filters.value };
@@ -348,7 +400,6 @@ const fetchCustomerList = async () => {
   console.log(res);
   if (res) {
     tableData.value = res.data;
-    
   }
 };
 
@@ -365,6 +416,7 @@ function handlePagination(payload: { page: number; limit: number }) {
 
 onMounted(() => {
   fetchCustomerList();
+  fetchCustomerTypeOptions();
 });
 
 const showAddDialog = ref(false);
@@ -428,6 +480,34 @@ const submitAddForm = () => {
     // TODO: 刷新客户列表
   });
 };
+
+const showEditLevelDialog = ref(false);
+const editLevelForm = ref({ customerType: "" });
+const editLevelFormRef = ref();
+const editLevelRules = {
+  customerType: [{ required: true, message: "请选择会员等级", trigger: "change" }],
+};
+const selectedCustomerIds = ref<string[]>([]);
+function handleSelectionChange(selection: any[]) {
+  selectedCustomerIds.value = selection.map((item) => item.id);
+}
+function openEditLevelDialog() {
+  if (selectedCustomerIds.value.length === 0) {
+    ElMessage.warning("请先选择要修改的客户！");
+    return;
+  }
+  editLevelForm.value.customerType = "";
+  showEditLevelDialog.value = true;
+}
+async function submitEditLevel(formRef: any) {
+  formRef.value.validate(async (valid: boolean) => {
+    if (!valid) return;
+    await updateCustomerLevel(selectedCustomerIds.value, editLevelForm.value.customerType);
+    showEditLevelDialog.value = false;
+    ElMessage.success("批量修改成功！");
+    fetchCustomerList();
+  });
+}
 </script>
 
 <style scoped>

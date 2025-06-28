@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-
+const customerTypeUrl = "/api/app/customer/custoimer-type-name";
 const DEPT_BASE_URL = "/api/v1/dept";
 
 /**
@@ -25,5 +25,33 @@ export function getCustomerList(params: any) {
     url: "/api/app/customer/customer-list",
     method: "get",
     params,
+  });
+}
+
+/**
+ * 获取客户类型列表
+ * @returns Promise
+ */
+export function getCustomerTypeList() {
+  return request({
+    url: "/api/app/customer/custoimer-type-name",
+    method: "get",
+  });
+}
+
+/**
+ * 批量修改客户等级
+ * @param ids 客户ID数组
+ * @param customerType 客户类型ID
+ * @returns Promise
+ */
+export function updateCustomerLevel(ids: string[], customerType: string) {
+  return request({
+    url: "/api/app/customer/customer",
+    method: "put",
+    data: {
+      ids,
+      customerType,
+    },
   });
 }
