@@ -105,34 +105,34 @@ export const usePermissionStore = defineStore("permission", () => {
 });
 
 /**
- * 解析后端返回的路由数据并转换为 Vue Router 兼容的路由配置
- *
- * @param rawRoutes 后端返回的原始路由数据
- * @returns 解析后的路由集合
- */
-const parseDynamicRoutes = (rawRoutes: RouteVO[]): RouteRecordRaw[] => {
-  const parsedRoutes: RouteRecordRaw[] = [];
+//  * 解析后端返回的路由数据并转换为 Vue Router 兼容的路由配置
+//  *
+//  * @param rawRoutes 后端返回的原始路由数据
+//  * @returns 解析后的路由集合
+//  */
+// const parseDynamicRoutes = (rawRoutes: RouteVO[]): RouteRecordRaw[] => {
+//   const parsedRoutes: RouteRecordRaw[] = [];
 
-  rawRoutes.forEach((route) => {
-    const normalizedRoute = { ...route } as RouteRecordRaw;
+//   rawRoutes.forEach((route) => {
+//     const normalizedRoute = { ...route } as RouteRecordRaw;
 
-    // 处理组件路径
-    normalizedRoute.component =
-      normalizedRoute.component?.toString() === "Layout"
-        ? Layout
-        : modules[`../../views/${normalizedRoute.component}.vue`] ||
-        modules["../../views/error-page/404.vue"];
+//     // 处理组件路径
+//     normalizedRoute.component =
+//       normalizedRoute.component?.toString() === "Layout"
+//         ? Layout
+//         : modules[`../../views/${normalizedRoute.component}.vue`] ||
+//         modules["../../views/error-page/404.vue"];
 
-    // 递归解析子路由
-    if (normalizedRoute.children) {
-      normalizedRoute.children = parseDynamicRoutes(route.children);
-    }
+//     // 递归解析子路由
+//     if (normalizedRoute.children) {
+//       normalizedRoute.children = parseDynamicRoutes(route.children);
+//     }
 
-    parsedRoutes.push(normalizedRoute);
-  });
+//     parsedRoutes.push(normalizedRoute);
+//   });
 
-  return parsedRoutes;
-};
+//   return parsedRoutes;
+// };
 
 /**
  * 导出此hook函数用于在非组件环境(如其他store、工具函数等)中获取权限store实例

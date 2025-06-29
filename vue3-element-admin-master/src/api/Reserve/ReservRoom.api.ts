@@ -50,13 +50,44 @@ const AuthAPI = {
       method: "put",
     });
   },
-
+  ///入住
+  ZhuRoom(data:any) {
+    return request({
+      url: `${AUTH_BASE_URL}/checkin`,
+      method: "put",
+      data
+    });
+  },
   ///预定显示
   RoomShow(data:any) {
     return request({
       url: `${AUTH_BASE_URL}/show-reserve-room`,
       method: "post",
       params:data
+    });
+  },
+
+   ///结算
+  RoomJiesuan(data:any) {
+    return request({
+      url: `${AUTH_BASE_URL}/settlement`,
+      method: "put",
+      data
+    });
+  },
+  ///反填房
+  FanRoom(id:any) {
+    return request({
+      url: `${AUTH_BASE_URL}/${id}/show-fan-reserve-room`,
+      method: "get"
+    });
+  },
+
+  ///退房
+  NoRoom(id:any) {
+    return request({
+      url: `${AUTH_BASE_URL}/${id}/no-room`,
+      method: "put"
     });
   },
 };
