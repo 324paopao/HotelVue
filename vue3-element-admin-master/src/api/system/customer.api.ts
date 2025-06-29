@@ -40,7 +40,7 @@ export function getCustomerTypeList() {
 }
 
 /**
- * 批量修改客户等级
+ * 批量修改客户等级/类型
  * @param ids 客户ID数组
  * @param customerType 客户类型ID
  * @returns Promise

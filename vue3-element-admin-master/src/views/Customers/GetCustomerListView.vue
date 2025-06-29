@@ -81,7 +81,7 @@
               <el-button>同步粉丝</el-button>
               <el-button @click="toggleExpand">收起</el-button>
               <el-button @click="onSearch">搜索</el-button>
-              <el-button>清空</el-button>
+              <el-button @click="resetFilters">清空</el-button>
             </div>
           </div>
         </template>
@@ -295,15 +295,33 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="showEditLevelDialog" title="会员等级" width="400px">
+  <el-dialog
+    v-model="showEditLevelDialog"
+    title="会员等级"
+    width="600px"
+    :close-on-click-modal="false"
+    :show-close="true"
+  >
     <el-form
       ref="editLevelFormRef"
       :model="editLevelForm"
       :rules="editLevelRules"
-      label-width="100px"
+      label-width="160px"
+      style="margin: 40px 0 20px 0; display: flex; flex-direction: column; align-items: center"
     >
-      <el-form-item label="请选择会员等级" prop="customerType" required>
-        <el-select v-model="editLevelForm.customerType" placeholder="请选择">
+      <el-form-item
+        label="请选择会员等级："
+        prop="customerType"
+        required
+        style="width: 100%; justify-content: center"
+      >
+        <el-select
+          v-model="editLevelForm.customerType"
+          placeholder="请选择"
+          style="width: 300px"
+          filterable
+          clearable
+        >
           <el-option
             v-for="item in customerTypeOptions"
             :key="item.id"
@@ -314,8 +332,10 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="showEditLevelDialog = false">取消</el-button>
-      <el-button type="primary" @click="submitEditLevel(editLevelFormRef)">确定</el-button>
+      <div class="dialog-footer center-footer">
+        <el-button @click="showEditLevelDialog = false">取消</el-button>
+        <el-button type="primary" @click="submitEditLevel(editLevelFormRef)">确定</el-button>
+      </div>
     </template>
   </el-dialog>
 </template>
@@ -360,11 +380,21 @@ const tableData = ref([]);
 const total = ref(0);
 
 const customerTypeOptions = ref();
+const selectedCustomerIds = ref<string[]>([]);
 
 const fetchCustomerTypeOptions = async () => {
   const res = await getCustomerTypeList();
   if (res) {
     customerTypeOptions.value = res;
+  }
+};
+
+const fetchCustomerList = async () => {
+  const params = buildQueryParams();
+  const res = await getCustomerList(params);
+  console.log(res);
+  if (res) {
+    tableData.value = res.data;
   }
 };
 
@@ -393,15 +423,6 @@ function buildQueryParams() {
   }
   return query;
 }
-
-const fetchCustomerList = async () => {
-  const params = buildQueryParams();
-  const res = await getCustomerList(params);
-  console.log(res);
-  if (res) {
-    tableData.value = res.data;
-  }
-};
 
 const onSearch = () => {
   pageIndex.value = 1;
@@ -487,9 +508,9 @@ const editLevelFormRef = ref();
 const editLevelRules = {
   customerType: [{ required: true, message: "请选择会员等级", trigger: "change" }],
 };
-const selectedCustomerIds = ref<string[]>([]);
 function handleSelectionChange(selection: any[]) {
   selectedCustomerIds.value = selection.map((item) => item.id);
+  console.log("handleSelectionChange", selection, selectedCustomerIds.value);
 }
 function openEditLevelDialog() {
   if (selectedCustomerIds.value.length === 0) {
@@ -500,14 +521,49 @@ function openEditLevelDialog() {
   showEditLevelDialog.value = true;
 }
 async function submitEditLevel(formRef: any) {
+  console.log(
+    "submitEditLevel called",
+    formRef,
+    selectedCustomerIds.value,
+    editLevelForm.value.customerType
+  );
+  if (!formRef || !formRef.value) return;
+  if (selectedCustomerIds.value.length === 0) {
+    ElMessage.warning("请先选择要修改的客户！");
+    return;
+  }
   formRef.value.validate(async (valid: boolean) => {
-    if (!valid) return;
+    console.log("form validate result", valid);
+    if (!valid) {
+      ElMessage.warning("请完整选择等级后再提交！");
+      return;
+    }
+    console.log(
+      "calling updateCustomerLevel",
+      selectedCustomerIds.value,
+      editLevelForm.value.customerType
+    );
     await updateCustomerLevel(selectedCustomerIds.value, editLevelForm.value.customerType);
     showEditLevelDialog.value = false;
     ElMessage.success("批量修改成功！");
     fetchCustomerList();
   });
 }
+
+const resetFilters = () => {
+  filters.value = {
+    CustomerNickName: "",
+    CustomerType: "",
+    CustomerName: "",
+    PhoneNumber: "",
+    Gender: "",
+    openCardTime: [],
+    infoType: "phone",
+    infoValue: "",
+  };
+  pageIndex.value = 1;
+  fetchCustomerList();
+};
 </script>
 
 <style scoped>
@@ -713,5 +769,35 @@ async function submitEditLevel(formRef: any) {
   height: 45px !important;
   line-height: 45px !important;
   font-size: 16px;
+}
+.dialog-footer.center-footer {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  padding-right: 0;
+}
+.dialog-footer .el-button + .el-button {
+  margin-left: 12px;
+}
+.dialog-footer .el-button {
+  min-width: 80px;
+  height: 36px;
+  font-size: 16px;
+}
+.el-dialog__title {
+  font-weight: bold;
+  font-size: 18px;
+}
+.el-form-item__label {
+  font-size: 16px;
+}
+.el-select {
+  font-size: 16px;
+}
+::v-deep(.el-dialog) {
+  margin: auto !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
 }
 </style>
