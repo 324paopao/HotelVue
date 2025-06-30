@@ -37,6 +37,23 @@
             <span>预定详情 </span>
           </el-menu-item>
         </el-sub-menu>
+         <el-sub-menu index="/She">
+          <template #title>
+            <el-icon>
+              <Setting />
+            </el-icon>
+            <span>设置</span>
+          </template>
+          <el-menu-item index="/accountview">
+            <span>账户管理</span>
+          </el-menu-item>
+          <el-menu-item index="">
+            <span>角色管理</span>
+          </el-menu-item>
+          <el-menu-item index="">
+            <span>操作日志</span>
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-col>
   </div>
