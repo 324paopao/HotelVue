@@ -30,12 +30,41 @@
             </el-icon>
             <span>预定列表 </span>
           </el-menu-item>
+
           <el-menu-item index="/ReserverDetails">
             <el-icon>
               <Setting />
             </el-icon>
             <span>预定详情 </span>
           </el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="2">
+          <template #title>
+            <el-icon>
+              <Location />
+            </el-icon>
+            <span>订单</span>
+          </template>
+          <el-menu-item index="/Orderlist">
+            <el-icon>
+              <Setting />
+            </el-icon>
+            <span>订房订单 </span>
+          </el-menu-item>
+          <el-menu-item index="/ReserveRoomList">
+            <el-icon>
+              <Document />
+            </el-icon>
+            <span>预定</span>
+          </el-menu-item>
+          <el-menu-item index="/ReserverGetlist">
+            <el-icon>
+              <Setting />
+            </el-icon>
+            <span>预定列表 </span>
+          </el-menu-item>
+
+
         </el-sub-menu>
       </el-menu>
     </el-col>
