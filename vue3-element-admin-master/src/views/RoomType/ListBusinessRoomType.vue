@@ -9,7 +9,7 @@
           margin-bottom: 16px;
         "
       >
-        <div>
+  <div>
           <el-button type="primary" @click="drawerVisible = true">新增房型</el-button>
           <el-button :disabled="multipleSelection.length === 0" @click="handleBatchDelete">
             批量删除
@@ -258,6 +258,7 @@
             <el-link type="danger" style="margin-left: 8px" @click="DeleteRoomNum(scope.row.id)">
               删除
             </el-link>
+            
           </template>
         </el-table-column>
       </el-table>
@@ -274,7 +275,7 @@
     </el-dialog>
 
     <!-- 新增房号弹窗 -->
-    <el-dialog v-model="addRoomNumDialogVisible" title="新增房号" width="500px">
+    <el-dialog v-model="addRoomNumDialogVisible" :title="dialogTitle" width="500px">
       <el-form :model="addRoomNumForm" label-width="80px">
         <el-form-item label="房号" required>
           <el-input v-model="addRoomNumForm.roomNum" maxlength="10" />
@@ -308,24 +309,21 @@ onMounted(() => {
   GetListRoomType();
 });
 
+//删除房号
 function DeleteRoomNum(Row: any) {
   ElMessageBox.confirm("确认删除已选中的数据项?", "警告", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(
-    async () => {
-      // 删除逻辑
-      await RoomTypeAPI.DeleteRoomNumAxios(Row).then((res: any) => {
-        if (res != null) {
-          ElMessage.success("删除成功");
-          getRoomNumList();
-        }
-      });
-        }
-
-
-  );
+  }).then(async () => {
+    // 删除逻辑
+    await RoomTypeAPI.DeleteRoomNumAxios(Row).then((res: any) => {
+      if (res != null) {
+        ElMessage.success("删除成功");
+        getRoomNumList();
+      }
+    });
+  });
 }
 
 // 新增房号弹窗相关
@@ -338,12 +336,14 @@ const addRoomNumForm = reactive({
   order: 0,
   description: "",
 });
+const dialogTitle = ref("新增房号");
 function openAddRoomNumDialog() {
   addRoomNumForm.roomNum = 0;
   addRoomNumForm.order = 0;
   addRoomNumForm.description = "";
   addRoomNumForm.state = true;
   addRoomNumDialogVisible.value = true;
+  dialogTitle.value = "新增房号";
 }
 function UpdataRoomNum(row: any) {
   Object.assign(addRoomNumForm, row);
@@ -351,8 +351,8 @@ function UpdataRoomNum(row: any) {
     addRoomNumForm.state = true;
   }
   numid = row.id;
-
   addRoomNumDialogVisible.value = true;
+  dialogTitle.value = "修改房号";
 }
 
 async function submitAddRoomNum() {
@@ -496,6 +496,7 @@ async function submitForm() {
   if (editId == "") {
     res = await RoomTypeAPI.AddRoomTypeAxios(form);
   } else {
+    console.log("form", form);
     res = await RoomTypeAPI.UpdataRoomTypeAxios(editId, {
       ...form,
       id: editId,

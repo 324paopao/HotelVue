@@ -1,12 +1,20 @@
 import request from "@/utils/request";
 const RoomTypeUrl = "/api/app/room-type";
 const RoomNumUrl = "/api/app/room-numm-services";
-
+const RoomNumServicesUrl = "/api/app/reserve-room-server";
 const RoomTypeAPI = {
-  /** 获取房型列表 */
+  /** 获取房型列表加分页条件 */
   GetRoomTypeAxios(Query: any) {
     return request<any, RoomTypeSeach>({
       url: `${RoomTypeUrl}/show`,
+      method: "get",
+      params: Query,
+    });
+  },
+  /** 获取房型列表 */
+  GetRoomTypeListAxios(Query: any) {
+    return request<any, RoomTypeSeach>({
+      url: `${RoomNumServicesUrl}/room-types-list`,
       method: "get",
       params: Query,
     });
@@ -58,6 +66,14 @@ const RoomTypeAPI = {
       params: Query,
     });
   },
+  // 获取房号列表
+  GetRoomNumAxios(data: any) {
+    return request<any>({
+      url: `${RoomNumUrl}/room-num-list`,
+      method: "get",
+      params: data,
+    });
+  },
 
   // 添加房号
   AddRoomNumAxios(data: any) {
@@ -75,10 +91,37 @@ const RoomTypeAPI = {
       data,
     });
   },
+  // 删除房号
   DeleteRoomNumAxios(Id: string) {
     return request<any>({
       url: `${RoomNumUrl}/room-num/${Id}`,
       method: "delete",
+    });
+  },
+  // 修改房号状态(上架下架)
+  UpdataRoomNumStateAxios(Id: string, data: any) {
+    return request<any>({
+      url: `${RoomNumUrl}/${Id}/state-to-room-num`,
+      method: "put",
+      params: data,
+    });
+  },
+  // 批量删除房号
+  BatchDeleteRoomNumAxios(ids: string[]) {
+    const paramas = ids.map((id) => `ids=${id}`).join("&");
+    return request<any>({
+      url: `${RoomNumUrl}/room-num-batch?${paramas}`,
+      method: "delete",
+      params: ids,
+    });
+  },
+  // 批量上下架房号
+  BatchUpdateRoomNumStateAxios(ids: string[], state: boolean) {
+    return request<any>({
+      url: `${RoomNumUrl}/state-to-room-num-batch?state=${state}`,
+      method: "put",
+      data: ids,
+      headers: { "Content-Type": "application/json" },
     });
   },
 };
