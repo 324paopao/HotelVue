@@ -70,7 +70,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         meta: { title: "静态页面" },
       },
       {
-        path: "listroomtype",
+        path: "/listroomtype",
         name: "listroomtype",
         component: () => import("@/views/RoomType/ListRoomType.vue"),
         meta: { title: "房态列表", icon: "user", hidden: true },
@@ -87,9 +87,28 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/RoomType/ListRoomState.vue"),
         meta: { title: "房态", icon: "user", hidden: true },
       },
+      {
+        path: "/ReserveRoomList",
+        name: "ReserveRoomList",
+        component: () => import("@/views/ReserveRoomList.vue"),
+        meta: { title: "办理预订", icon: "user", hidden: true },
+      },
+      {
+        path: "/ReserverGetlist",
+        name: "ReserverGetlist",
+        component: () => import("@/views/ReserverGetlist.vue"),
+        meta: { title: "预订订单", icon: "user", hidden: true },
+      },
+      {
+        path: "ReserverDetails",
+        name: "ReserverDetails",
+        component: () => import("@/views/ReserverDetails.vue"),
+        meta: { title: "订单详情", icon: "user", hidden: true },
+      },
     ],
   },
 ];
+
 
 /**
  * 创建路由
