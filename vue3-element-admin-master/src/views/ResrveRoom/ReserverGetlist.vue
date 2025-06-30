@@ -73,7 +73,7 @@
           <el-link v-if="scope.row.status === 0 && scope.row.status != 5" type="primary" style="margin-left: 8px;"
             @click="NoReseRoom(scope.row.id)">取消预订</el-link>
 
-          <el-link type="primary" style="margin-left: 8px;" @click="Xiangqing(scope.row.id)">详情</el-link>
+          <el-link type="primary" style="margin-left: 8px;" @click="Detail(scope.row.id)">详情</el-link>
 
           <el-link v-if="scope.row.status != 0 && scope.row.status <= 1" type="warning" style="margin-left: 8px;"
             @click="TuiFang(scope.row)">退房</el-link>
@@ -482,7 +482,7 @@ async function handleJiesuanConfirm() {
 }
 
 //详情
-const Xiangqing = (id: any) => {
+const Detail = (id: any) => {
   router.push({
     path: '/ReserverDetails',
     query: {
