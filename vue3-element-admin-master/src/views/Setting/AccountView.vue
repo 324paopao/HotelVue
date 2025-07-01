@@ -12,7 +12,7 @@
       <el-card>
         <el-row>
           <el-col :span="12">
-            <el-button @click="AddAccount()">新增子账号</el-button>
+            <el-button size="large" @click="AddAccount()">新增子账号</el-button>
             <!-- 新增对话框 -->
             <el-dialog v-model="dialogVisible" :title="title" width="500">
               <span>
@@ -117,7 +117,8 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-input v-model="searchInput" :placeholder="searchType === 'mobile' ? '请输入手机号' : '请输入姓名'"
+            <el-input 
+            v-model="searchInput" :placeholder="searchType === 'mobile' ? '请输入手机号' : '请输入姓名'"
               style="width: 200px; margin-left: 10px;" clearable />
             <el-button type="primary" style="margin-left: 10px;" @click="handleSearch">查询</el-button>
           </el-col>
@@ -144,13 +145,15 @@
             <el-table-column label="操作" align="center">
               <template #default="scope">
                 <span style="color: #409EFF; cursor: pointer;" @click="handleEdit(scope.row)">编辑</span>&nbsp;&nbsp;
-                <span style="color: #409EFF; cursor: pointer;"
-                  @click="handlePermission(scope.row)">权限明细</span>&nbsp;&nbsp;
+                <span 
+                style="color: #409EFF; cursor: pointer;"
+                @click="handlePermission(scope.row)">权限明细</span>&nbsp;&nbsp;
                 <span style="color: #409EFF; cursor: pointer;" @click="handleDelete(scope.row.id)">删除</span>
               </template>
             </el-table-column>
           </el-table>
         </el-card>
+
         <!-- 权限明细 -->
         <el-dialog v-model="permissionDialogVisible" title="权限明细" width="800">
           <div v-if="permissionDetail && permissionDetail.length">
@@ -197,6 +200,35 @@
             <el-button type="primary" @click="handleWriteoffConfirm">确定</el-button>
           </template>
         </el-dialog>
+        <!-- 分页 -->
+        <el-card>
+          <table>
+            <tbody>
+              <tr>
+                <td><el-pagination 
+                  v-model:current-page="page.PageIndex" v-model:page-size="page.PageSize"
+                    :page-sizes="[10, 20, 30, 40]" :background="true" layout="total,slot, sizes"
+                    :total="page.totleCount" prev-text="上一页" next-text="下一页">
+                    ,每页{{ page.PageSize }}条,当前{{ page.PageIndex }}/{{ page.totlePage }}页
+                  </el-pagination></td>
+                <td><el-pagination 
+                  v-model:current-page="page.PageIndex" v-model:page-size="page.PageSize"
+                    :page-sizes="[10, 20, 30, 40]" :background="true" layout="slot, prev, pager, next"
+                    :total="page.totleCount" prev-text="上一页" next-text="下一页">
+                    <el-button :disabled="page.PageIndex == 1" @click="page.PageIndex = 1">首页</el-button>
+                  </el-pagination></td>
+                <td><el-pagination 
+                  v-model:current-page="page.PageIndex" v-model:page-size="page.PageSize"
+                    :page-sizes="[10, 20, 30, 40]" :background="true" layout="slot, jumper" :total="page.totleCount"
+                    prev-text="上一页" next-text="下一页">
+                    <el-button 
+                    :disabled="page.PageIndex == page.totlePage"
+                    @click="page.PageIndex = page.totlePage">尾页</el-button>
+                  </el-pagination></td>
+              </tr>
+            </tbody>
+          </table>
+        </el-card>
       </el-card>
     </div>
   </el-card>
@@ -205,14 +237,14 @@
 <script setup lang="ts">
 import PermissionNode from './PermissionNode.vue'
 import { ArrowDown } from '@element-plus/icons-vue'
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive,watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import RoleAPI from '@/api/Setting/role.api'
 import AccountAPI from '@/api/Setting/account.api'
 import moment from 'moment'
 const writeoffDialogVisible = ref(false)
 const permissionDialogVisible = ref(false)
-const permissionDetail = ref<any[]>([])
+const permissionDetail = ref<any>([])
 const dialogVisible = ref(false)
 const roleDialogVisible = ref(false)
 const selectedRoles = ref<{ id: number; roleName: string }[]>([]); // 存储多选结果
@@ -481,9 +513,16 @@ function getAccountList() {
   })
   AccountAPI.getAccountList(params).then(res => {
     tableData.value = res.data
+    page.totleCount = res.totleCount
+    page.totlePage = res.totlePage
     console.log("user", res.data)
   })
 }
+
+watch(page,()=>{
+  getAccountList()
+})
+
 //#endregion
 
 //#region 删除

@@ -93,17 +93,21 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/ReserverDetails.vue"),
         meta: { title: "订单详情", icon: "user", hidden: true },
       },
-       {
+      {
         path: "accountview",
         name: "accountview",
         component: () => import("@/views/Setting/AccountView.vue"),
         meta: { title: "账号管理", icon: "user", hidden: true },
       },
-
+      {
+        path: "roleview",
+        name: "roleview",
+        component: () => import("@/views/Setting/RoleView.vue"),
+        meta: { title: "角色管理", icon: "user", hidden: true },
+      },
     ],
   },
 ];
-
 
 /**
  * 创建路由

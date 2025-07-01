@@ -16,6 +16,39 @@ export const RoleAPI ={
       method:'get',
       params:data
     })
+  },
+  getPermissionTree(){
+    return request({
+      url:`${Role_BASE_URL}/permission-tree`,
+      method:'get'
+    })
+  },
+  addRole(data:any){
+    return request({
+      url:`${Role_BASE_URL}/role`,
+      method:'post',
+      data
+    })
+  },
+  deleteRole(data:any){
+    return request({
+      url:`${Role_BASE_URL}/del-role/${data}`,
+      method:'delete',
+    })
+  },
+  updateRole(id:string,data:any){
+    return request({
+      url:`${Role_BASE_URL}/role/${id}`,
+      method:'put',
+      data
+    })
+  },
+  deleteRange(ids:any){
+    return request({
+      url:`${Role_BASE_URL}/range`,
+      method:'delete',
+      params:ids
+    })
   }
 }
 
