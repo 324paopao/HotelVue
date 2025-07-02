@@ -45,10 +45,11 @@ const AuthAPI = {
   },
 
   /** 获取验证码接口*/
-  getCaptcha() {
-    return request<any, CaptchaInfo>({
-      url: `${AUTH_BASE_URL}/Captcha`,
+  async getCaptcha (id:any) {
+    return request<any, Blob>({
+      url: `${AUTH_BASE_URL}/${id}/captcha`,
       method: "get",
+      responseType: "blob" // 关键点：加上这一行
     });
   },
 };
