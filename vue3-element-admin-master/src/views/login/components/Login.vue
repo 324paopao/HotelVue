@@ -131,6 +131,10 @@ const router = useRouter();
 //const route = useRoute();
 
 //import { useUserStore } from "@/store";
+const route = useRoute();
+import { useStore } from "@/store/Usertinfo";
+const store = useStore();
+import { useUserStore } from "@/store";
 import CommonWrapper from "@/components/CommonWrapper/index.vue";
 import { Auth } from "@/utils/auth";
 import { ArrowDown } from '@element-plus/icons-vue';
@@ -257,6 +261,17 @@ async function handleLoginSubmit() {
     counterStore.userInfo.nickName = res.nickName;
     console.log("登录成功:", res);
     ElMessage.success("登录成功");
+
+    await userStore.login(loginFormData.value);
+    localStorage.setItem('id', res.accessToken)
+    store.accessToken = res.accessToken,
+      store.expiresIn = res.expiresIn,
+      store.id = res.id,
+      store.nickName = res.nickName
+    store.refreshToken = res.refreshToken
+    store.tokenType = res.tokenType
+    store.userName = res.userName
+
 
     // 菜单数据格式转换函数
     function convertMenuData(data: any[]): any[] {

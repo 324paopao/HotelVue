@@ -9,13 +9,13 @@
       <div class="section-title">预订信息</div>
       <el-form :model="form" label-width="200px" :inline="true">
         <el-form-item label="客源信息" required>
-          <el-select v-model="form.infomation" placeholder="请选择" style="width: 120px;">
+          <el-select v-model="form.infomation" placeholder="请选择" style="width: 120px">
             <el-option label="散客" value="散客" />
             <el-option label="协议单位" value="协议单位" />
           </el-select>
         </el-form-item>
         <el-form-item label="订单来源" required>
-          <el-select v-model="form.ordersource" placeholder="门店前台" style="width: 120px;">
+          <el-select v-model="form.ordersource" placeholder="门店前台" style="width: 120px">
             <el-option label="门店前台" value="门店前台" />
             <el-option label="OTA" value="OTA" />
           </el-select>
@@ -49,7 +49,12 @@
         </el-form-item>
       </el-form>
       <div class="room-table-wrapper">
-        <el-table :data="roomTypes" border style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table
+          :data="roomTypes"
+          border
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+        >
           <el-table-column type="selection" width="50" />
           <el-table-column prop="name" label="房型列表" />
           <el-table-column prop="canReserve" label="可定数" />
@@ -59,13 +64,8 @@
             {{ 1 }}
           </el-table-column>
 
-
           <el-table-column prop="sort" label="排序">
-
-            <div v-if='form.roomNum = ""'>
-              未排房
-
-            </div>
+            <div v-if="form.roomNum = ''">未排房</div>
             <div v-else>
               {{ form.roomNum }}
             </div>
@@ -107,12 +107,19 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from "vue";
 import AuthAPI from "@/api/Reserve/ReservRoom.api";
+
+import { useRouter } from "vue-router";
+
+import { random } from "lodash-es";
+import { useStore } from '@/store/Usertinfo';
+const store = useStore()
+
 const form = reactive({
   infomation: "",
   ordersource: "",
   reserveName: "",
   phone: "",
-  bookingNumber: "",
+  bookingNumber: Date.now() + Math.random().toString(36).substr(2, 9),
   sdate: "",
   edate: "",
   day: 0,
@@ -123,10 +130,14 @@ const form = reactive({
   roomNum: "",
   message: "",
   idCard: "",
-  aaa: []
+  aaa: [],
+  userid: store.id,
+
+
 });
 
 const roomTypes = ref();
+const router = useRouter();
 
 onMounted(() => {
   load();
@@ -150,16 +161,16 @@ watch(
 const selectedRows = ref([]);
 function handleSelectionChange(selection: any) {
   form.aaa = selection;
-  // 你可以在这里做其它操作，比如 
-  console.log("1213", form.aaa)
+  // 你可以在这里做其它操作，比如
+  console.log("1213", form.aaa);
 }
-
 
 const save = () => {
-  const res = AuthAPI.RoomAdd(form)
-  console.log("qweqw", res)
+  const res = AuthAPI.RoomAdd(form);
+  console.log("qweqw", res);
   ElMessage.success("添加成功");
-}
+  router.push("/listRoomState");
+};
 </script>
 
 <style scoped>
