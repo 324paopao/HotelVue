@@ -54,7 +54,16 @@
     <el-table :data="tableData" style="width: 100%; margin-top: 20px;">
       <el-table-column prop="roomNum" label="房号" width="100" />
       <el-table-column prop="roomTypeName" label="房型" width="120" />
-      <el-table-column prop="status" label="状态" width="120" />
+      <el-table-column prop="status" label="状态" width="120">
+        <template #default="scope">
+          <el-tag v-if="scope.row.status === 0" type="success">待入住</el-tag>
+          <el-tag v-if="scope.row.status === 1" type="warning">入住中</el-tag>
+          <el-tag v-if="scope.row.status === 2" type="danger">已退房</el-tag>
+          <el-tag v-if="scope.row.status === 3" type="success">已结算</el-tag>
+          <el-tag v-if="scope.row.status === 4" type="warning">超时未入住</el-tag>
+          <el-tag v-if="scope.row.status === 5" type="danger">已取消</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="reserveName" label="客人姓名" width="120" />
       <el-table-column prop="sdate" label="(预)抵店时间" width="180" />
       <el-table-column prop="edate" label="(预)离店时间" width="180" />
@@ -228,6 +237,8 @@
 <script setup lang="ts">
 import AuthAPI from '@/api/Reserve/ReservRoom.api';
 import router from '@/router';
+import { useStore } from '@/store/Usertinfo';
+const store = useStore()
 import moment from 'moment';
 import { ref, reactive } from 'vue';
 const searchType = ref('');
@@ -285,7 +296,8 @@ const form = reactive({
   rid: '',
   name: '',
   num: '',
-  NoReservRoom: ''
+  NoReservRoom: '',
+  Userid: store.id
 
 })
 const PaiFang = (name: any, id: any, rid: any) => {
@@ -303,7 +315,7 @@ const Paiload = async () => {
   //roomList.list = res;
 }
 const Queding = async () => {
-  const params = { roomnum: form.num, id: form.rid }
+  const params = { roomnum: form.num, id: form.rid, userid: store.id }
   const res = await AuthAPI.RoomOrderby(params)
   console.log("12121212", res)
   ElMessage.success("排房成功");
@@ -324,7 +336,7 @@ const NoReseRoom = (id: any) => {
 }
 //取消预订
 const Notressave = async () => {
-  const params = { NoReservRoom: form.NoReservRoom, id: form.rid }
+  const params = { NoReservRoom: form.NoReservRoom, id: form.rid, userid: store.id }
   await AuthAPI.NotReserveRoom(params);
   ElMessage.success("取消预定成功");
   form.NoReservRoom = "";
@@ -340,7 +352,8 @@ const fromroom: any = reactive({
   phone: "",
   reserveName: '',
   idCard: "",
-  typ: ''
+  typ: '',
+  userid: store.id
 })
 const Ruzhu = (Row: any) => {
   dialogFormV.value = true;
@@ -366,7 +379,8 @@ const Queren = async () => {
     roomNum: fromroom.roomNum,
     phone: fromroom.phone,
     reserveName: fromroom.reserveName,
-    idCard: fromroom.idCard
+    idCard: fromroom.idCard,
+    userid: store.id
   }
   console.log("1213123123", params)
   await AuthAPI.ZhuRoom(params);
