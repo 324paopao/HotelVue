@@ -55,3 +55,101 @@ export function updateCustomerLevel(ids: string[], customerType: string) {
     },
   });
 }
+
+/**
+ * 导出客户数据
+ * @param params 查询参数（筛选条件等）
+ * @returns Promise 文件下载流
+ */
+export function exportCustomerData(params?: any) {
+  return request({
+    url: "/api/app/customer/export-all-customers",
+    method: "post",
+    data: params,
+    responseType: "blob",
+  });
+}
+
+/**
+ * 创建标签
+ * @param data 标签数据对象
+ * @returns Promise
+ */
+export function createTag(data: any) {
+  return request({
+    url: "/api/app/label/label",
+    method: "post",
+    data,
+  });
+}
+
+/**
+ * 获取标签列表
+ * @param params 查询参数（分页、筛选等）
+ * @returns Promise
+ */
+export function getTagList(params?: any) {
+  return request({
+    url: "/api/app/label/label-list",
+    method: "get",
+    params,
+  });
+}
+
+/**
+ * 获取标签详情
+ * @param id 标签ID
+ * @returns Promise
+ */
+export function getTagDetail(id: string) {
+  return request({
+    url: `/api/app/label/label/${id}`,
+    method: "get",
+  });
+}
+
+/**
+ * 更新标签
+ * @param id 标签ID
+ * @param data 标签数据
+ * @returns Promise
+ */
+export function updateTag(id: string, data: any) {
+  return request({
+    url: `/api/app/label/label/${id}`,
+    method: "put",
+    data,
+  });
+}
+
+/**
+ * 删除标签
+ * @param id 标签ID
+ * @returns Promise
+ */
+export function deleteTag(id: string) {
+  return request({
+    url: `/api/app/label/label/${id}`,
+    method: "delete",
+  });
+}
+
+/**
+ * 获取标签下的客户列表
+ * @param params 查询参数
+ * @returns Promise
+ *
+ * 请求参数格式:
+ * {
+ *   PageIndex: number;      // 页码，默认1
+ *   PageSize: number;       // 每页数量，默认10
+ *   LabelName?: string;     // 标签名称（可选）
+ * }
+ */
+export function getLabelCustomerList(params: any) {
+  return request({
+    url: "/api/app/label/customer-list",
+    method: "get",
+    params,
+  });
+}

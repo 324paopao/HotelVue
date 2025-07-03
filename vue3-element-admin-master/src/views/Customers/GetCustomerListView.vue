@@ -68,16 +68,16 @@
           <!-- 按钮区 -->
           <div class="filter-row flex-row" style="margin-top: 8px">
             <div>
-              <el-button>导出会员数据</el-button>
+              <el-button @click="handleExportCustomers">导出客户数据</el-button>
               <el-button>打标签</el-button>
               <el-button @click="openEditLevelDialog">修改等级</el-button>
               <el-button>冻结</el-button>
               <el-button>解冻</el-button>
               <el-button type="primary" @click="showAddDialog = true">添加客户</el-button>
-              <el-button>导入客户</el-button>
+              <el-button>导入客户数据</el-button>
             </div>
             <div class="flex-row-right">
-              <el-button>标签管理</el-button>
+              <el-button @click="goToTagManagement">标签管理</el-button>
               <el-button>同步粉丝</el-button>
               <el-button @click="toggleExpand">收起</el-button>
               <el-button @click="onSearch">搜索</el-button>
@@ -108,18 +108,18 @@
               <el-button class="expand-btn" @click="toggleExpand">展开</el-button>
             </div>
             <div class="flex-row-right">
-              <el-button>标签管理</el-button>
+              <el-button @click="goToTagManagement">标签管理</el-button>
               <el-button>同步粉丝</el-button>
             </div>
           </div>
           <div class="filter-row ops-row">
-            <el-button>导出会员数据</el-button>
+            <el-button @click="handleExportCustomers">导出客户数据</el-button>
             <el-button>打标签</el-button>
             <el-button @click="openEditLevelDialog">修改等级</el-button>
             <el-button>冻结</el-button>
             <el-button>解冻</el-button>
             <el-button type="primary" @click="showAddDialog = true">添加客户</el-button>
-            <el-button>导入客户</el-button>
+            <el-button>导入客户数据</el-button>
           </div>
         </template>
       </el-form>
@@ -140,7 +140,7 @@
           <div style="display: flex; align-items: center">
             <el-avatar :size="40" :src="scope.row.avatar" />
             <div style="margin-left: 8px">
-              <div>昵称：{{ scope.row.CustomerNickName || "--" }}</div>
+              <div>昵称：{{ scope.row.customerNickName || "--" }}</div>
               <div>
                 姓名：
                 <b>{{ scope.row.customerName }}</b>
@@ -347,10 +347,14 @@ import {
   getCustomerList,
   getCustomerTypeList,
   updateCustomerLevel,
+  exportCustomerData,
 } from "@/api/system/customer.api";
 import { regionData } from "element-china-area-data";
 import Pagination from "@/components/Pagination/index.vue";
 import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const customerKindGuid = {
   member: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -558,6 +562,78 @@ const resetFilters = () => {
   };
   pageIndex.value = 1;
   fetchCustomerList();
+};
+
+/**
+ * 导出客户数据功能
+ * 根据当前筛选条件导出客户数据到Excel文件
+ * 1. 获取当前筛选参数
+ * 2. 调用后端API导出数据
+ * 3. 将响应转换为Blob对象并创建下载链接
+ * 4. 触发文件下载并提供用户反馈
+ */
+const handleExportCustomers = async () => {
+  try {
+    // 构建与当前列表查询相同的筛选参数
+    const params = buildQueryParams();
+
+    // 调用API获取文件数据流
+    const response = await exportCustomerData(params);
+
+    // 关闭加载提示
+
+    // 验证响应数据
+    if (!response.data) {
+      ElMessage.error("导出失败：未获取到数据");
+      return;
+    }
+
+    // 生成包含日期的文件名
+    const date = new Date();
+    const dateString = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, "0")}${date.getDate().toString().padStart(2, "0")}`;
+    const timeString = `${date.getHours().toString().padStart(2, "0")}${date.getMinutes().toString().padStart(2, "0")}`;
+    const filename = `客户数据_${dateString}_${timeString}.xlsx`;
+
+    // 将响应数据转换为Excel文件blob对象
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    // 下载文件
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    // 显示成功消息，添加文件名提示
+    ElMessage.success(`导出成功，文件名：${filename}`);
+  } catch (error: any) {
+    // 错误处理与反馈
+    console.error("导出客户数据失败", error);
+
+    // 更详细的错误提示
+    if (error.response) {
+      // 服务器返回错误状态码
+      ElMessage.error(`导出失败：服务器返回 ${error.response.status} 错误`);
+    } else if (error.request) {
+      // 请求发送但没有收到响应
+      ElMessage.error("导出失败：服务器无响应，请检查网络连接");
+    } else {
+      // 请求配置出错
+      ElMessage.error(`导出失败：${error.message || "未知错误"}`);
+    }
+  }
+};
+
+/**
+ * 跳转到标签管理页面
+ */
+const goToTagManagement = () => {
+  router.push("/customers/tags-management");
 };
 </script>
 

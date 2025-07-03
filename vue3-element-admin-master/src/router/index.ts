@@ -81,6 +81,18 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/Customers/GetCustomerListView.vue"),
         meta: { title: "客户列表", icon: "user", hidden: true },
       },
+      {
+        path: "customers/tags-management",
+        name: "CustomerTagsManagement",
+        component: () => import("@/views/Customers/CustomerTagsManagement.vue"),
+        meta: { title: "标签管理", icon: "user", hidden: true },
+      },
+      {
+        path: "customers/tag-edit",
+        name: "CustomerTagEdit",
+        component: () => import("@/views/Customers/CustomerTagEdit.vue"),
+        meta: { title: "创建标签", icon: "user", hidden: true },
+      },
     ],
   },
 ];
