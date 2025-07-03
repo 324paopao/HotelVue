@@ -45,7 +45,12 @@
       <el-table-column prop="roomNum" label="房号" width="100" />
       <el-table-column prop="roomTypeName" label="房型" width="120" />
       <el-table-column prop="price" label="价钱" width="120" />
-      <el-table-column prop="payStatus" label="状态" width="120" />
+      <el-table-column prop="payStatus" label="状态" width="120">
+        <template #default="scope">
+          <el-tag v-if="scope.row.payStatus == 0" type="success">待支付</el-tag>
+          <el-tag v-if="scope.row.payStatus == 1" type="warning">已支付</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="reserveName" label="客人姓名" width="120" />
       <el-table-column prop="sdate" label="(预)抵店时间" width="180" />
       <el-table-column prop="edate" label="(预)离店时间" width="180" />
@@ -70,8 +75,9 @@
 
 <script setup lang="ts">
 
-import AuthAPI1 from '@/api/Reserve/PayMoneey.api';
+//import AuthAPI1 from '@/api/Reserve/PayMoneey.api';
 import AuthAPI from '@/api/Reserve/ReservRoom.api';
+import axios from 'axios';
 import { ref, reactive } from 'vue';
 const searchType = ref('');
 const tableData = ref()
@@ -118,13 +124,28 @@ async function load() {
 //   subject: '酒店预定支付'
 // })
 const zhifu = async (row: any) => {
-  const params = {
-    orderNo: row.id,
+  const params1 = {
+    orderId: row.id,
     amount: row.price,
     subject: '酒店预定支付'
   }
-  const res = await AuthAPI1.paymoney(params)
-  console.log("支付", res)
+  console.log("1111", row)
+  console.log("12121", params1)
+  axios.post('https://localhost:44384/api/alipay/pay', null, { params: params1 })
+    //const res = await AuthAPI1.paymoney(params)
+    .then(async res => {
+      console.log("支付", res.data)
+      document.write(res.data);
+      // const html = await res.data
+      // const div = document.createElement('div')
+      // div.innerHTML = html
+      // document.body.appendChild(div)
+    })
+
+
+
+  // // 创建一个临时 DOM 元素用于插入 HTML 表单
+
 }
 
 

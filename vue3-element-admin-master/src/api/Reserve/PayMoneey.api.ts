@@ -1,13 +1,13 @@
 import request from "@/utils/request";
 
-const AUTH_BASE_URL = "/api/app/alipay";
+const AUTH_BASE_URL = "/api/alipay";
 
 const AuthAPI1 = {
 
   ///支付
   paymoney(data: any) {
     return request({
-      url: `${AUTH_BASE_URL}/payment`,
+      url: `${AUTH_BASE_URL}/pay`,
       method: "post",
       params: data
     });
