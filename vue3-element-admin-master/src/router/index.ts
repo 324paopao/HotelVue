@@ -73,7 +73,19 @@ export const constantRoutes: RouteRecordRaw[] = [
         path: "/listroomtype",
         name: "listroomtype",
         component: () => import("@/views/RoomType/ListRoomType.vue"),
-        meta: { title: "我的通知", icon: "user", hidden: true },
+        meta: { title: "房态列表", icon: "user", hidden: true },
+      },
+      {
+        path: "businessRoomtype",
+        name: "businessRoomtype",
+        component: () => import("@/views/RoomType/ListBusinessRoomType.vue"),
+        meta: { title: "业务-房型管理-房型设置", icon: "user", hidden: true },
+      },
+      {
+        path: "listRoomState",
+        name: "listRoomState",
+        component: () => import("@/views/RoomType/ListRoomState.vue"),
+        meta: { title: "房态", icon: "user", hidden: true },
       },
       {
         path: "/ReserveRoomList",
