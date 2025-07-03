@@ -105,6 +105,12 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/Setting/RoleView.vue"),
         meta: { title: "角色管理", icon: "user", hidden: true },
       },
+      {
+        path: "operationlog",
+        name: "operationlog",
+        component: () => import("@/views/Setting/OperationLog.vue"),
+        meta: { title: "操作日志管理", icon: "user", hidden: true },
+      },
     ],
   },
 ];

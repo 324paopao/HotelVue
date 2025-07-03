@@ -355,7 +355,7 @@ defineOptions({
 
 import { dayjs } from "element-plus";
 import LogAPI, { VisitStatsVO, VisitTrendVO } from "@/api/system/log.api";
-import { useUserStore } from "@/store/modules/user.store";
+import { useCounterStore } from "@/store";
 import { formatGrowthRate } from "@/utils";
 import { useTransition, useDateFormat } from "@vueuse/core";
 import { Connection, Failed } from "@element-plus/icons-vue";
@@ -389,7 +389,7 @@ interface VersionItem {
   tag?: string; // 版本标签（可选）
 }
 
-const userStore = useUserStore();
+const userStore = useCounterStore();
 
 // 当前通知公告列表
 const vesionList = ref<VersionItem[]>([
@@ -425,7 +425,7 @@ const currentDate = new Date();
 // 问候语：根据当前小时返回不同问候语
 const greetings = computed(() => {
   const hours = currentDate.getHours();
-  const nickname = userStore.userInfo.nickname;
+  const nickname = userStore.userInfo.nickName
   if (hours >= 6 && hours < 8) {
     return "晨起披衣出草堂，轩窗已自喜微凉🌅！";
   } else if (hours >= 8 && hours < 12) {

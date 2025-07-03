@@ -6,13 +6,31 @@
       :validate-on-rule-change="false">
       <!-- 用户名 -->
       <el-form-item prop="username">
-        <el-input v-model.trim="loginFormData.username" :placeholder="t('login.username')">
-          <template #prefix>
-            <el-icon>
-              <User />
-            </el-icon>
-          </template>
-        </el-input>
+        <div style="display: flex; align-items: center;">
+          <el-input v-model.trim="loginFormData.username" :placeholder="t('login.username')" style="flex: 1;">
+            <template #prefix>
+              <el-icon>
+                <User />
+              </el-icon>
+            </template>
+          </el-input>
+          <el-dropdown style="margin-left: 8px;" @command="handleSelectUser" >
+            <el-button link style="padding: 0 6px; min-width: unset;">
+              <el-icon><ArrowDown /></el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  v-for="user in userList"
+                  :key="user.username + user.label"
+                  :command="user"
+                >
+                  {{ user.label }}：{{ user.username }}/{{ user.password }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </el-form-item>
 
       <!-- 密码 -->
@@ -100,19 +118,33 @@
 </template>
 <script setup lang="ts">
 import type { FormInstance } from "element-plus";
-import { LocationQuery, RouteLocationRaw, useRoute, useRouter } from "vue-router";
+import {  useRouter } from "vue-router";
+//import { LocationQuery, RouteLocationRaw, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import AuthAPI, { type LoginFormData } from "@/api/auth.api";
+import { useCounterStore } from "@/store";
+import { useMenuStore } from "@/store";
+import MenuAPI from "@/api/Setting/menu.api";
+const counterStore = useCounterStore();
+const menuStore = useMenuStore();
 const router = useRouter();
-const route = useRoute();
+//const route = useRoute();
 
-import { useUserStore } from "@/store";
+//import { useUserStore } from "@/store";
 import CommonWrapper from "@/components/CommonWrapper/index.vue";
 import { Auth } from "@/utils/auth";
+import { ArrowDown } from '@element-plus/icons-vue';
 
 const { t } = useI18n();
-const userStore = useUserStore();
+//const userStore = useUserStore();
 
+// 账号列表
+const userList = [
+  { label: "超级管理员", username: "admin", password: "123456" },
+  { label: "经理", username: "wangwu", password: "105866" },
+  { label: "员工", username: "lisi", password: "202657" },
+  { label: "前台接待", username: "lisi", password: "202657" }
+];
 
 onMounted(() => getCaptcha());
 
@@ -126,8 +158,8 @@ const captchaBase64 = ref();
 const rememberMe = Auth.getRememberMe();
 
 const loginFormData = ref<LoginFormData>({
-  username: "admin",
-  password: "123456",
+  username: "",
+  password: "",
   captchaKey: "",
   captchaCode: "",
   rememberMe,
@@ -218,17 +250,40 @@ async function handleLoginSubmit() {
       captchaCode: loginFormData.value.captchaCode
     }
     const res = await AuthAPI.login(params);
+    counterStore.userInfo.id = res.id;
+    counterStore.userInfo.userName = res.userName;
+    counterStore.userInfo.accessToken = res.accessToken;
+    counterStore.userInfo.refreshToken = res.refreshToken;
+    counterStore.userInfo.nickName = res.nickName;
     console.log("登录成功:", res);
     ElMessage.success("登录成功");
-    await userStore.login(loginFormData.value);
 
+    // 菜单数据格式转换函数
+    function convertMenuData(data: any[]): any[] {
+      return data
+        .filter((item: any) => item.isVisible)
+        .map((item: any) => ({
+          path: item.path,
+          name: item.name,
+          meta: {
+            icon: item.icon,
+            title: item.name
+          },
+          children: item.children && item.children.length > 0 ? convertMenuData(item.children) : []
+        }));
+    }
+    // 拉取菜单并格式转换
+    const menuRes = await MenuAPI.getMenuListByUserId(counterStore.userInfo.id);
+    const menuList = convertMenuData(menuRes);
+    menuStore.setMenuList(menuList);
+    //await userStore.login(loginFormData.value);
 
     // 3. 获取用户信息（包含用户角色，用于路由生成）
     //await userStore.getUserInfo();
 
     // 4. 登录成功后直接跳转到静态页面
-    await router.replace("/static-page");
-
+    //await router.replace("/static-page");
+    await router.replace("/dashboard");
     // 5. 记住我功能已实现，根据用户选择决定token的存储方式:
     // - 选中"记住我": token存储在localStorage中，浏览器关闭后仍然有效
     // - 未选中"记住我": token存储在sessionStorage中，浏览器关闭后失效
@@ -247,25 +302,25 @@ async function handleLoginSubmit() {
  * @param query 路由查询参数
  * @returns 标准化后的路由地址
  */
-function resolveRedirectTarget(query: LocationQuery): RouteLocationRaw {
-  // 默认跳转路径
-  const defaultPath = "/";
+// function resolveRedirectTarget(query: LocationQuery): RouteLocationRaw {
+//   // 默认跳转路径
+//   const defaultPath = "/";
 
-  // 获取原始重定向路径
-  const rawRedirect = (query.redirect as string) || defaultPath;
+//   // 获取原始重定向路径
+//   const rawRedirect = (query.redirect as string) || defaultPath;
 
-  try {
-    // 6. 使用Vue Router解析路径
-    const resolved = router.resolve(rawRedirect);
-    return {
-      path: resolved.path,
-      query: resolved.query,
-    };
-  } catch {
-    // 7. 异常处理：返回安全路径
-    return { path: defaultPath };
-  }
-}
+//   try {
+//     // 6. 使用Vue Router解析路径
+//     const resolved = router.resolve(rawRedirect);
+//     return {
+//       path: resolved.path,
+//       query: resolved.query,
+//     };
+//   } catch {
+//     // 7. 异常处理：返回安全路径
+//     return { path: defaultPath };
+//   }
+// }
 
 // 检查输入大小写
 function checkCapsLock(event: KeyboardEvent) {
@@ -278,6 +333,12 @@ function checkCapsLock(event: KeyboardEvent) {
 const emit = defineEmits(["update:modelValue"]);
 function toOtherForm(type: "register" | "resetPwd") {
   emit("update:modelValue", type);
+}
+
+// 选择账号后自动填充
+function handleSelectUser(user: { label: string; username: string; password: string }) {
+  loginFormData.value.username = user.username;
+  loginFormData.value.password = user.password;
 }
 </script>
 

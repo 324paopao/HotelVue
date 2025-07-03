@@ -80,6 +80,12 @@ export interface LoginResult {
   tokenType: string;
   /** 过期时间(秒) */
   expiresIn: number;
+  /** 用户名 */
+  userName: string;
+  /** 用户ID */
+  id: number;
+  /** 昵称 */
+  nickName: string;
 }
 
 /** 验证码信息 */
