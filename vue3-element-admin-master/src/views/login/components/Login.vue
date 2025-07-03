@@ -101,7 +101,8 @@ import { useI18n } from "vue-i18n";
 import AuthAPI, { type LoginFormData } from "@/api/auth.api";
 const router = useRouter();
 const route = useRoute();
-
+import { useStore } from "@/store/Usertinfo";
+const store = useStore();
 import { useUserStore } from "@/store";
 import CommonWrapper from "@/components/CommonWrapper/index.vue";
 import { Auth } from "@/utils/auth";
@@ -193,7 +194,17 @@ async function handleLoginSubmit() {
     const res = await AuthAPI.login(params);
     console.log("登录成功:", res);
     ElMessage.success("登录成功");
+
     await userStore.login(loginFormData.value);
+    localStorage.setItem('id', res.accessToken)
+    store.accessToken = res.accessToken,
+      store.expiresIn = res.expiresIn,
+      store.id = res.id,
+      store.nickName = res.nickName
+    store.refreshToken = res.refreshToken
+    store.tokenType = res.tokenType
+    store.userName = res.userName
+
 
 
     // 3. 获取用户信息（包含用户角色，用于路由生成）

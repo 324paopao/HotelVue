@@ -107,12 +107,15 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from "vue";
 import AuthAPI from "@/api/Reserve/ReservRoom.api";
+import { random } from "lodash-es";
+import { useStore } from '@/store/Usertinfo';
+const store = useStore()
 const form = reactive({
   infomation: "",
   ordersource: "",
   reserveName: "",
   phone: "",
-  bookingNumber: "",
+  bookingNumber: Date.now() + Math.random().toString(36).substr(2, 9),
   sdate: "",
   edate: "",
   day: 0,
@@ -123,6 +126,7 @@ const form = reactive({
   roomNum: "",
   message: "",
   idCard: "",
+  userid: store.id,
   aaa: []
 });
 
