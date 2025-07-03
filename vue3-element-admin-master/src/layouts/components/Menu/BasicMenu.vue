@@ -58,6 +58,24 @@
             <span>预定详情</span>
           </el-menu-item>
         </el-sub-menu>
+        <el-sub-menu index="2">
+          <template #title>
+            <el-icon><Location /></el-icon>
+            <span>客户</span>
+          </template>
+          <el-menu-item index="/getcustomerlist">
+            <el-icon><IconMenu /></el-icon>
+            <span>客户列表</span>
+          </el-menu-item>
+          <el-menu-item index="3">
+            <el-icon><Document /></el-icon>
+            <span>Navigator Three</span>
+          </el-menu-item>
+          <el-menu-item index="4">
+            <el-icon><Setting /></el-icon>
+            <span>Navigator Four</span>
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-col>
   </div>
@@ -69,6 +87,7 @@ import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 const route = useRoute();
 const activeIndex = ref(route.path);
+//const router = useRouter();
 
 // 添加空函数实现以解决报错
 const handleOpen = (key: string, keyPath: string[]) => {
