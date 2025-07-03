@@ -9,8 +9,8 @@
           margin-bottom: 16px;
         "
       >
-  <div>
-          <el-button type="primary" @click="drawerVisible = true">新增房型</el-button>
+        <div>
+          <el-button type="primary" @click="openAddDrawer">新增房型</el-button>
           <el-button :disabled="multipleSelection.length === 0" @click="handleBatchDelete">
             批量删除
           </el-button>
@@ -169,26 +169,24 @@
           "
         >
           <div style="font-weight: bold; font-size: 16px; margin-bottom: 16px">展示信息</div>
-          <el-form-item label="房型图片">
-            <el-upload
-              class="avatar-uploader"
-              action="https://localhost:44384/api/FileImg"
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload"
-              name="file"
-            >
-              <img v-if="form.imageUrl" :src="getImageUrl(form.imageUrl)" class="avatar" />
-              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-            </el-upload>
-            <div class="el-form-item__tip">
-              支持jpg、jpeg、bmp、png格式，大小不超过2M，建议尺寸：750px*448px
-            </div>
-          </el-form-item>
           <el-form-item label="房型视频">
-            <el-upload action="#" :limit="1" :auto-upload="false" list-type="picture">
-              <el-button>上传视频</el-button>
-            </el-upload>
+            <div class="upload-container">
+              <!-- 上传按钮 -->
+              <input type="file" accept="video/*" @change="handleFileChange" />
+
+              <!-- 上传进度条 -->
+              <div v-if="uploadProgress > 0">上传进度：{{ uploadProgress }}%</div>
+
+              <!-- 上传成功后显示视频 -->
+              <video
+                v-if="form.videoUrl"
+                :src="form.videoUrl"
+                controls
+                width="440"
+                height="160"
+                class="mt-4"
+              ></video>
+            </div>
             <div class="el-form-item__tip">
               最多上传一个视频，上传视频封面图片尺寸建议和房型图片保持一致：750PX*448PX
             </div>
@@ -214,6 +212,24 @@
               {{ tag }}
             </el-tag>
             <el-link type="primary" style="margin-left: 8px" @click="addTag()">添加</el-link>
+          </el-form-item>
+          <el-form-item label="房型图片">
+            <el-upload
+              class="avatar-uploader"
+              action="https://localhost:44384/api/FileImg"
+              :show-file-list="true"
+              :on-success="handleAvatarSuccess"
+              :before-upload="beforeAvatarUpload"
+              :file-list="fileList"
+              name="files"
+              list-type="picture-card"
+              :multiple="true"
+            >
+              <el-icon><Plus /></el-icon>
+            </el-upload>
+            <div class="el-form-item__tip">
+              支持jpg、jpeg、bmp、png格式，大小不超过2M，建议尺寸：750px*448px
+            </div>
           </el-form-item>
         </div>
         <!-- 配套服务 -->
@@ -258,7 +274,6 @@
             <el-link type="danger" style="margin-left: 8px" @click="DeleteRoomNum(scope.row.id)">
               删除
             </el-link>
-            
           </template>
         </el-table-column>
       </el-table>
@@ -304,10 +319,42 @@ import { ref, reactive, onMounted } from "vue";
 import RoomTypeAPI from "@/api/system/roomtype";
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
-import type { UploadProps } from "element-plus";
 onMounted(() => {
   GetListRoomType();
 });
+
+import axios from "axios";
+
+//const videoUrl = ref("");
+const uploadProgress = ref(0);
+
+const handleFileChange = async (event: any) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await axios.post(
+      "https://localhost:44384/api/FileImg/UploadVideoAsync",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          uploadProgress.value = percent;
+        },
+      }
+    );
+    console.log("formData", response.data);
+    form.videoUrl = response.data;
+  } catch (error) {
+    console.error("上传失败", error);
+  }
+};
 
 //删除房号
 function DeleteRoomNum(Row: any) {
@@ -443,9 +490,9 @@ async function handleDelete(id: any) {
 let editId = "";
 
 function onEdit(row: any) {
-  // 反填所有字段
   Object.assign(form, row);
-  // 反填标签
+
+  // 处理标签
   if (typeof row.displayChannels === "string") {
     form.displayChannelses = row.displayChannels ? row.displayChannels.split(",") : [];
   } else if (Array.isArray(row.displayChannels)) {
@@ -453,10 +500,29 @@ function onEdit(row: any) {
   } else {
     form.displayChannelses = [];
   }
+
+  // 处理图片字段
+  if (typeof row.imageUrls === "string") {
+    // 数据库返回逗号分隔字符串
+    form.imageUrls = row.imageUrls ? row.imageUrls.split(",") : [];
+  } else if (Array.isArray(row.imageUrls)) {
+    // 数据库返回数组
+    form.imageUrls = row.imageUrls;
+  } else {
+    form.imageUrls = [];
+  }
+
+  // 生成图片预览列表
+  fileList.value = form.imageUrls.map((url: string, idx: number) => ({
+    name: `图片${idx + 1}`,
+    url: getImageUrl(url),
+  }));
+
   editId = row.id;
   drawerVisible.value = true;
 }
 
+const fileList = ref<any[]>([]); // 用于图片预览
 const form = reactive({
   name: "",
   state: 0,
@@ -467,7 +533,6 @@ const form = reactive({
   maxOccupancy: 0,
   obligate: true,
   extraBedPolicy: "",
-  imageUrl: "",
   videoUrl: "",
   roomTypeCount: 0,
   order: 0,
@@ -475,8 +540,10 @@ const form = reactive({
   displayChannelses: ["官方直营", "今日特惠", "微信优享"],
   displayChannels: "",
   facilities: "",
+  imageUrls: [], // 用于存储图片路径
 });
 const inputTag = ref("");
+
 // 添加标签
 function addTag() {
   showTagDialog.value = true;
@@ -493,12 +560,18 @@ function removeTag(tag: string) {
 async function submitForm() {
   let res;
   form.displayChannels = form.displayChannelses.join(",");
+  const payload = {
+    ...form,
+    imageUrls: Array.isArray(form.imageUrls) ? form.imageUrls.join(",") : "",
+  };
   if (editId == "") {
-    res = await RoomTypeAPI.AddRoomTypeAxios(form);
+    console.log("payload", payload);
+
+    res = await RoomTypeAPI.AddRoomTypeAxios(payload);
   } else {
     console.log("form", form);
     res = await RoomTypeAPI.UpdataRoomTypeAxios(editId, {
-      ...form,
+      ...payload,
       id: editId,
       lastModificationTime: "",
       lastModifierId: null,
@@ -518,14 +591,14 @@ async function submitForm() {
     form.maxOccupancy = 0;
     form.obligate = true;
     form.extraBedPolicy = "";
-    form.imageUrl = "";
     form.videoUrl = "";
     form.roomTypeCount = 0;
     form.order = 0;
     form.description = "";
     form.displayChannelses = ["官方直营", "今日特惠", "微信优享"];
     form.facilities = "";
-    GetListRoomType();
+    form.imageUrls = [];
+
     editId = "";
   } else {
     ElMessage.error(editId ? "修改失败" : "新增失败");
@@ -535,6 +608,8 @@ async function submitForm() {
 function handleDrawerClose() {
   drawerVisible.value = false;
   editId = "";
+  form.imageUrls = [];
+  fileList.value = [];
 }
 //新增房型标签
 const showTagDialog = ref(false);
@@ -548,31 +623,6 @@ function confirmAddTag() {
 }
 function resetTagDialog() {
   tagForm.value = "";
-}
-
-const handleAvatarSuccess = (response: any) => {
-  console.log(response);
-  if (response && response.filePath) {
-    form.imageUrl = response.filePath;
-  }
-};
-const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
-  const isImage = ["image/jpeg", "image/png", "image/bmp"].includes(rawFile.type);
-  if (!isImage) {
-    ElMessage.error("图片格式仅支持 JPG/PNG/BMP!");
-    return false;
-  }
-  if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error("图片大小不能超过2MB!");
-    return false;
-  }
-  return true;
-};
-//显示预览图片
-function getImageUrl(path: string) {
-  if (!path) return "";
-  if (/^https?:\/\//.test(path)) return path;
-  return "https://localhost:44384" + path;
 }
 
 //存批量删除的id
@@ -650,6 +700,65 @@ const handleCurrentRoomNumChange = (val: number) => {
   roomNumQuery.PageIndex = val;
   getRoomNumList();
 };
+
+const handleAvatarSuccess = (response: any) => {
+  const paths = response.filePaths || response.filepaths;
+  let newPaths = [];
+  if (Array.isArray(paths)) {
+    newPaths = paths;
+  } else if (typeof paths === "string") {
+    newPaths = paths ? paths.split(",") : [];
+  }
+  // 累加到已有图片
+  form.imageUrls = [...form.imageUrls, ...newPaths];
+  fileList.value = form.imageUrls.map((url: string, idx: number) => ({
+    name: `图片${idx + 1}`,
+    url: getImageUrl(url),
+  }));
+};
+
+function getImageUrl(path: string) {
+  if (!path) return "";
+  if (/^https?:\/\//.test(path)) return path;
+  return "https://localhost:44384" + path;
+}
+
+const beforeAvatarUpload = (rawFile) => {
+  const isImage = ["image/jpeg", "image/png", "image/bmp"].includes(rawFile.type);
+  if (!isImage) {
+    ElMessage.error("图片格式仅支持 JPG/PNG/BMP!");
+    return false;
+  }
+  if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error("图片大小不能超过2MB!");
+    return false;
+  }
+  return true;
+};
+
+function openAddDrawer() {
+  // 清空所有表单字段
+  form.name = "";
+  form.state = 0;
+  form.price = 0;
+  form.depositRequired = true;
+  form.depositAmount = 0;
+  form.area = 0;
+  form.maxOccupancy = 0;
+  form.obligate = true;
+  form.extraBedPolicy = "";
+  form.videoUrl = "";
+  form.roomTypeCount = 0;
+  form.order = 0;
+  form.description = "";
+  form.displayChannelses = ["官方直营", "今日特惠", "微信优享"];
+  form.displayChannels = "";
+  form.facilities = "";
+  form.imageUrls = [];
+  fileList.value = [];
+  editId = "";
+  drawerVisible.value = true;
+}
 </script>
 
 <style scoped>

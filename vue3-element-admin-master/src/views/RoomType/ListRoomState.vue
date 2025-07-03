@@ -81,6 +81,7 @@
 import { ref, computed, onMounted } from "vue";
 import { updateRoomState, getRoomStateList } from "@/api/system/roomstate";
 import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
 
 const stateTextMap: Record<string, string> = {
   1: "净房",
@@ -116,6 +117,7 @@ function getTagType(
 const roomGroups = ref<any[]>([]);
 const selectedRoomType = ref("");
 const selectedState = ref("");
+const router = useRouter();
 
 function loadRoomGroups(params = {}) {
   getRoomStateList(params).then((res: any) => {
@@ -159,6 +161,10 @@ onMounted(() => {
 
 function handleChangeState(room: any, command: string) {
   const state = Number(command);
+  if (state === 4 || state === 5) {
+    router.push("/ReserveRoomList");
+    return;
+  }
   updateRoomState(room.id, state)
     .then(() => {
       ElMessage.success("状态修改成功");
