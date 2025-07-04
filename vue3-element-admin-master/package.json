@@ -53,6 +53,7 @@
     "@wangeditor-next/editor-for-vue": "^5.1.14",
     "animate.css": "^4.1.1",
     "axios": "^1.9.0",
+    "china-area-data": "^5.0.1",
     "codemirror": "^5.65.19",
     "codemirror-editor-vue3": "^2.8.0",
     "default-passive-events": "^2.0.0",

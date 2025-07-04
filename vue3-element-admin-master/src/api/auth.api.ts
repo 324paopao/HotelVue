@@ -45,10 +45,11 @@ const AuthAPI = {
   },
 
   /** 获取验证码接口*/
-  getCaptcha() {
-    return request<any, CaptchaInfo>({
-      url: `${AUTH_BASE_URL}/Captcha`,
+  async getCaptcha (id:any) {
+    return request<any, Blob>({
+      url: `${AUTH_BASE_URL}/${id}/captcha`,
       method: "get",
+      responseType: "blob" // 关键点：加上这一行
     });
   },
 };
@@ -79,6 +80,12 @@ export interface LoginResult {
   tokenType: string;
   /** 过期时间(秒) */
   expiresIn: number;
+  /** 用户名 */
+  userName: string;
+  /** 用户ID */
+  id: number;
+  /** 昵称 */
+  nickName: string;
 }
 
 /** 验证码信息 */

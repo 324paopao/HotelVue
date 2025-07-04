@@ -5,14 +5,14 @@
         <el-col :span="12">
           <div style="margin-bottom: 16px; align-items: center">
             <!-- 新增房号按钮 -->
-            <el-button @click="openAddRoomNumDialog">新增房号</el-button>
-            <el-button :disabled="multipleSelection.length === 0" @click="BatchDelete">
+            <el-button v-if="hasAction('新增房号')" @click="openAddRoomNumDialog">新增房号</el-button>
+            <el-button v-if="hasAction('删除房号')" :disabled="multipleSelection.length === 0" @click="BatchDelete">
               删除房号
             </el-button>
-            <el-button :disabled="multipleSelection.length === 0" @click="BatchUpState">
+            <el-button v-if="hasAction('批量上架')" :disabled="multipleSelection.length === 0" @click="BatchUpState">
               批量上架
             </el-button>
-            <el-button :disabled="multipleSelection.length === 0" @click="BatchDownState">
+            <el-button v-if="hasAction('批量下架')" :disabled="multipleSelection.length === 0" @click="BatchDownState">
               批量下架
             </el-button>
           </div>
@@ -68,8 +68,8 @@
         </el-table-column>
         <el-table-column label="操作" width="220">
           <template #default="scope">
-            <el-link type="primary" @click="UpdataRoomNum(scope.row)">修改</el-link>
-            <el-link type="danger" style="margin-left: 8px" @click="DeleteRoomNum(scope.row.id)">
+            <el-link v-if="hasAction('修改')" type="primary" @click="UpdataRoomNum(scope.row)">修改</el-link>
+            <el-link v-if="hasAction('删除')" type="danger" style="margin-left: 8px" @click="DeleteRoomNum(scope.row.id)">
               删除
             </el-link>
             <el-link type="primary" style="margin-left: 8px" @click="UpdataStateRoomNum(scope.row)">
@@ -131,6 +131,19 @@
 import { ref, reactive, onMounted } from "vue";
 import RoomTypeAPI from "@/api/system/roomtype";
 import { ElMessageBox, ElMessage } from "element-plus";
+
+//#region 操作权限
+import { useMenuStore } from '@/store';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+const menuStore = useMenuStore();
+const route = useRoute();
+const actions = computed(() => menuStore.getActionsByPath(route.path));
+console.log("actions", actions.value)
+function hasAction(actionName: string) {
+  return actions.value.some(a => a.name === actionName);
+}
+//#endregion
 
 //修改状态上架下架
 async function UpdataStateRoomNum(row: any) {
@@ -281,6 +294,9 @@ function getTypeList() {
 onMounted(() => {
   getList();
   getTypeList(); //房型下拉绑定
+  console.log('当前路由path:', route.path)
+  console.log('actions:', actions.value)
+  console.log('菜单:', menuStore.menuList)
 });
 
 const multipleSelection = ref<any[]>([]);

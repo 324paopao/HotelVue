@@ -38,7 +38,7 @@
 
         <!-- <el-date-picker v-model="dateRange" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
           style="margin-right: 16px;" /> -->
-        <el-button type="primary" @click="exportDetail">导出明细</el-button>
+        <el-button v-if="hasAction('导出明细')" type="primary" @click="exportDetail">导出明细</el-button>
         <el-select v-model="searchType" placeholder="房客姓名" style="width: 110px;">
           <el-option label="房客姓名" value="房客姓名" />
           <el-option label="证件号" value="证件号" />
@@ -70,23 +70,29 @@
       <el-table-column prop="infomation" label="客户类型" width="100" />
       <el-table-column label="操作" width="220">
         <template #default="scope">
-          <el-link v-if="scope.row.status === 0 && scope.row.status != 5" type="primary"
+          <el-link 
+          v-if="hasAction('入住') && scope.row.status === 0 && scope.row.status != 5" type="primary"
             @click="Ruzhu(scope.row)">入住</el-link>
 
-          <el-link v-if="scope.row.roomNum === '未排房' && scope.row.status != 5" type="primary" style="margin-left: 8px;"
+          <el-link 
+          v-if="hasAction('排房') && scope.row.roomNum === '未排房' && scope.row.status != 5" type="primary" style="margin-left: 8px;"
             @click="PaiFang(scope.row.roomTypeName, scope.row.roomTypeid, scope.row.id)">排房</el-link>
 
-          <el-link v-if="scope.row.roomNum != '未排房' && scope.row.status == 1" type="primary" style="margin-left: 8px;"
+          <el-link 
+          v-if="scope.row.roomNum != '未排房' && scope.row.status == 1" type="primary" style="margin-left: 8px;"
             @click="NoPaiFang(scope.row.id)">取消排房</el-link>
 
-          <el-link v-if="scope.row.status === 0 && scope.row.status != 5" type="primary" style="margin-left: 8px;"
+          <el-link 
+          v-if="hasAction('取消预订') && scope.row.status === 0 && scope.row.status != 5" type="primary" style="margin-left: 8px;"
             @click="NoReseRoom(scope.row.id)">取消预订</el-link>
 
-          <el-link type="primary" style="margin-left: 8px;" @click="Detail(scope.row.id)">详情</el-link>
-
-          <el-link v-if="scope.row.status != 0 && scope.row.status <= 1" type="warning" style="margin-left: 8px;"
+          <el-link v-if="hasAction('详情')" type="primary" style="margin-left: 8px;" @click="Detail(scope.row.id)">详情</el-link>
+          
+          <el-link 
+          v-if="scope.row.status != 0 && scope.row.status <= 1" type="warning" style="margin-left: 8px;"
             @click="TuiFang(scope.row)">退房</el-link>
-          <el-link v-if="scope.row.status != 0 && scope.row.status <= 2" type="success" style="margin-left: 8px;"
+          <el-link 
+          v-if="scope.row.status != 0 && scope.row.status <= 2" type="success" style="margin-left: 8px;"
             @click="Jiesuan(scope.row)">结算</el-link>
         </template>
       </el-table-column>
@@ -94,7 +100,8 @@
 
     <!-- 分页 -->
     <div style="margin-top: 16px; text-align: right;">
-      <el-pagination v-model:current-page="Seach1.PageIndex" v-model:page-size="Seach1.PageSize"
+      <el-pagination 
+      v-model:current-page="Seach1.PageIndex" v-model:page-size="Seach1.PageSize"
         :page-sizes="[3, 4, 5, 6]" layout="total, sizes, prev, pager, next, jumper" :total="Seach1.totleCount" />
     </div>
   </div>
@@ -243,9 +250,27 @@ import moment from 'moment';
 import { ref, reactive } from 'vue';
 const searchType = ref('');
 const tableData = ref()
+//#region 操作权限
+import { useMenuStore } from '@/store';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+const menuStore = useMenuStore();
+const route = useRoute();
+const actions = computed(() => menuStore.getActionsByPath(route.path));
+console.log("actions", actions.value)
+function hasAction(actionName: string) {
+  return actions.value.some(a => a.name === actionName);
+}
+//#endregion
 onMounted(() => {
   load();
+  console.log('当前路由path:', route.path)
+  console.log('actions:', actions.value)
+  console.log('菜单:', menuStore.menuList)
 });
+watch(actions.value, (val) => {
+  console.log('actions变化了:', val)
+})
 const Seach = reactive({
   Comman: ''
 })
