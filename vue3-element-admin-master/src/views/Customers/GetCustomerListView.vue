@@ -78,8 +78,8 @@
               <el-button>导入客户</el-button>
             </div>
             <div class="flex-row-right">
-              <el-button @click="goToTagManagement">标签管理</el-button>
-              <el-button>同步粉丝</el-button>
+              <el-button v-if="hasAction('标签管理')" @click="goToTagManagement">标签管理</el-button>
+              <el-button v-if="hasAction('同步粉丝')">同步粉丝</el-button>
               <el-button @click="toggleExpand">收起</el-button>
               <el-button @click="onSearch">搜索</el-button>
               <el-button @click="resetFilters">清空</el-button>
@@ -105,8 +105,8 @@
               <el-button class="expand-btn" @click="toggleExpand">展开</el-button>
             </div>
             <div class="flex-row-right">
-              <el-button @click="goToTagManagement">标签管理</el-button>
-              <el-button>同步粉丝</el-button>
+              <el-button v-if="hasAction('标签管理')" @click="goToTagManagement">标签管理</el-button>
+              <el-button v-if="hasAction('同步粉丝')">同步粉丝</el-button>
             </div>
           </div>
           <div class="filter-row ops-row">
@@ -192,9 +192,9 @@
           <el-divider direction="vertical" />
           <el-link @click="handleSetLevel(scope.row)">设置等级</el-link>
           <el-divider direction="vertical" />
-          <el-link>送积分</el-link>
+          <el-link v-if="hasAction('送积分')">送积分</el-link>
           <el-divider direction="vertical" />
-          <el-link>送优惠券</el-link>
+          <el-link v-if="hasAction('送优惠券')">送优惠券</el-link>
           <el-divider direction="vertical" />
           <el-link v-if="scope.row.status !== false" @click="openRechargeDialog(scope.row)">
             充值
@@ -485,7 +485,18 @@ import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-
+//#region 操作权限
+import { useMenuStore } from '@/store';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+const menuStore = useMenuStore();
+const route = useRoute();
+const actions = computed(() => menuStore.getActionsByPath(route.path));
+console.log("actions", actions.value)
+function hasAction(actionName: string) {
+  return actions.value.some(a => a.name === actionName);
+}
+//#endregion
 const customerKindGuid = {
   member: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   normal: "3fa85f64-5717-4562-b3fc-2c963f66afa7",
@@ -572,6 +583,9 @@ function handlePagination(payload: { page: number; limit: number }) {
 onMounted(() => {
   fetchCustomerList();
   fetchCustomerTypeOptions();
+  console.log('当前路由path:', route.path)
+  console.log('actions:', actions.value)
+  console.log('菜单:', menuStore.menuList)
 });
 
 const showAddDialog = ref(false);

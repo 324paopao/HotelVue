@@ -32,7 +32,7 @@
     <div class="navbar-actions__item">
       <el-dropdown trigger="click">
         <div class="user-profile">
-          <img class="user-profile__avatar" :src="userStore.userInfo.avatar" />
+          <img class="user-profile__avatar" :src="avatarSrc" @error="onAvatarError"/>
           <span class="user-profile__name">{{ userStore.userInfo.username }}</span>
         </div>
         <template #dropdown>
@@ -67,6 +67,7 @@ import { DeviceEnum } from "@/enums/settings/device.enum";
 import { useAppStore, useSettingsStore, useUserStore } from "@/store";
 import { SidebarColor, ThemeMode } from "@/enums/settings/theme.enum";
 import { LayoutMode } from "@/enums";
+import { ref } from "vue";
 
 // 导入子组件
 import MenuSearch from "@/components/MenuSearch/index.vue";
@@ -82,7 +83,12 @@ const userStore = useUserStore();
 
 const route = useRoute();
 const router = useRouter();
-
+// 设置头像错误时，使用默认头像
+const defaultAvatar = new URL('@/assets/images/custom-avatar.jpg', import.meta.url).href;
+const avatarSrc = ref(userStore.userInfo.avatar || defaultAvatar);
+function onAvatarError(e: Event) {
+  (e.target as HTMLImageElement).src = defaultAvatar;
+}
 // 是否为桌面设备
 const isDesktop = computed(() => appStore.device === DeviceEnum.DESKTOP);
 
