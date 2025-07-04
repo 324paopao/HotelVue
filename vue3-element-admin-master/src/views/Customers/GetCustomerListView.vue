@@ -68,17 +68,17 @@
           <!-- 按钮区 -->
           <div class="filter-row flex-row" style="margin-top: 8px">
             <div>
-              <el-button @click="handleExportCustomers">导出客户数据</el-button>
-              <el-button>打标签</el-button>
-              <el-button @click="openEditLevelDialog">修改等级</el-button>
-              <el-button>冻结</el-button>
-              <el-button>解冻</el-button>
-              <el-button type="primary" @click="showAddDialog = true">添加客户</el-button>
-              <el-button>导入客户数据</el-button>
+              <el-button  @click="handleExportCustomers">导出客户数据</el-button>
+              <el-button v-if="hasAction('打标签')">打标签</el-button>
+              <el-button v-if="hasAction('修改等级')" @click="openEditLevelDialog">修改等级</el-button>
+              <el-button v-if="hasAction('冻结')">冻结</el-button>
+              <el-button v-if="hasAction('解冻')">解冻</el-button>
+              <el-button v-if="hasAction('添加客户')" type="primary" @click="showAddDialog = true">添加客户</el-button>
+              <el-button v-if="hasAction('导入客户')">导入客户</el-button>
             </div>
             <div class="flex-row-right">
-              <el-button @click="goToTagManagement">标签管理</el-button>
-              <el-button>同步粉丝</el-button>
+              <el-button v-if="hasAction('标签管理')" @click="goToTagManagement">标签管理</el-button>
+              <el-button v-if="hasAction('同步粉丝')">同步粉丝</el-button>
               <el-button @click="toggleExpand">收起</el-button>
               <el-button @click="onSearch">搜索</el-button>
               <el-button @click="resetFilters">清空</el-button>
@@ -108,18 +108,18 @@
               <el-button class="expand-btn" @click="toggleExpand">展开</el-button>
             </div>
             <div class="flex-row-right">
-              <el-button @click="goToTagManagement">标签管理</el-button>
-              <el-button>同步粉丝</el-button>
+              <el-button v-if="hasAction('标签管理')" @click="goToTagManagement">标签管理</el-button>
+              <el-button v-if="hasAction('同步粉丝')">同步粉丝</el-button>
             </div>
           </div>
           <div class="filter-row ops-row">
-            <el-button @click="handleExportCustomers">导出客户数据</el-button>
-            <el-button>打标签</el-button>
-            <el-button @click="openEditLevelDialog">修改等级</el-button>
-            <el-button>冻结</el-button>
-            <el-button>解冻</el-button>
-            <el-button type="primary" @click="showAddDialog = true">添加客户</el-button>
-            <el-button>导入客户数据</el-button>
+            <el-button @click="handleExportCustomers">导出客户</el-button>
+            <el-button v-if="hasAction('打标签')">打标签</el-button>
+            <el-button v-if="hasAction('修改等级')" @click="openEditLevelDialog">修改等级</el-button>
+            <el-button v-if="hasAction('冻结')">冻结</el-button>
+            <el-button v-if="hasAction('解冻')">解冻</el-button>
+            <el-button v-if="hasAction('添加客户')" type="primary" @click="showAddDialog = true">添加客户</el-button>
+            <el-button v-if="hasAction('导入客户')">导入客户</el-button>
           </div>
         </template>
       </el-form>
@@ -173,17 +173,17 @@
       <el-table-column label="累计维权次数" prop="totalRights" align="center" />
       <el-table-column label="操作" width="260">
         <template #default="">
-          <el-link type="primary">详情</el-link>
+          <el-link v-if="hasAction('详情')" type="primary">详情</el-link>
           <el-divider direction="vertical" />
-          <el-link type="danger">冻结</el-link>
+          <el-link v-if="hasAction('冻结')" type="danger">冻结</el-link>
           <el-divider direction="vertical" />
-          <el-link>送积分</el-link>
+          <el-link v-if="hasAction('送积分')">送积分</el-link>
           <el-divider direction="vertical" />
-          <el-link>送优惠券</el-link>
+          <el-link v-if="hasAction('送优惠券')">送优惠券</el-link>
           <el-divider direction="vertical" />
-          <el-link>充值</el-link>
+          <el-link v-if="hasAction('充值')">充值</el-link>
           <el-divider direction="vertical" />
-          <el-link>消费</el-link>
+          <el-link v-if="hasAction('消费')">消费</el-link>
         </template>
       </el-table-column>
     </el-table>
@@ -355,7 +355,18 @@ import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-
+//#region 操作权限
+import { useMenuStore } from '@/store';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+const menuStore = useMenuStore();
+const route = useRoute();
+const actions = computed(() => menuStore.getActionsByPath(route.path));
+console.log("actions", actions.value)
+function hasAction(actionName: string) {
+  return actions.value.some(a => a.name === actionName);
+}
+//#endregion
 const customerKindGuid = {
   member: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   normal: "3fa85f64-5717-4562-b3fc-2c963f66afa7",
@@ -442,6 +453,9 @@ function handlePagination(payload: { page: number; limit: number }) {
 onMounted(() => {
   fetchCustomerList();
   fetchCustomerTypeOptions();
+  console.log('当前路由path:', route.path)
+  console.log('actions:', actions.value)
+  console.log('菜单:', menuStore.menuList)
 });
 
 const showAddDialog = ref(false);

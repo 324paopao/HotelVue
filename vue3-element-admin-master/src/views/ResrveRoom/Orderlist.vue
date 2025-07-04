@@ -58,7 +58,7 @@
       <el-table-column label="操作" width="220">
         <template #default="scope">
           <el-link 
-          v-if="scope.row.payStatus == 0" type="success" style="margin-left: 8px;"
+          v-if="hasAction('支付') && scope.row.payStatus == 0" type="success" style="margin-left: 8px;"
             @click="zhifu(scope.row)">支付</el-link>
         </template>
       </el-table-column>
@@ -83,8 +83,23 @@ import axios from 'axios';
 import { ref, reactive } from 'vue';
 const searchType = ref('');
 const tableData = ref()
+//#region 操作权限
+import { useMenuStore } from '@/store';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+const menuStore = useMenuStore();
+const route = useRoute();
+const actions = computed(() => menuStore.getActionsByPath(route.path));
+console.log("actions", actions.value)
+function hasAction(actionName: string) {
+  return actions.value.some(a => a.name === actionName);
+}
+//#endregion
 onMounted(() => {
   load();
+  console.log('当前路由path:', route.path)
+  console.log('actions:', actions.value)
+  console.log('菜单:', menuStore.menuList)
 });
 const Seach = reactive({
   Comman: ''
