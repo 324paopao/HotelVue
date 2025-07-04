@@ -70,12 +70,13 @@ export const constantRoutes: RouteRecordRaw[] = [
         meta: { title: "静态页面" },
       },
       {
-        path: "listroomtype",
+        path: "/listroomtype",
         name: "listroomtype",
         component: () => import("@/views/RoomType/ListRoomType.vue"),
         meta: { title: "房态列表", icon: "user", hidden: true },
       },
       {
+
         path: "getcustomerlist",
         name: "getcustomerlist",
         component: () => import("@/views/Customers/GetCustomerListView.vue"),
@@ -92,10 +93,47 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "CustomerTagEdit",
         component: () => import("@/views/Customers/CustomerTag.vue"),
         meta: { title: "创建标签", icon: "user", hidden: true },
+
+        path: "businessRoomtype",
+        name: "businessRoomtype",
+        component: () => import("@/views/RoomType/ListBusinessRoomType.vue"),
+        meta: { title: "业务-房型管理-房型设置", icon: "user", hidden: true },
+      },
+      {
+        path: "listRoomState",
+        name: "listRoomState",
+        component: () => import("@/views/RoomType/ListRoomState.vue"),
+        meta: { title: "房态", icon: "user", hidden: true },
+      },
+      {
+        path: "/ReserveRoomList",
+        name: "ReserveRoomList",
+        component: () => import("@/views/ResrveRoom/ReserveRoomAdd.vue"),
+        meta: { title: "办理预订", icon: "user", hidden: true },
+      },
+      {
+        path: "/ReserverGetlist",
+        name: "ReserverGetlist",
+        component: () => import("@/views/ResrveRoom/ReserverGetlist.vue"),
+        meta: { title: "预订订单", keepAlive: true, icon: "user", hidden: true },
+      },
+      {
+        path: "/Orderlist",
+        name: "Orderlist",
+        component: () => import("@/views/ResrveRoom/Orderlist.vue"),
+        meta: { title: "订房订单", keepAlive: true, icon: "user", hidden: true },
+      },
+      {
+        path: "ReserverDetails",
+        name: "ReserverDetails",
+        component: () => import("@/views/ResrveRoom/ReserverDetails.vue"),
+        meta: { title: "订单详情", keepAlive: true, icon: "user", hidden: true },
+
       },
     ],
   },
 ];
+
 
 /**
  * 创建路由

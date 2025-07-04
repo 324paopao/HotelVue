@@ -1,6 +1,8 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import setupPlugins from "@/plugins";
+import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 // 暗黑主题样式
 import "element-plus/theme-chalk/dark/css-vars.css";
@@ -19,4 +21,8 @@ import "default-passive-events";
 const app = createApp(App);
 // 注册插件
 app.use(setupPlugins);
+
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+app.use(pinia)
 app.mount("#app");
