@@ -90,7 +90,7 @@ export const constantRoutes: RouteRecordRaw[] = [
       {
         path: "customers/tag-edit",
         name: "CustomerTagEdit",
-        component: () => import("@/views/Customers/CustomerTagEdit.vue"),
+        component: () => import("@/views/Customers/CustomerTag.vue"),
         meta: { title: "创建标签", icon: "user", hidden: true },
       },
     ],

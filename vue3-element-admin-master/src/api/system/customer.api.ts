@@ -153,3 +153,55 @@ export function getLabelCustomerList(params: any) {
     params,
   });
 }
+
+/**
+ * 客户充值
+ * @param data 充值数据
+ * @returns Promise
+ */
+export function rechargeCustomerBalance(data: {
+  id: string;
+  availableBalance: number;
+  rechargeamount: number;
+  customerDesc: string;
+}) {
+  return request({
+    url: "/api/app/customer/up-available-balance",
+    method: "post",
+    data,
+  });
+}
+
+/**
+ * 客户消费
+ * @param data 消费数据
+ * @returns Promise
+ */
+export function customerConsume(data: {
+  id: string;
+  availableBalance: number;
+  availableGiftBalance: number;
+  sumofconsumption: number;
+  consumerNumber: number;
+  consumerDesc: string;
+}) {
+  return request({
+    url: "/api/app/customer/up-sumofconsumption",
+    method: "post",
+    data,
+  });
+}
+
+/**
+ * 批量冻结/解冻客户
+ * @param ids 客户ID数组
+ * @param status false=冻结 true=解冻
+ * @returns Promise
+ */
+export function updateCustomerStatus(ids: string[], status: boolean) {
+  return request({
+    url: "/api/app/customer/customer-status",
+    method: "put",
+    data: { ids, status },
+  });
+}
