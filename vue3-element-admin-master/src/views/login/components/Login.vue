@@ -122,10 +122,10 @@ import {  useRouter } from "vue-router";
 //import { LocationQuery, RouteLocationRaw, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import AuthAPI, { type LoginFormData } from "@/api/auth.api";
-import { useCounterStore } from "@/store";
+//import { useCounterStore } from "@/store";
 import { useMenuStore } from "@/store";
 import MenuAPI from "@/api/Setting/menu.api";
-const counterStore = useCounterStore();
+//const counterStore = useCounterStore();
 const menuStore = useMenuStore();
 const router = useRouter();
 //const route = useRoute();
@@ -134,7 +134,7 @@ const router = useRouter();
 const route = useRoute();
 import { useStore } from "@/store/Usertinfo";
 const store = useStore();
-import { useUserStore } from "@/store";
+//import { useUserStore } from "@/store";
 import CommonWrapper from "@/components/CommonWrapper/index.vue";
 import { Auth } from "@/utils/auth";
 import { ArrowDown } from '@element-plus/icons-vue';
@@ -254,23 +254,24 @@ async function handleLoginSubmit() {
       captchaCode: loginFormData.value.captchaCode
     }
     const res = await AuthAPI.login(params);
-    counterStore.userInfo.id = res.id;
-    counterStore.userInfo.userName = res.userName;
-    counterStore.userInfo.accessToken = res.accessToken;
-    counterStore.userInfo.refreshToken = res.refreshToken;
-    counterStore.userInfo.nickName = res.nickName;
+    // counterStore.userInfo.id = res.id;
+    // counterStore.userInfo.userName = res.userName;
+    // counterStore.userInfo.accessToken = res.accessToken;
+    // counterStore.userInfo.refreshToken = res.refreshToken;
+    // counterStore.userInfo.nickName = res.nickName;
+    store.accessToken = res.accessToken;
+    store.expiresIn = res.expiresIn;
+    store.id = res.id;
+    store.nickName = res.nickName;
+    store.refreshToken = res.refreshToken;
+    store.tokenType = res.tokenType;
+    store.userName = res.userName;
     console.log("登录成功:", res);
     ElMessage.success("登录成功");
 
-    await userStore.login(loginFormData.value);
+    //await userStore.login(loginFormData.value);
     localStorage.setItem('id', res.accessToken)
-    store.accessToken = res.accessToken,
-      store.expiresIn = res.expiresIn,
-      store.id = res.id,
-      store.nickName = res.nickName
-    store.refreshToken = res.refreshToken
-    store.tokenType = res.tokenType
-    store.userName = res.userName
+    
 
 
     // 菜单数据格式转换函数
@@ -284,11 +285,12 @@ async function handleLoginSubmit() {
             icon: item.icon,
             title: item.name
           },
+          actions: item.actions || [], // 加上这一行！
           children: item.children && item.children.length > 0 ? convertMenuData(item.children) : []
         }));
     }
     // 拉取菜单并格式转换
-    const menuRes = await MenuAPI.getMenuListByUserId(counterStore.userInfo.id);
+    const menuRes = await MenuAPI.getMenuListByUserId(store.id);
     const menuList = convertMenuData(menuRes);
     menuStore.setMenuList(menuList);
     //await userStore.login(loginFormData.value);

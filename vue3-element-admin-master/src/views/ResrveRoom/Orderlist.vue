@@ -57,7 +57,8 @@
       <el-table-column prop="infomation" label="客户类型" width="100" />
       <el-table-column label="操作" width="220">
         <template #default="scope">
-          <el-link v-if="scope.row.payStatus == 0" type="success" style="margin-left: 8px;"
+          <el-link 
+          v-if="scope.row.payStatus == 0" type="success" style="margin-left: 8px;"
             @click="zhifu(scope.row)">支付</el-link>
         </template>
       </el-table-column>
@@ -65,7 +66,8 @@
 
     <!-- 分页 -->
     <div style="margin-top: 16px; text-align: right;">
-      <el-pagination v-model:current-page="Seach1.PageIndex" v-model:page-size="Seach1.PageSize" :page-sizes="[4, 5, 6]"
+      <el-pagination 
+      v-model:current-page="Seach1.PageIndex" v-model:page-size="Seach1.PageSize" :page-sizes="[4, 5, 6]"
         layout="total, sizes, prev, pager, next, jumper" :total="Seach1.totleCount" />
     </div>
   </div>

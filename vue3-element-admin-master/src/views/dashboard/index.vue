@@ -1,5 +1,17 @@
 <template>
   <div class="dashboard-container">
+    <!-- 动态操作权限按钮演示 -->
+    <div style="margin-bottom: 16px;">
+      <el-button
+        v-for="action in actions"
+        :key="action.id"
+        type="primary"
+        @click="() => $message.success('点击了：' + action.name)"
+        style="margin-right: 8px;"
+      >
+        {{ action.name }}
+      </el-button>
+    </div>
     <!-- github 角标 -->
     <github-corner class="github-corner" />
 
@@ -7,10 +19,10 @@
       <div class="flex flex-wrap">
         <!-- 左侧问候语区域 -->
         <div class="flex-1 flex items-start">
-          <img
+          <!-- <img
             class="w80px h80px rounded-full"
-            :src="userStore.userInfo.avatar + '?imageView2/1/w/80/h/80'"
-          />
+            :src="store.userInfo.avatar + '?imageView2/1/w/80/h/80'"
+          /> -->
           <div class="ml-5">
             <p>{{ greetings }}</p>
             <p class="text-sm text-gray">今日天气晴朗，气温在15℃至25℃之间，东南风。</p>
@@ -355,11 +367,17 @@ defineOptions({
 
 import { dayjs } from "element-plus";
 import LogAPI, { VisitStatsVO, VisitTrendVO } from "@/api/system/log.api";
-import { useCounterStore } from "@/store";
+import { useStore } from "@/store/Usertinfo";
+const store = useStore();
+
 import { formatGrowthRate } from "@/utils";
 import { useTransition, useDateFormat } from "@vueuse/core";
 import { Connection, Failed } from "@element-plus/icons-vue";
 import { useOnlineCount } from "@/composables/useOnlineCount";
+import { useMenuStore } from '@/store';
+import { useRoute } from 'vue-router';
+const menuStore = useMenuStore();
+const route = useRoute();
 
 // 在线用户数量组件相关
 const { onlineUserCount, lastUpdateTime, isConnected } = useOnlineCount();
@@ -389,7 +407,7 @@ interface VersionItem {
   tag?: string; // 版本标签（可选）
 }
 
-const userStore = useCounterStore();
+//const userStore = useCounterStore();
 
 // 当前通知公告列表
 const vesionList = ref<VersionItem[]>([
@@ -424,8 +442,10 @@ const currentDate = new Date();
 
 // 问候语：根据当前小时返回不同问候语
 const greetings = computed(() => {
+  console.log("store",store)
   const hours = currentDate.getHours();
-  const nickname = userStore.userInfo.nickName
+  const nickname = store.nickName;
+  console.log("nickname",store.nickName)
   if (hours >= 6 && hours < 8) {
     return "晨起披衣出草堂，轩窗已自喜微凉🌅！";
   } else if (hours >= 8 && hours < 12) {
@@ -618,6 +638,9 @@ watch(
 onMounted(() => {
   fetchVisitStatsData();
 });
+
+// 获取当前页面的操作权限
+const actions = computed(() => menuStore.getActionsByPath(route.path));
 </script>
 
 <style lang="scss" scoped>

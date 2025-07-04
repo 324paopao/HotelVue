@@ -12,7 +12,7 @@
       <el-card>
         <el-row>
           <el-col :span="12">
-            <el-button size="large" @click="AddAccount()">新增子账号</el-button>
+            <el-button v-if="hasAction('新增子账号')" size="large" @click="AddAccount()">新增子账号</el-button>
             <!-- 新增对话框 -->
             <el-dialog v-model="dialogVisible" :title="title" width="500">
               <span>
@@ -139,16 +139,16 @@
                 <span>
                   {{ getWriteoffDisplay(scope.row.writeoffConfig) }}
                 </span>
-                <span style="color: #409EFF; cursor: pointer; margin-left: 8px;" @click="Writeoff(scope.row)">编辑</span>
+                <span v-if="hasAction('编辑核销通知权限')" style="color: #409EFF; cursor: pointer; margin-left: 8px;" @click="Writeoff(scope.row)">编辑核销通知权限</span>
               </template>
             </el-table-column>
             <el-table-column label="操作" align="center">
               <template #default="scope">
-                <span style="color: #409EFF; cursor: pointer;" @click="handleEdit(scope.row)">编辑</span>&nbsp;&nbsp;
-                <span 
+                <span v-if="hasAction('编辑')" style="color: #409EFF; cursor: pointer;" @click="handleEdit(scope.row)">编辑</span>&nbsp;&nbsp;
+                <span v-if="hasAction('权限明细')"
                 style="color: #409EFF; cursor: pointer;"
                 @click="handlePermission(scope.row)">权限明细</span>&nbsp;&nbsp;
-                <span style="color: #409EFF; cursor: pointer;" @click="handleDelete(scope.row.id)">删除</span>
+                <span v-if="hasAction('删除')" style="color: #409EFF; cursor: pointer;" @click="handleDelete(scope.row.id)">删除</span>
               </template>
             </el-table-column>
           </el-table>
@@ -249,6 +249,20 @@ const dialogVisible = ref(false)
 const roleDialogVisible = ref(false)
 const selectedRoles = ref<{ id: number; roleName: string }[]>([]); // 存储多选结果
 //const roleSearch = ref('')
+
+//#region 操作权限
+import { useMenuStore } from '@/store';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+const menuStore = useMenuStore();
+const route = useRoute();
+const actions = computed(() => menuStore.getActionsByPath(route.path));
+console.log("actions", actions.value)
+function hasAction(actionName: string) {
+  return actions.value.some(a => a.name === actionName);
+}
+//#endregion
+
 const tableData = ref([{
   "nickName": "王五",
   "mobile": "15874512023",
@@ -272,6 +286,9 @@ onMounted(() => {
   getRoleList()
   getAccountList()
   selectedRoleName.value = '全部角色'
+  console.log('当前路由path:', route.path)
+  console.log('actions:', actions.value)
+  console.log('菜单:', menuStore.menuList)
 })
 //#region 角色列表
 const RoleData = ref([{

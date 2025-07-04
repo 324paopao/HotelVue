@@ -73,7 +73,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         path: "/listroomtype",
         name: "listroomtype",
         component: () => import("@/views/RoomType/ListRoomType.vue"),
-        meta: { title: "房态列表", icon: "user", hidden: true },
+        meta: { title: "房号管理", icon: "user", hidden: true },
       },
       {
 
@@ -93,7 +93,8 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "CustomerTagEdit",
         component: () => import("@/views/Customers/CustomerTagEdit.vue"),
         meta: { title: "创建标签", icon: "user", hidden: true },
-
+      },
+      {
         path: "businessRoomtype",
         name: "businessRoomtype",
         component: () => import("@/views/RoomType/ListBusinessRoomType.vue"),

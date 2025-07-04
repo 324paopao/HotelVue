@@ -11,8 +11,8 @@
     <el-card>
       <el-row>
         <el-col :span="12">
-          <el-button @click="handleAddRole">添加角色</el-button>
-          <el-button :disabled="disabled" @click="delRange()"  >批量删除</el-button>
+          <el-button v-if="hasAction('添加角色')" @click="handleAddRole">添加角色</el-button>
+          <el-button v-if="hasAction('批量删除')"  :disabled="disabled" @click="delRange()">批量删除</el-button>
         </el-col>
         <el-col :span="12" style="text-align: right;">
           <el-form :inline="true" :model="SearchData" class="demo-form-inline">
@@ -57,14 +57,15 @@
         </el-table-column>
         <el-table-column prop="address" label="操作" align="center">
           <template #default="scope">
-            <span style="color: #409EFF; cursor: pointer;" @click="handleUpdRole(scope.row)">编辑</span>&nbsp;&nbsp;
-            <span style="color: #409EFF; cursor: pointer;" @click="handleDeleteRole(scope.row)">删除</span>
+            <span v-if="hasAction('编辑权限')" style="color: #409EFF; cursor: pointer;" @click="handleUpdRole(scope.row)">编辑</span>&nbsp;&nbsp;
+            <span v-if="hasAction('删除')"  style="color: #409EFF; cursor: pointer;" @click="handleDeleteRole(scope.row)">删除</span>
           </template>
         </el-table-column>
       </el-table>
       <!-- 分页控件 -->
       <div style="margin: 20px 0; text-align: right;">
-        <el-pagination v-model:current-page="page.PageIndex" v-model:page-size="page.PageSize"
+        <el-pagination 
+        v-model:current-page="page.PageIndex" v-model:page-size="page.PageSize"
           :page-sizes="[10, 20, 30, 40]" :background="true" layout="total, sizes, prev, pager, next, jumper"
           :total="page.totleCount" @current-change="handleCurrentChange" @size-change="handleSizeChange" />
       </div>
@@ -76,16 +77,32 @@
 import { reactive, ref, onMounted } from 'vue'
 import moment from 'moment'
 import type { FormInstance, FormRules } from 'element-plus'
+
 import RoleAPI from '@/api/Setting/role.api'
 const dialogVisible = ref(false)
 const disabled = ref(true)
 const title = ref('添加角色')
+//#region 操作权限
+import { useMenuStore } from '@/store';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+const menuStore = useMenuStore();
+const route = useRoute();
+const actions = computed(() => menuStore.getActionsByPath(route.path));
+console.log("actions", actions.value)
+function hasAction(actionName: string) {
+  return actions.value.some(a => a.name === actionName);
+}
+//#endregion
 const SearchData = reactive({
   RoleName: ''
 })
 onMounted(() => {
   getTree()
   getRole()
+  console.log('当前路由path:', route.path)
+  console.log('actions:', actions.value)
+  console.log('菜单:', menuStore.menuList)
 })
 //#region 角色权限
 function getTree() {
