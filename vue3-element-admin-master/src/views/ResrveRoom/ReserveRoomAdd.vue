@@ -72,9 +72,7 @@
           </el-table-column>
 
           <el-table-column prop="breakfast" label="早餐份数">
-            <template #default="scope">
-              <el-input v-model="form.breakfastNum" size="small" placeholder="请输入" />
-            </template>
+            <el-input v-model="form.breakfastNum" size="small" placeholder="请输入" />
           </el-table-column>
 
           <el-table-column prop="price" label="自定义价格">
@@ -82,12 +80,7 @@
               <el-input v-model="scop.row.price" size="small" />
             </template>
           </el-table-column>
-          <el-table-column label="操作">
-            <template #default="scope">
-              <el-link type="primary">设置房价</el-link>
-              <el-link type="primary" class="ml-10">排序</el-link>
-            </template>
-          </el-table-column>
+
         </el-table>
       </div>
     </el-card>
@@ -107,9 +100,11 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from "vue";
 import AuthAPI from "@/api/Reserve/ReservRoom.api";
-import { random } from "lodash-es";
 import { useStore } from '@/store/Usertinfo';
+import { useRouter } from 'vue-router'
+
 const store = useStore()
+const router = useRouter()
 const form = reactive({
   infomation: "",
   ordersource: "",
@@ -151,7 +146,7 @@ watch(
     }
   }
 );
-const selectedRows = ref([]);
+
 function handleSelectionChange(selection: any) {
   form.aaa = selection;
   // 你可以在这里做其它操作，比如 
@@ -163,6 +158,7 @@ const save = () => {
   const res = AuthAPI.RoomAdd(form)
   console.log("qweqw", res)
   ElMessage.success("添加成功");
+  router.push('/ReserverGetlist')
 }
 </script>
 

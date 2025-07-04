@@ -497,6 +497,12 @@ async function handleJiesuanConfirm() {
 
 //详情
 const Detail = (id: any) => {
+  // router.push({
+  //   path: '/ReserverDetails',
+  //   query: {
+  //     ids: id
+  //   }
+  // })
   router.push({
     path: '/ReserverDetails',
     query: {

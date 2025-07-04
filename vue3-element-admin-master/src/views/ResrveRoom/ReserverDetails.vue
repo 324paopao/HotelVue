@@ -60,9 +60,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, reactive, onMounted, watch } from "vue";
 import AuthAPI from "@/api/Reserve/ReservRoom.api";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
 const form = reactive({
   infomation: "",
   ordersource: "",
@@ -80,27 +82,21 @@ const form = reactive({
   message: "",
   idCard: "",
 });
-onMounted(() => {
-  load();
-});
+const tableData = ref([]);
 
-
-import { useRoute } from "vue-router";
-const route = useRoute();
-
-const tableData = ref();
 const load = async () => {
   const id = route.query.ids;
 
   const res = await AuthAPI.FanRoom(id);
   console.log(res);
   Object.assign(form, res);
-  tableData.value = res ? [res] : [];
+  tableData.value = Array.isArray(res) ? res : [res];
   console.log("tableData", tableData.value);
   console.log("frpm", form)
 };
 
-
+onMounted(() => { load(); });
+watch(() => route.query.ids, () => { load(); });
 </script>
 
 <style scoped>
