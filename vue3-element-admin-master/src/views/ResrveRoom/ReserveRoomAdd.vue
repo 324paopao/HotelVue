@@ -9,13 +9,13 @@
       <div class="section-title">预订信息</div>
       <el-form :model="form" label-width="200px" :inline="true">
         <el-form-item label="客源信息" required>
-          <el-select v-model="form.infomation" placeholder="请选择" style="width: 120px;">
+          <el-select v-model="form.infomation" placeholder="请选择" style="width: 120px">
             <el-option label="散客" value="散客" />
             <el-option label="协议单位" value="协议单位" />
           </el-select>
         </el-form-item>
         <el-form-item label="订单来源" required>
-          <el-select v-model="form.ordersource" placeholder="门店前台" style="width: 120px;">
+          <el-select v-model="form.ordersource" placeholder="门店前台" style="width: 120px">
             <el-option label="门店前台" value="门店前台" />
             <el-option label="OTA" value="OTA" />
           </el-select>
@@ -59,13 +59,8 @@
             {{ 1 }}
           </el-table-column>
 
-
           <el-table-column prop="sort" label="排序">
-
-            <div v-if='form.roomNum = ""'>
-              未排房
-
-            </div>
+            <div v-if="form.roomNum = ''">未排房</div>
             <div v-else>
               {{ form.roomNum }}
             </div>
@@ -105,6 +100,7 @@ import { useRouter } from 'vue-router'
 
 const store = useStore()
 const router = useRouter()
+
 const form = reactive({
   infomation: "",
   ordersource: "",
@@ -121,12 +117,13 @@ const form = reactive({
   roomNum: "",
   message: "",
   idCard: "",
+  aaa: [],
   userid: store.id,
-  aaa: []
+
+
 });
 
 const roomTypes = ref();
-
 onMounted(() => {
   load();
 });
@@ -149,14 +146,13 @@ watch(
 
 function handleSelectionChange(selection: any) {
   form.aaa = selection;
-  // 你可以在这里做其它操作，比如 
-  console.log("1213", form.aaa)
+  // 你可以在这里做其它操作，比如
+  console.log("1213", form.aaa);
 }
 
-
 const save = () => {
-  const res = AuthAPI.RoomAdd(form)
-  console.log("qweqw", res)
+  const res = AuthAPI.RoomAdd(form);
+  console.log("qweqw", res);
   ElMessage.success("添加成功");
   router.push('/ReserverGetlist')
 }
