@@ -49,7 +49,7 @@
             <div v-for="room in group.rooms" :key="room.id" class="room-card">
               <div class="room-header">
                 <span class="room-num">{{ room.roomNum }}</span>
-                <el-dropdown @command="(cmd) => handleChangeState(room, cmd)">
+                <el-dropdown @command="(cmd) => handleChangeState(room, cmd, room.roomNum)">
                   <span class="room-more">...</span>
                   <template #dropdown>
                     <el-dropdown-menu>
@@ -82,7 +82,6 @@ import { ref, computed, onMounted } from "vue";
 import { updateRoomState, getRoomStateList } from "@/api/system/roomstate";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
-
 const stateTextMap: Record<string, string> = {
   1: "净房",
   2: "脏房",
@@ -154,16 +153,25 @@ function onStateChange(state: string | number) {
     loadRoomGroups({ TypeName: selectedRoomType.value, State: selectedState.value });
   }
 }
-
 onMounted(() => {
   loadRoomGroups();
 });
 
-function handleChangeState(room: any, command: string) {
+function handleChangeState(room: any, command: string, roomNum: any) {
   const state = Number(command);
-  if (state === 4 || state === 5) {
-    router.push("/ReserveRoomList");
+  if (state == 4) {
+    router.push({
+      path: "/ReserveRoomList",
+      query: {
+        num: roomNum,
+      },
+    });
+
+    loadRoomGroups();
     return;
+  }
+  if (state == 5) {
+    router.push("/ReserverGetlist");
   }
   updateRoomState(room.id, state)
     .then(() => {

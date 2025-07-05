@@ -122,11 +122,13 @@ const form = reactive({
   breakfastNum: 0,
   price: 0,
   status: 0,
-  roomNum: "",
+  roomNum: "未排房",
   message: "",
   idCard: "",
   aaa: [],
 });
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 const roomTypes = ref();
 const router = useRouter();
@@ -158,10 +160,12 @@ function handleSelectionChange(selection: any) {
 }
 
 const save = () => {
+  form.roomNum = route.query.num;
   const res = AuthAPI.RoomAdd(form);
   console.log("qweqw", res);
   ElMessage.success("添加成功");
-  router.push("/listRoomState");
+  //router.push("/listRoomState");
+  router.push("/ReserverGetlist");
 };
 </script>
 
