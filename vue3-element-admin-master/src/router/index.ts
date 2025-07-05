@@ -73,7 +73,26 @@ export const constantRoutes: RouteRecordRaw[] = [
         path: "/listroomtype",
         name: "listroomtype",
         component: () => import("@/views/RoomType/ListRoomType.vue"),
-        meta: { title: "房态列表", icon: "user", hidden: true },
+        meta: { title: "房号管理", icon: "user", hidden: true },
+      },
+      {
+
+        path: "getcustomerlist",
+        name: "getcustomerlist",
+        component: () => import("@/views/Customers/GetCustomerListView.vue"),
+        meta: { title: "客户列表", icon: "user", hidden: true },
+      },
+      {
+        path: "customers/tags-management",
+        name: "CustomerTagsManagement",
+        component: () => import("@/views/Customers/CustomerTagsManagement.vue"),
+        meta: { title: "标签管理", icon: "user", hidden: true },
+      },
+      {
+        path: "customers/tag-edit",
+        name: "CustomerTagEdit",
+        component: () => import("@/views/Customers/CustomerTagEdit.vue"),
+        meta: { title: "创建标签", icon: "user", hidden: true },
       },
       {
         path: "businessRoomtype",
@@ -110,11 +129,29 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "ReserverDetails",
         component: () => import("@/views/ResrveRoom/ReserverDetails.vue"),
         meta: { title: "订单详情", keepAlive: true, icon: "user", hidden: true },
+
+      },
+      {
+        path: "accountview",
+        name: "accountview",
+        component: () => import("@/views/Setting/AccountView.vue"),
+        meta: { title: "账号管理", icon: "user", hidden: true },
+      },
+      {
+        path: "roleview",
+        name: "roleview",
+        component: () => import("@/views/Setting/RoleView.vue"),
+        meta: { title: "角色管理", icon: "user", hidden: true },
+      },
+      {
+        path: "operationlog",
+        name: "operationlog",
+        component: () => import("@/views/Setting/OperationLog.vue"),
+        meta: { title: "操作日志管理", icon: "user", hidden: true },
       },
     ],
   },
 ];
-
 
 /**
  * 创建路由

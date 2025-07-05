@@ -1,7 +1,7 @@
 <template>
   <div class="static-page-container">
-    <h1>欢迎来到静态页面！</h1>
-    <p>这里是一个示例静态页面，登录后会跳转到这里。</p>
+    <!-- <h1>欢迎来到静态页面！</h1>
+    <p>这里是一个示例静态页面，登录后会跳转到这里。</p> -->
   </div>
 </template>
 

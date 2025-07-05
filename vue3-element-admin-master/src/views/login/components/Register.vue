@@ -118,8 +118,8 @@ interface Model extends LoginFormData {
 }
 
 const model = ref<Model>({
-  username: "admin",
-  password: "123456",
+  username: "",
+  password: "",
   confirmPassword: "",
   captchaKey: "",
   captchaCode: "",
@@ -178,14 +178,37 @@ const rules = computed(() => {
 
 // 获取验证码
 const codeLoading = ref(false);
-function getCaptcha() {
-  codeLoading.value = true;
-  AuthAPI.getCaptcha()
-    .then((data) => {
-      model.value.captchaKey = data.captchaKey;
-      captchaBase64.value = data.captchaBase64;
-    })
-    .finally(() => (codeLoading.value = false));
+async function getCaptcha() {
+  codeLoading.value = true; // 开始加载动画
+  const id = new Date().getTime().toString(); // 生成唯一验证码 key
+  try {
+    // 调用后端接口获取验证码图片（Blob 格式）
+    const response = await AuthAPI.getCaptcha(id);
+    let blob: Blob; // 用于存放图片二进制数据
+    // 兼容不同 axios 封装返回格式
+    if (response instanceof Blob) {
+      // 如果直接返回的是 Blob
+      blob = response;
+    } else if (response && response.data instanceof Blob) {
+      // 如果 axios 封装，图片在 data 字段里
+      blob = response.data;
+    } else {
+      // 返回值不是 Blob，报错并退出
+      console.error("返回值不是Blob类型,实际类型:", typeof response);
+      return;
+    }
+    // 创建 FileReader 实例，将 Blob 转为 base64
+    const reader = new FileReader();
+    reader.readAsDataURL(blob); // 异步读取
+    reader.onload = () => {
+      // 读取完成后，将 base64 赋值给 captchaBase64，img 会自动刷新
+      captchaBase64.value = reader.result as string;
+      loginFormData.value.captchaKey = id; // 保存验证码 key，后端校验用
+      loginFormData.value.captchaCode = ""; // 清空输入框
+    };
+  } finally {
+    codeLoading.value = false; // 关闭加载动画
+  }
 }
 
 // 检查输入大小写
