@@ -205,3 +205,21 @@ export function updateCustomerStatus(ids: string[], status: boolean) {
     data: { ids, status },
   });
 }
+
+/**
+ * 送积分
+ * @param data 送积分数据
+ * @returns Promise
+ */
+export function giveCustomerPoints(data: {
+  id: string;
+  availablePoints: number;
+  accumulativeintegral: number;
+  pointsmodifydesc: string;
+}) {
+  return request({
+    url: "/api/app/customer/available-points",
+    method: "put",
+    data,
+  });
+}

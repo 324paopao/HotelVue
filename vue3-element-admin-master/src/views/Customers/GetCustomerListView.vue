@@ -1,5 +1,5 @@
 <template>
-  <el-card class="query-card" shadow="never" style="margin-bottom: 24px; width: 100%">
+  <el-card class="query-card sticky-header" shadow="never" style="margin-bottom: 24px; width: 100%">
     <div class="filter-card">
       <el-form :inline="true" class="filter-form" label-width="100px">
         <template v-if="isExpand">
@@ -78,7 +78,9 @@
               <el-button>导入客户</el-button>
             </div>
             <div class="flex-row-right">
-              <el-button v-if="hasAction('标签管理')" @click="goToTagManagement">标签管理</el-button>
+              <el-button v-if="hasAction('标签管理')" @click="goToTagManagement">
+                标签管理
+              </el-button>
               <el-button v-if="hasAction('同步粉丝')">同步粉丝</el-button>
               <el-button @click="toggleExpand">收起</el-button>
               <el-button @click="onSearch">搜索</el-button>
@@ -105,7 +107,9 @@
               <el-button class="expand-btn" @click="toggleExpand">展开</el-button>
             </div>
             <div class="flex-row-right">
-              <el-button v-if="hasAction('标签管理')" @click="goToTagManagement">标签管理</el-button>
+              <el-button v-if="hasAction('标签管理')" @click="goToTagManagement">
+                标签管理
+              </el-button>
               <el-button v-if="hasAction('同步粉丝')">同步粉丝</el-button>
             </div>
           </div>
@@ -165,7 +169,7 @@
           <el-link type="primary">添加标签</el-link>
         </template>
       </el-table-column>
-      <el-table-column label="卡号" prop="id" align="center" />
+      <el-table-column label="卡号" prop="id"  width="170" />
       <el-table-column label="手机" prop="phoneNumber" align="center" />
       <el-table-column label="可用余额" prop="availableBalance" align="center">
         <template #default="scope">
@@ -192,9 +196,7 @@
           <el-divider direction="vertical" />
           <el-link @click="handleSetLevel(scope.row)">设置等级</el-link>
           <el-divider direction="vertical" />
-          <el-link v-if="hasAction('送积分')">送积分</el-link>
-          <el-divider direction="vertical" />
-          <el-link v-if="hasAction('送优惠券')">送优惠券</el-link>
+          <el-link @click="openGivePointsDialog(scope.row)">送积分</el-link>
           <el-divider direction="vertical" />
           <el-link v-if="scope.row.status !== false" @click="openRechargeDialog(scope.row)">
             充值
@@ -206,12 +208,19 @@
         </template>
       </el-table-column>
     </el-table>
-    <Pagination
-      v-model:page="pageIndex"
-      v-model:limit="pageSize"
-      :total="total"
-      @pagination="handlePagination"
-    />
+    <!-- 分页控件 -->
+    <div style="margin: 20px 0; text-align: right">
+      <el-pagination
+        v-model:current-page="page.PageIndex"
+        v-model:page-size="page.PageSize"
+        :page-sizes="[5, 10, 20, 50]"
+        :background="true"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="page.totleCount"
+        @current-change="handleCurrentChange"
+        @size-change="handleSizeChange"
+      />
+    </div>
   </el-card>
 
   <!-- 添加客户弹窗 -->
@@ -465,10 +474,72 @@
       </div>
     </template>
   </el-dialog>
+
+  <!-- 送积分弹窗 -->
+  <el-dialog
+    v-model="showGivePointsDialog"
+    title="手动修改积分"
+    width="650px"
+    :close-on-click-modal="false"
+  >
+    <div style="margin-bottom: 16px">
+      <div style="padding-left: 65px; font-size: 14px; color: #606266; margin-bottom: 8px">
+        客户信息： 客户：{{ givePointsForm.customerName }}，等级：{{ givePointsForm.level }}
+      </div>
+
+      <div
+        style="
+          padding-left: 140px;
+          font-size: 12px;
+          color: #606266;
+          line-height: 22px;
+          margin-top: 4px;
+        "
+      >
+        余额：{{ givePointsForm.balance }}，积分：{{ givePointsForm.availablePoints }}
+      </div>
+    </div>
+    <el-form :model="givePointsForm" label-width="140px">
+      <!-- 调整 label-width -->
+      <el-form-item label="修改积分(增减)" required>
+        <!-- 确保 required 存在以显示红星 -->
+        <el-input
+          v-model="givePointsForm.accumulativeintegral"
+          type="number"
+          style="width: 200px"
+        />
+      </el-form-item>
+      <div style="color: #909399; margin-bottom: 12px; padding-left: 160px">
+        <!-- 调整 margin-left -->
+        可用积分{{ givePointsForm.availablePoints }},输入500，表示增加500，表示减少500
+      </div>
+      <el-form-item label="操作员">
+        <span>{{ givePointsForm.operator }}</span>
+      </el-form-item>
+      <el-form-item label="备注：">
+        <el-input
+          v-model="givePointsForm.pointsmodifydesc"
+          type="textarea"
+          maxlength="100"
+          show-word-limit
+          style="width: 200px"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="showGivePointsDialog = false">取消</el-button>
+      <el-button type="primary" :loading="givePointsLoading" @click="handleGivePoints">
+        确定
+      </el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+// ===================== 客户列表页面 =====================
+
+// 引入相关依赖
+import { ref, onMounted, watch, reactive } from "vue";
 import {
   addCustomer,
   getCustomerList,
@@ -478,38 +549,44 @@ import {
   rechargeCustomerBalance,
   customerConsume,
   updateCustomerStatus,
+  giveCustomerPoints,
 } from "@/api/system/customer.api";
 import { regionData } from "element-china-area-data";
-import Pagination from "@/components/Pagination/index.vue";
+// 移除未用的 Pagination 组件
+// import Pagination from "@/components/Pagination/index.vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-//#region 操作权限
-import { useMenuStore } from '@/store';
-import { useRoute } from 'vue-router';
-import { computed } from 'vue';
+// #region 操作权限相关
+import { useMenuStore } from "@/store";
+import { useRoute } from "vue-router";
+import { computed } from "vue";
 const menuStore = useMenuStore();
 const route = useRoute();
 const actions = computed(() => menuStore.getActionsByPath(route.path));
-console.log("actions", actions.value)
+console.log("actions", actions.value);
 function hasAction(actionName: string) {
-  return actions.value.some(a => a.name === actionName);
+  return actions.value.some((a) => a.name === actionName);
 }
-//#endregion
+// #endregion
+
+// 客户类型常量
 const customerKindGuid = {
   member: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   normal: "3fa85f64-5717-4562-b3fc-2c963f66afa7",
 };
 
+// 控制筛选条件展开/收起
 const isExpand = ref(false);
 const toggleExpand = () => {
   isExpand.value = !isExpand.value;
 };
 
-const pageIndex = ref(1);
-const pageSize = ref(10);
-
+// ===================== 分页与筛选 =====================
+// 当前页码
+const pageIndex = ref(1); // 当前页码
+// 查询条件对象
 const filters = ref({
   CustomerNickName: "",
   CustomerType: "",
@@ -521,75 +598,105 @@ const filters = ref({
   infoValue: "",
 });
 
+// ===================== 分页参数对象 =====================
+const page = reactive({
+  PageIndex: 1,
+  PageSize: 5,
+  totleCount: 0,
+  totlePage: 0,
+});
+
+// ===================== 客户数据 =====================
+// 客户表格数据
 const tableData = ref([]);
-const total = ref(0);
 
-const customerTypeOptions = ref();
-const selectedCustomerIds = ref<string[]>([]);
-
-const fetchCustomerTypeOptions = async () => {
-  const res = await getCustomerTypeList();
-  if (res) {
-    customerTypeOptions.value = res;
-  }
-};
-
+// 获取客户列表数据（带分页）
 const fetchCustomerList = async () => {
   const params = buildQueryParams();
   const res = await getCustomerList(params);
-  console.log(res);
   if (res) {
     tableData.value = res.data;
+    page.totleCount = res.totleCount;
+    page.totlePage = res.totlePage;
   }
 };
 
+// 构建查询参数（只传递有值的参数，分页参数必传）
 function buildQueryParams() {
-  const params = { ...filters.value };
-  params.CustomerNickName = "";
-  params.CustomerName = "";
-  params.PhoneNumber = "";
-  if (params.infoType && params.infoValue) {
-    if (params.infoType === "phone") params.PhoneNumber = params.infoValue;
-    if (params.infoType === "nickname") params.CustomerNickName = params.infoValue;
-    if (params.infoType === "name") params.CustomerName = params.infoValue;
+  const params: Record<string, any> = {};
+  // 处理 infoType
+  if (filters.value.infoType && filters.value.infoValue) {
+    if (filters.value.infoType === "phone") params.PhoneNumber = filters.value.infoValue;
+    if (filters.value.infoType === "nickname") params.CustomerNickName = filters.value.infoValue;
+    if (filters.value.infoType === "name") params.CustomerName = filters.value.infoValue;
   }
-  const query: Record<string, any> = {
-    PageIndex: pageIndex.value,
-    PageSize: pageSize.value,
-  };
-  if (params.CustomerNickName) query["CustomerNickName"] = params.CustomerNickName;
-  if (params.CustomerType) query["CustomerType"] = params.CustomerType;
-  if (params.CustomerName) query["CustomerName"] = params.CustomerName;
-  if (params.PhoneNumber) query["PhoneNumber"] = params.PhoneNumber;
-  if (params.Gender !== "" && params.Gender !== undefined) query["Gender"] = params.Gender;
-  if (params.openCardTime && params.openCardTime.length === 2) {
-    query["StartTime"] = params.openCardTime[0];
-    query["EndTime"] = params.openCardTime[1];
+  if (filters.value.CustomerType) params.CustomerType = filters.value.CustomerType;
+  if (filters.value.Gender !== "" && filters.value.Gender !== undefined)
+    params.Gender = filters.value.Gender;
+  if (filters.value.openCardTime && filters.value.openCardTime.length === 2) {
+    params.StartTime = filters.value.openCardTime[0];
+    params.EndTime = filters.value.openCardTime[1];
   }
-  return query;
+  // 分页参数必传
+  params.PageIndex = page.PageIndex;
+  params.PageSize = page.PageSize;
+  return params;
 }
 
+// 页码变化
+function handleCurrentChange(val: number) {
+  page.PageIndex = val;
+  fetchCustomerList();
+}
+// 每页条数变化
+function handleSizeChange(val: number) {
+  page.PageSize = val;
+  page.PageIndex = 1;
+  fetchCustomerList();
+}
+
+// 搜索按钮点击事件，自动跳转到第一页
 const onSearch = () => {
-  pageIndex.value = 1;
+  page.PageIndex = 1;
   fetchCustomerList();
 };
 
-function handlePagination(payload: { page: number; limit: number }) {
-  pageIndex.value = payload.page;
-  pageSize.value = payload.limit;
-  fetchCustomerList();
-}
+// 移除未用的 handlePagination 方法
+// function handlePagination(payload: { page: number; limit: number }) {
+//   pageIndex.value = payload.page;
+//   pageSize.value = payload.limit;
+//   fetchCustomerList();
+// }
 
+// ===================== 客户类型选项 =====================
+// 明确类型，避免 never 报错
+const customerTypeOptions = ref<{ id: string; customerTypeName: string }[]>([]); // 客户类型下拉选项
+// 获取客户类型选项
+const fetchCustomerTypeOptions = async () => {
+  const res = await getCustomerTypeList();
+  if (res && res.data) {
+    customerTypeOptions.value = res.data as { id: string; customerTypeName: string }[];
+  }
+};
+
+// ===================== 多选相关 =====================
+const selectedCustomerIds = ref<string[]>([]); // 选中的客户ID集合
+
+// 页面挂载时初始化数据
 onMounted(() => {
   fetchCustomerList();
   fetchCustomerTypeOptions();
-  console.log('当前路由path:', route.path)
-  console.log('actions:', actions.value)
-  console.log('菜单:', menuStore.menuList)
+  console.log("当前路由path:", route.path);
+  console.log("actions:", actions.value);
+  console.log("菜单:", menuStore.menuList);
 });
 
+// ===================== 添加客户弹窗相关 =====================
+// 控制添加客户弹窗显示
 const showAddDialog = ref(false);
+// 添加客户表单ref
 const addFormRef = ref();
+// 添加客户表单数据
 const addForm = ref({
   customerNickName: "",
   customerType: customerKindGuid.member,
@@ -604,7 +711,9 @@ const addForm = ref({
   region: [],
   address: "",
 });
+// 地区选项
 const regionOptions = ref(regionData);
+// 添加客户表单校验规则
 const addRules = {
   customerType: [{ required: true, message: "请选择客户类型", trigger: "change" }],
   customerName: [{ required: true, message: "请输入客户姓名", trigger: "blur" }],
@@ -613,6 +722,7 @@ const addRules = {
     { pattern: /^1[3-9]\d{9}$/, message: "手机号格式不正确", trigger: "blur" },
   ],
 };
+// 提交添加客户表单
 const submitAddForm = () => {
   addFormRef.value.validate(async (valid: boolean) => {
     if (!valid) return;
@@ -650,16 +760,19 @@ const submitAddForm = () => {
   });
 };
 
-const showEditLevelDialog = ref(false);
-const editLevelForm = ref({ customerType: "" });
-const editLevelFormRef = ref();
+// ===================== 等级修改弹窗相关 =====================
+const showEditLevelDialog = ref(false); // 控制等级弹窗显示
+const editLevelForm = ref({ customerType: "" }); // 等级表单数据
+const editLevelFormRef = ref(); // 等级表单ref
 const editLevelRules = {
   customerType: [{ required: true, message: "请选择会员等级", trigger: "change" }],
 };
+// 选中项变化
 function handleSelectionChange(selection: any[]) {
   selectedCustomerIds.value = selection.map((item) => item.id);
   console.log("handleSelectionChange", selection, selectedCustomerIds.value);
 }
+// 打开等级弹窗
 function openEditLevelDialog(row?: any) {
   if (row && selectedCustomerIds.value.length === 0) {
     selectedCustomerIds.value = [row.id];
@@ -670,14 +783,8 @@ function openEditLevelDialog(row?: any) {
   editLevelForm.value.customerType = "";
   showEditLevelDialog.value = true;
 }
+// 提交等级修改
 async function submitEditLevel() {
-  console.log(
-    "submitEditLevel called",
-    //formRef,
-    selectedCustomerIds.value,
-    editLevelForm.value.customerType
-  );
-  //if (!formRef || !formRef.value) return;
   if (selectedCustomerIds.value.length === 0) {
     ElMessage.warning("请先选择要修改的客户！");
     return;
@@ -687,7 +794,6 @@ async function submitEditLevel() {
       ElMessage.warning("请完整选择等级后再提交！");
       return;
     }
-
     await updateCustomerLevel(selectedCustomerIds.value, editLevelForm.value.customerType);
     showEditLevelDialog.value = false;
     ElMessage.success("批量修改成功！");
@@ -695,6 +801,8 @@ async function submitEditLevel() {
   });
 }
 
+// ===================== 其它操作 =====================
+// 重置筛选条件
 const resetFilters = () => {
   filters.value = {
     CustomerNickName: "",
@@ -713,38 +821,27 @@ const resetFilters = () => {
 /**
  * 导出客户数据功能
  * 根据当前筛选条件导出客户数据到Excel文件
- * 1. 获取当前筛选参数
- * 2. 调用后端API导出数据
- * 3. 将响应转换为Blob对象并创建下载链接
- * 4. 触发文件下载并提供用户反馈
  */
 const handleExportCustomers = async () => {
   try {
     // 构建与当前列表查询相同的筛选参数
     const params = buildQueryParams();
-
     // 调用API获取文件数据流
     const response = await exportCustomerData(params);
-
-    // 关闭加载提示
-
     // 验证响应数据
     if (!response.data) {
       ElMessage.error("导出失败：未获取到数据");
       return;
     }
-
     // 生成包含日期的文件名
     const date = new Date();
     const dateString = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, "0")}${date.getDate().toString().padStart(2, "0")}`;
     const timeString = `${date.getHours().toString().padStart(2, "0")}${date.getMinutes().toString().padStart(2, "0")}`;
     const filename = `客户数据_${dateString}_${timeString}.xlsx`;
-
     // 将响应数据转换为Excel文件blob对象
     const blob = new Blob([response.data], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
-
     // 下载文件
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -754,22 +851,16 @@ const handleExportCustomers = async () => {
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
-
     // 显示成功消息，添加文件名提示
     ElMessage.success(`导出成功，文件名：${filename}`);
   } catch (error: any) {
     // 错误处理与反馈
     console.error("导出客户数据失败", error);
-
-    // 更详细的错误提示
     if (error.response) {
-      // 服务器返回错误状态码
       ElMessage.error(`导出失败：服务器返回 ${error.response.status} 错误`);
     } else if (error.request) {
-      // 请求发送但没有收到响应
       ElMessage.error("导出失败：服务器无响应，请检查网络连接");
     } else {
-      // 请求配置出错
       ElMessage.error(`导出失败：${error.message || "未知错误"}`);
     }
   }
@@ -782,8 +873,10 @@ const goToTagManagement = () => {
   router.push("/customers/tags-management");
 };
 
-// 充值弹窗相关数据和方法
+// ===================== 充值弹窗相关 =====================
+// 控制充值弹窗显示
 const showRechargeDialog = ref(false);
+// 充值表单数据
 const rechargeForm = ref({
   customerId: "",
   customerName: "",
@@ -791,16 +884,14 @@ const rechargeForm = ref({
   remark: "",
   operatorId: "17376144917", // 这里应该从登录用户信息中获取
 });
+// 充值金额校验
 const invalidRechargeAmount = ref(false);
-
 // 监听充值金额变化，检查金额是否有效
 watch(
   () => rechargeForm.value.amount,
   (newValue) => {
     if (showRechargeDialog.value) {
       const amount = parseFloat(newValue || "0");
-
-      // 检查金额是否有效（超出范围或小数位过多）
       invalidRechargeAmount.value = !!(
         newValue &&
         (isNaN(amount) || amount < 0.01 || amount > 950000 || !/^\d+(\.\d{1,2})?$/.test(newValue))
@@ -808,7 +899,6 @@ watch(
     }
   }
 );
-
 // 打开充值弹窗
 const openRechargeDialog = (row: any) => {
   rechargeForm.value = {
@@ -818,32 +908,24 @@ const openRechargeDialog = (row: any) => {
     remark: "",
     operatorId: row.phoneNumber,
   };
-  invalidRechargeAmount.value = false; // 重置金额无效标志
+  invalidRechargeAmount.value = false;
   showRechargeDialog.value = true;
 };
-
 // 提交充值
 const submitRecharge = async () => {
-  // 简单验证
   if (!rechargeForm.value.amount) {
     ElMessage.warning("请输入充值金额");
     return;
   }
-
   const amount = parseFloat(rechargeForm.value.amount);
-
-  // 验证金额是否在有效范围内（0.01-950000之间且最多两位小数）
   if (isNaN(amount) || amount < 0.01 || amount > 950000) {
     ElMessage.warning("请输入0.01-950000之间的数");
     return;
   }
-
-  // 验证最多两位小数
   if (!/^\d+(\.\d{1,2})?$/.test(rechargeForm.value.amount)) {
     ElMessage.warning("金额最多支持两位小数");
     return;
   }
-
   try {
     await rechargeCustomerBalance({
       id: rechargeForm.value.customerId,
@@ -851,17 +933,17 @@ const submitRecharge = async () => {
       rechargeamount: amount,
       customerDesc: rechargeForm.value.remark || "",
     });
-
     ElMessage.success("充值成功");
     showRechargeDialog.value = false;
-    fetchCustomerList(); // 刷新列表
+    fetchCustomerList();
   } catch (error) {
     console.error("充值失败", error);
     ElMessage.error("充值失败，请重试");
   }
 };
 
-const showConsumeDialog = ref(false);
+// ===================== 消费弹窗相关 =====================
+const showConsumeDialog = ref(false); // 控制消费弹窗显示
 const consumeForm = ref({
   customerId: "",
   customerName: "",
@@ -871,9 +953,8 @@ const consumeForm = ref({
   giftBalance: undefined,
   operatorId: "17376144917",
 });
-const insufficientBalance = ref(false);
-const invalidAmount = ref(false);
-
+const insufficientBalance = ref(false); // 余额不足标志
+const invalidAmount = ref(false); // 金额无效标志
 // 监听消费金额变化，检查余额是否足够和金额是否有效
 watch(
   () => consumeForm.value.sumofconsume,
@@ -882,25 +963,20 @@ watch(
       const amount = parseFloat(newValue || "0");
       const availableBalance = parseFloat(consumeForm.value.availableBalance || "0");
       const giftBalance = parseFloat(consumeForm.value.giftBalance || "0");
-
-      // 首先检查金额是否有效（超出范围或小数位过多）
       invalidAmount.value = !!(
         newValue &&
         (isNaN(amount) || amount < 0.01 || amount > 950000 || !/^\d+(\.\d{1,2})?$/.test(newValue))
       );
-
-      // 只有在金额有效的情况下才检查余额是否足够
       if (!invalidAmount.value) {
         insufficientBalance.value =
           !isNaN(amount) && amount > 0 && amount > availableBalance + giftBalance;
       } else {
-        // 如果金额无效，不显示余额不足
         insufficientBalance.value = false;
       }
     }
   }
 );
-
+// 打开消费弹窗
 const openConsumeDialog = (row: any) => {
   consumeForm.value = {
     customerId: row.id,
@@ -911,76 +987,71 @@ const openConsumeDialog = (row: any) => {
     giftBalance: row.availableGiftBalance,
     operatorId: row.phoneNumber,
   };
-  insufficientBalance.value = false; // 重置余额不足标志
-  invalidAmount.value = false; // 重置金额无效标志
+  insufficientBalance.value = false;
+  invalidAmount.value = false;
   showConsumeDialog.value = true;
 };
-
+// 提交消费
 const submitConsume = async () => {
   if (!consumeForm.value.sumofconsume) {
     ElMessage.warning("请输入消费金额");
     return;
   }
   const amount = parseFloat(consumeForm.value.sumofconsume);
-
-  // 验证金额是否在有效范围内（0.01-950000之间且最多两位小数）
   if (isNaN(amount) || amount < 0.01 || amount > 950000) {
     ElMessage.warning("请输入0.01-950000之间的数");
     return;
   }
-
-  // 验证最多两位小数
   if (!/^\d+(\.\d{1,2})?$/.test(consumeForm.value.sumofconsume)) {
     ElMessage.warning("金额最多支持两位小数");
     return;
   }
-
-  // 验证余额是否足够
   const availableBalance = parseFloat(consumeForm.value.availableBalance || "0");
   const giftBalance = parseFloat(consumeForm.value.giftBalance || "0");
   if (amount > availableBalance + giftBalance) {
     ElMessage.warning("会员余额不足");
     return;
   }
-
   try {
     await customerConsume({
       id: consumeForm.value.customerId,
       availableBalance,
       availableGiftBalance: giftBalance,
       sumofconsumption: amount,
-      consumerNumber: 0, // 如有实际次数可替换
+      consumerNumber: 0,
       consumerDesc: consumeForm.value.consumerDesc || "",
     });
     ElMessage.success("消费成功");
     showConsumeDialog.value = false;
-    fetchCustomerList(); // 刷新列表
+    fetchCustomerList();
   } catch (error) {
     console.error("消费失败", error);
     ElMessage.error("消费失败，请重试");
   }
 };
 
+// ===================== 冻结/解冻相关 =====================
+// 冻结客户
 const handleFreeze = async (row: any) => {
   try {
-    await updateCustomerStatus([row.id], false); // false=冻结
+    await updateCustomerStatus([row.id], false);
     ElMessage.success("冻结成功");
     fetchCustomerList();
   } catch {
     ElMessage.error("冻结失败");
   }
 };
-
+// 解冻客户
 const handleUnfreeze = async (row: any) => {
   try {
-    await updateCustomerStatus([row.id], true); // true=解冻
+    await updateCustomerStatus([row.id], true);
     ElMessage.success("解冻成功");
     fetchCustomerList();
   } catch {
     ElMessage.error("解冻失败");
   }
 };
-
+// 批量冻结
 const handleBatchFreeze = async () => {
   if (!selectedCustomerIds.value.length) {
     ElMessage.warning("请先选择客户");
@@ -990,7 +1061,7 @@ const handleBatchFreeze = async () => {
   ElMessage.success("批量冻结成功");
   fetchCustomerList();
 };
-
+// 批量解冻
 const handleBatchUnfreeze = async () => {
   if (!selectedCustomerIds.value.length) {
     ElMessage.warning("请先选择客户");
@@ -1000,11 +1071,67 @@ const handleBatchUnfreeze = async () => {
   ElMessage.success("批量解冻成功");
   fetchCustomerList();
 };
-
+// 设置等级
 const handleSetLevel = (row: any) => {
-  // 这里可以打开等级设置弹窗，或直接调用相关逻辑
-  // 例如：openEditLevelDialog(row)
   openEditLevelDialog(row);
+};
+
+// ===================== 送积分弹窗相关 =====================
+// 控制送积分弹窗显示
+const showGivePointsDialog = ref(false);
+// 送积分表单数据
+const givePointsForm = ref({
+  id: "",
+  customerName: "",
+  level: "",
+  balance: 0,
+  availablePoints: 0,
+  accumulativeintegral: 0,
+  operator: "",
+  pointsmodifydesc: "",
+});
+const givePointsLoading = ref(false); // 送积分loading
+// 打开送积分弹窗
+const openGivePointsDialog = (row: any) => {
+  givePointsForm.value = {
+    id: row.id,
+    customerName: row.customerName || row.customerNickName || "",
+    level: row.customerTypeName || "",
+    balance: row.availableBalance || 0,
+    availablePoints: row.availablePoints || 0,
+    accumulativeintegral: 0,
+    operator: row.phoneNumber || "",
+    pointsmodifydesc: "",
+  };
+  showGivePointsDialog.value = true;
+};
+// 提交送积分
+const handleGivePoints = async () => {
+  givePointsLoading.value = true;
+  try {
+    const pointsToAccumulate = Number(givePointsForm.value.accumulativeintegral);
+    if (isNaN(pointsToAccumulate)) {
+      ElMessage.warning("请输入有效的积分增减数量");
+      givePointsLoading.value = false;
+      return;
+    }
+    const paramsToSend = {
+      id: String(givePointsForm.value.id),
+      availablePoints: Number(givePointsForm.value.availablePoints) + pointsToAccumulate,
+      accumulativeintegral: pointsToAccumulate,
+      pointsmodifydesc: String(givePointsForm.value.pointsmodifydesc),
+    };
+    console.log("发送给 giveCustomerPoints 的参数:", paramsToSend);
+    await giveCustomerPoints(paramsToSend);
+    ElMessage.success("送积分成功");
+    showGivePointsDialog.value = false;
+    fetchCustomerList();
+  } catch (error) {
+    console.error("送积分失败", error);
+    ElMessage.error("送积分失败");
+  } finally {
+    givePointsLoading.value = false;
+  }
 };
 </script>
 
@@ -1427,5 +1554,13 @@ const handleSetLevel = (row: any) => {
   text-align: center;
   display: inline-block;
   margin-top: 2px;
+}
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  box-shadow: 0 2px 8px -4px #d3d3d3;
+  border-bottom: 1px solid #ebeef5;
 }
 </style>
