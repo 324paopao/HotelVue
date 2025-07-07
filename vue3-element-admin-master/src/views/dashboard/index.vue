@@ -6,8 +6,8 @@
         v-for="action in actions"
         :key="action.id"
         type="primary"
-        @click="() => $message.success('点击了：' + action.name)"
         style="margin-right: 8px;"
+        @click="() => $message.success('点击了：' + action.name)"
       >
         {{ action.name }}
       </el-button>

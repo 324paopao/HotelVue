@@ -65,12 +65,12 @@ export const constantRoutes: RouteRecordRaw[] = [
         meta: { title: "我的通知", icon: "user", hidden: true },
       },
       {
-        path: "/static-page",
+        path: "static-page",
         component: () => import("@/views/static-page.vue"),
         meta: { title: "静态页面" },
       },
       {
-        path: "/listroomtype",
+        path: "listroomtype",
         name: "listroomtype",
         component: () => import("@/views/RoomType/ListRoomType.vue"),
         meta: { title: "房号管理", icon: "user", hidden: true },
@@ -107,19 +107,19 @@ export const constantRoutes: RouteRecordRaw[] = [
         meta: { title: "房态", icon: "user", hidden: true },
       },
       {
-        path: "/ReserveRoomList",
+        path: "ReserveRoomList",
         name: "ReserveRoomList",
         component: () => import("@/views/ResrveRoom/ReserveRoomAdd.vue"),
         meta: { title: "办理预订", icon: "user", hidden: true },
       },
       {
-        path: "/ReserverGetlist",
+        path: "ReserverGetlist",
         name: "ReserverGetlist",
         component: () => import("@/views/ResrveRoom/ReserverGetlist.vue"),
         meta: { title: "预订订单", keepAlive: true, icon: "user", hidden: true },
       },
       {
-        path: "/Orderlist",
+        path: "Orderlist",
         name: "Orderlist",
         component: () => import("@/views/ResrveRoom/Orderlist.vue"),
         meta: { title: "订房订单", keepAlive: true, icon: "user", hidden: true },
