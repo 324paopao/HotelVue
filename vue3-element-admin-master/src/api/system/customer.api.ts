@@ -34,7 +34,7 @@ export function getCustomerList(params: any) {
  */
 export function getCustomerTypeList() {
   return request({
-    url: "/api/app/customer/custoimer-type-name",
+    url: "/api/app/customer/customer-type-name",
     method: "get",
   });
 }
@@ -184,6 +184,7 @@ export function customerConsume(data: {
   sumofconsumption: number;
   consumerNumber: number;
   consumerDesc: string;
+  accumulativeconsumption: number;
 }) {
   return request({
     url: "/api/app/customer/up-sumofconsumption",

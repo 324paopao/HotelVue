@@ -209,10 +209,11 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import { ElMessage } from "element-plus";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { createTag } from "@/api/system/customer.api";
 
 const router = useRouter();
+const route = useRoute();
 
 const tagForm = reactive({
   name: "",
@@ -250,6 +251,11 @@ const tagForm = reactive({
     max: "",
   },
 });
+
+// 自动选中“条件标签”
+if (route.query.type === "1") {
+  tagForm.type = "condition";
+}
 
 const saveTag = async () => {
   if (!tagForm.name) {
