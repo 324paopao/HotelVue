@@ -89,7 +89,6 @@ export const constantRoutes: RouteRecordRaw[] = [
         meta: { title: "房号管理", icon: "user", hidden: true },
       },
       {
-
         path: "getcustomerlist",
         name: "getcustomerlist",
         component: () => import("@/views/Customers/GetCustomerListView.vue"),
@@ -142,7 +141,6 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "ReserverDetails",
         component: () => import("@/views/ResrveRoom/ReserverDetails.vue"),
         meta: { title: "订单详情", keepAlive: true, icon: "user", hidden: true },
-
       },
       {
         path: "accountview",
@@ -162,6 +160,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/Setting/OperationLog.vue"),
         meta: { title: "操作日志管理", icon: "user", hidden: true },
       },
+     
     ],
   },
 ];
