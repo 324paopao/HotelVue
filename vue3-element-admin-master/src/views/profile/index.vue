@@ -226,8 +226,8 @@ import UserAPI, {
   UserProfileForm,
 } from "@/api/system/user.api";
 
-import FileAPI from "@/api/file.api";
-
+//import FileAPI from "@/api/file.api";
+import axios from "axios";
 import { Camera } from "@element-plus/icons-vue";
 
 const userProfile = ref<UserProfileVO>({});
@@ -436,22 +436,25 @@ const triggerFileUpload = () => {
   fileInput.value?.click();
 };
 
-const handleFileChange = async (event: Event) => {
-  const target = event.target as HTMLInputElement;
+const handleFileChange = async (event:any) => {
+  const target = event.target;
   const file = target.files ? target.files[0] : null;
   if (file) {
-    // 调用文件上传API
+    const formData = new FormData();
+    formData.append('files', file); // 注意字段名是 files
+
     try {
-      const data = await FileAPI.uploadFile(file);
-      // 更新用户头像
-      userProfile.value.avatar = data.url;
-      // 更新用户信息
-      await UserAPI.updateProfile({
-        avatar: data.url,
-      });
+      const res = await axios.post('https://localhost:44384/api/FileImg', formData);
+      console.log('上传成功', res.data);
+      // 拼接完整图片地址
+      const imgUrl = 'https://localhost:44384' + res.data.filePaths[0];
+      userProfile.value.avatar = imgUrl;
+      // 同步更新到后端
+      await UserAPI.updateProfile({ avatar: imgUrl });
+      // 这里根据返回内容更新头像
+      // userProfile.value.avatar = res.data.filePaths[0];
     } catch (error) {
-      console.error("头像上传失败：" + error);
-      ElMessage.error("头像上传失败");
+      console.error('上传失败', error);
     }
   }
 };

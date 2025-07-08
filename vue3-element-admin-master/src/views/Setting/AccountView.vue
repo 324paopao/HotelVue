@@ -139,16 +139,22 @@
                 <span>
                   {{ getWriteoffDisplay(scope.row.writeoffConfig) }}
                 </span>
-                <span v-if="hasAction('编辑核销通知权限')" style="color: #409EFF; cursor: pointer; margin-left: 8px;" @click="Writeoff(scope.row)">编辑核销通知权限</span>
+                <span 
+                v-if="hasAction('编辑核销通知权限')" style="color: #409EFF; cursor: pointer; margin-left: 8px;"
+                  @click="Writeoff(scope.row)">编辑核销通知权限</span>
               </template>
             </el-table-column>
             <el-table-column label="操作" align="center">
               <template #default="scope">
-                <span v-if="hasAction('编辑')" style="color: #409EFF; cursor: pointer;" @click="handleEdit(scope.row)">编辑</span>&nbsp;&nbsp;
-                <span v-if="hasAction('权限明细')"
-                style="color: #409EFF; cursor: pointer;"
-                @click="handlePermission(scope.row)">权限明细</span>&nbsp;&nbsp;
-                <span v-if="hasAction('删除')" style="color: #409EFF; cursor: pointer;" @click="handleDelete(scope.row.id)">删除</span>
+                <span 
+                v-if="hasAction('编辑')" style="color: #409EFF; cursor: pointer;"
+                  @click="handleEdit(scope.row)">编辑</span>&nbsp;&nbsp;
+                <span 
+                v-if="hasAction('权限明细')" style="color: #409EFF; cursor: pointer;"
+                  @click="handlePermission(scope.row)">权限明细</span>&nbsp;&nbsp;
+                <span 
+                v-if="hasAction('删除')" style="color: #409EFF; cursor: pointer;"
+                  @click="handleDelete(scope.row.id)">删除</span>
               </template>
             </el-table-column>
           </el-table>
@@ -223,7 +229,7 @@
                     prev-text="上一页" next-text="下一页">
                     <el-button 
                     :disabled="page.PageIndex == page.totlePage"
-                    @click="page.PageIndex = page.totlePage">尾页</el-button>
+                      @click="page.PageIndex = page.totlePage">尾页</el-button>
                   </el-pagination></td>
               </tr>
             </tbody>
@@ -237,7 +243,7 @@
 <script setup lang="ts">
 import PermissionNode from './PermissionNode.vue'
 import { ArrowDown } from '@element-plus/icons-vue'
-import { ref, onMounted, reactive,watch } from 'vue'
+import { ref, onMounted, reactive, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import RoleAPI from '@/api/Setting/role.api'
 import AccountAPI from '@/api/Setting/account.api'
@@ -353,6 +359,11 @@ const rules = reactive<FormRules<RuleForm>>({
   ],
   email: [
     { required: true, message: '请输入邮箱', trigger: 'blur' },
+    {
+      pattern: /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/,
+      message: "请输入正确的邮箱地址",
+      trigger: "blur",
+    },
   ],
   gender: [
     {
@@ -536,7 +547,7 @@ function getAccountList() {
   })
 }
 
-watch(page,()=>{
+watch(page, () => {
   getAccountList()
 })
 
