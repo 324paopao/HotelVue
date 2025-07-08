@@ -224,3 +224,15 @@ export function giveCustomerPoints(data: {
     data,
   });
 }
+
+/**
+ * 获取客户详情
+ * @param id 客户ID
+ * @returns Promise
+ */
+export function getCustomerDetailById(id: string) {
+  return request({
+    url: `/api/app/customer/${id}/customer-by-id`,
+    method: "get",
+  });
+}
