@@ -27,14 +27,27 @@ export const constantRoutes: RouteRecordRaw[] = [
     path: "/",
     name: "/",
     component: Layout,
-    redirect: "/dashboard",
+    redirect: "/login",
     children: [
+      {
+        path: "login",
+        component: () => import("@/views/login/index.vue"),
+        // 用于 keep-alive 功能，需要与 SFC 中自动推导或显式声明的组件名称一致
+        // 参考文档: https://cn.vuejs.org/guide/built-ins/keep-alive.html#include-exclude
+        name: "login",
+        meta: {
+          title: "login",
+          icon: "homepage",
+          affix: true,
+          keepAlive: true,
+        },
+      },
       {
         path: "dashboard",
         component: () => import("@/views/dashboard/index.vue"),
         // 用于 keep-alive 功能，需要与 SFC 中自动推导或显式声明的组件名称一致
         // 参考文档: https://cn.vuejs.org/guide/built-ins/keep-alive.html#include-exclude
-        name: "Dashboard",
+        name: "dashboard",
         meta: {
           title: "dashboard",
           icon: "homepage",
