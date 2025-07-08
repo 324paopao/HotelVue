@@ -22,14 +22,14 @@ const FileAPI = {
    */
   uploadFile(file: File) {
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("files", file);
     return request<any, FileInfo>({
-      url: "/api/v1/files",
+      url: "/api/FileImg",
       method: "post",
       data: formData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      // headers: {
+      //   "Content-Type": "multipart/form-data",
+      // },
     });
   },
 
