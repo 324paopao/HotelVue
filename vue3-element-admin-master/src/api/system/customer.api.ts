@@ -34,7 +34,7 @@ export function getCustomerList(params: any) {
  */
 export function getCustomerTypeList() {
   return request({
-    url: "/api/app/customer/custoimer-type-name",
+    url: "/api/app/customer/customer-type-name",
     method: "get",
   });
 }
@@ -151,5 +151,76 @@ export function getLabelCustomerList(params: any) {
     url: "/api/app/label/customer-list",
     method: "get",
     params,
+  });
+}
+
+/**
+ * 客户充值
+ * @param data 充值数据
+ * @returns Promise
+ */
+export function rechargeCustomerBalance(data: {
+  id: string;
+  availableBalance: number;
+  rechargeamount: number;
+  customerDesc: string;
+}) {
+  return request({
+    url: "/api/app/customer/up-available-balance",
+    method: "post",
+    data,
+  });
+}
+
+/**
+ * 客户消费
+ * @param data 消费数据
+ * @returns Promise
+ */
+export function customerConsume(data: {
+  id: string;
+  availableBalance: number;
+  availableGiftBalance: number;
+  sumofconsumption: number;
+  consumerNumber: number;
+  consumerDesc: string;
+  accumulativeconsumption: number;
+}) {
+  return request({
+    url: "/api/app/customer/up-sumofconsumption",
+    method: "post",
+    data,
+  });
+}
+
+/**
+ * 批量冻结/解冻客户
+ * @param ids 客户ID数组
+ * @param status false=冻结 true=解冻
+ * @returns Promise
+ */
+export function updateCustomerStatus(ids: string[], status: boolean) {
+  return request({
+    url: "/api/app/customer/customer-status",
+    method: "put",
+    data: { ids, status },
+  });
+}
+
+/**
+ * 送积分
+ * @param data 送积分数据
+ * @returns Promise
+ */
+export function giveCustomerPoints(data: {
+  id: string;
+  availablePoints: number;
+  accumulativeintegral: number;
+  pointsmodifydesc: string;
+}) {
+  return request({
+    url: "/api/app/customer/available-points",
+    method: "put",
+    data,
   });
 }
