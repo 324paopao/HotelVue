@@ -72,7 +72,7 @@ export function exportCustomerData(params?: any) {
 
 /**
  * 创建标签
- * @param data 标签数据对象
+ * @param data 标签数据对象（如 { labelName: string, tagType: 0|1, description?: string, ... }）
  * @returns Promise
  */
 export function createTag(data: any) {
@@ -85,66 +85,21 @@ export function createTag(data: any) {
 
 /**
  * 获取标签列表
- * @param params 查询参数（分页、筛选等）
+ * @param params 查询参数（如 { PageIndex: number, PageSize: number, LabelName?: string, TagType?: 0|1 }）
  * @returns Promise
  */
 export function getTagList(params?: any) {
   return request({
-    url: "/api/app/label/label-list",
+    url: "/api/app/label/customer-list",
     method: "get",
     params,
   });
 }
 
 /**
- * 获取标签详情
- * @param id 标签ID
+ * 获取标签列表
+ * @param params 查询参数（如 { PageIndex, PageSize, LabelId }）
  * @returns Promise
- */
-export function getTagDetail(id: string) {
-  return request({
-    url: `/api/app/label/label/${id}`,
-    method: "get",
-  });
-}
-
-/**
- * 更新标签
- * @param id 标签ID
- * @param data 标签数据
- * @returns Promise
- */
-export function updateTag(id: string, data: any) {
-  return request({
-    url: `/api/app/label/label/${id}`,
-    method: "put",
-    data,
-  });
-}
-
-/**
- * 删除标签
- * @param id 标签ID
- * @returns Promise
- */
-export function deleteTag(id: string) {
-  return request({
-    url: `/api/app/label/label/${id}`,
-    method: "delete",
-  });
-}
-
-/**
- * 获取标签下的客户列表
- * @param params 查询参数
- * @returns Promise
- *
- * 请求参数格式:
- * {
- *   PageIndex: number;      // 页码，默认1
- *   PageSize: number;       // 每页数量，默认10
- *   LabelName?: string;     // 标签名称（可选）
- * }
  */
 export function getLabelCustomerList(params: any) {
   return request({

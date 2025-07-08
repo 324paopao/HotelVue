@@ -75,7 +75,7 @@
               <el-button @click="handleBatchFreeze">冻结</el-button>
               <el-button @click="handleBatchUnfreeze">解冻</el-button>
               <el-button type="primary" @click="showAddDialog = true">添加客户</el-button>
-              <el-button>导入客户</el-button>
+              <el-button @click="showImportDialog = true">导入客户</el-button>
             </div>
             <div class="flex-row-right">
               <el-button v-if="hasAction('标签管理')" @click="goToTagManagement">
@@ -120,7 +120,7 @@
             <el-button @click="handleBatchFreeze">冻结</el-button>
             <el-button @click="handleBatchUnfreeze">解冻</el-button>
             <el-button type="primary" @click="showAddDialog = true">添加客户</el-button>
-            <el-button>导入客户</el-button>
+            <el-button @click="showImportDialog = true">导入客户</el-button>
           </div>
         </template>
       </el-form>
@@ -184,6 +184,7 @@
       <el-table-column label="操作" width="260">
         <template #default="scope">
           <el-link type="primary" @click="goToDetail(scope.row)">详情</el-link>
+
           <el-divider direction="vertical" />
           <el-link v-if="scope.row.status !== false" type="danger" @click="handleFreeze(scope.row)">
             冻结
@@ -535,6 +536,30 @@
       </el-button>
     </template>
   </el-dialog>
+
+  <!-- 导入客户弹窗 -->
+  <el-dialog
+    v-model="showImportDialog"
+    title="导入客户"
+    width="400px"
+    :close-on-click-modal="false"
+  >
+    <el-upload
+      class="upload-demo"
+      :action="importCustomersUrl"
+      :headers="uploadHeaders"
+      :show-file-list="false"
+      :on-success="handleImportSuccess"
+      :on-error="handleImportError"
+      accept=".xlsx,.xls"
+      :before-upload="beforeUpload"
+    >
+      <el-button type="primary">选择Excel文件上传</el-button>
+    </el-upload>
+    <template #footer>
+      <el-button @click="showImportDialog = false">关闭</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -568,6 +593,9 @@ const menuStore = useMenuStore();
 const route = useRoute();
 const actions = computed(() => menuStore.getActionsByPath(route.path));
 console.log("actions", actions.value);
+
+
+
 function hasAction(actionName: string) {
   return actions.value.some((a) => a.name === actionName);
 }
@@ -679,7 +707,6 @@ const fetchCustomerTypeOptions = async () => {
     customerTypeOptions.value = res;
   }
 };
-
 
 // ===================== 多选相关 =====================
 const selectedCustomerIds = ref<string[]>([]); // 选中的客户ID集合
@@ -1139,6 +1166,29 @@ const handleGivePoints = async () => {
 
 const goToDetail = (row: any) => {
   router.push(`/customers/detail/${row.id}`);
+
+
+// ===================== 导入客户弹窗相关 =====================
+const showImportDialog = ref(false);
+const importCustomersUrl = "https://localhost:44384/api/Import/customers";
+const uploadHeaders = {}; // 如需token可在此加上
+const handleImportSuccess = () => {
+  ElMessage.success("导入成功！");
+  showImportDialog.value = false;
+  fetchCustomerList();
+};
+const handleImportError = () => {
+  ElMessage.error("导入失败，请检查文件格式或稍后重试");
+};
+const beforeUpload = (file: File) => {
+  const isExcel =
+    file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    file.type === "application/vnd.ms-excel";
+  if (!isExcel) {
+    ElMessage.error("只能上传 Excel 文件！");
+  }
+  return isExcel;
+
 };
 </script>
 
