@@ -77,11 +77,12 @@ const customer = ref<any>({});
 const defaultAvatar = '/default-avatar.png'; // 可替换为你的默认头像
 
 onMounted(async () => {
+  
   const id = route.params.id as string;
   try {
     const res = await getCustomerDetailById(id);
     customer.value = res;
-  } catch (e) {
+  } catch {
     ElMessage.error('获取客户详情失败');
   }
 });

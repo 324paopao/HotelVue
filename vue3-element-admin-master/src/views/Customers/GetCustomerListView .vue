@@ -183,7 +183,8 @@
       <el-table-column label="累计消费次数" prop="comsumerNumber" align="center" />
       <el-table-column label="操作" width="260">
         <template #default="scope">
-          <el-link type="primary" >详情</el-link>
+          <el-link type="primary" @click="goToDetail(scope.row)">详情</el-link>
+
           <el-divider direction="vertical" />
           <el-link v-if="scope.row.status !== false" type="danger" @click="handleFreeze(scope.row)">
             冻结
@@ -645,11 +646,18 @@ const fetchCustomerList = async () => {
   const res = await getCustomerList(params);
   if (res) {
     tableData.value = res.data;
-    //   page.totleCount = res.totleCount;
-    //  page.totlePage = res.totlePage;
+      page.totleCount = res.totleCount;
+      page.totlePage = res.totlePage;
   }
 };
+const goToDetail = (row: any) => {
+  router.push(`/customers/detail/${row.id}`);
 
+
+
+
+
+};
 // 构建查询参数（只传递有值的参数，分页参数必传）
 function buildQueryParams() {
   const params: Record<string, any> = {};
