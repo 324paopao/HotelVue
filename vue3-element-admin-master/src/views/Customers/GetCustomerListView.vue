@@ -183,8 +183,7 @@
       <el-table-column label="累计消费次数" prop="comsumerNumber" align="center" />
       <el-table-column label="操作" width="260">
         <template #default="scope">
-          <el-link type="primary" @click="goToDetail(scope.row)">详情</el-link>
-
+          <el-link type="primary" >详情</el-link>
           <el-divider direction="vertical" />
           <el-link v-if="scope.row.status !== false" type="danger" @click="handleFreeze(scope.row)">
             冻结
@@ -646,8 +645,8 @@ const fetchCustomerList = async () => {
   const res = await getCustomerList(params);
   if (res) {
     tableData.value = res.data;
-    page.totleCount = res.totleCount;
-    page.totlePage = res.totlePage;
+    //   page.totleCount = res.totleCount;
+    //  page.totlePage = res.totlePage;
   }
 };
 
@@ -1164,9 +1163,6 @@ const handleGivePoints = async () => {
   }
 };
 
-const goToDetail = (row: any) => {
-  router.push(`/customers/detail/${row.id}`);
-
 
 // ===================== 导入客户弹窗相关 =====================
 const showImportDialog = ref(false);
@@ -1188,7 +1184,6 @@ const beforeUpload = (file: File) => {
     ElMessage.error("只能上传 Excel 文件！");
   }
   return isExcel;
-
 };
 </script>
 
