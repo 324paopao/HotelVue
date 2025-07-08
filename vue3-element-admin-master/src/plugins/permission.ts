@@ -6,7 +6,7 @@ import { usePermissionStore, useUserStore } from "@/store";
 import { ROLE_ROOT } from "@/constants";
 
 // 路由生成锁，防止重复生成
-let isGeneratingRoutes = false;
+const isGeneratingRoutes = false;
 
 export function setupPermission() {
   // 白名单路由
