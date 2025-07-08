@@ -169,14 +169,16 @@
           <el-link type="primary">添加标签</el-link>
         </template>
       </el-table-column>
-      <el-table-column label="卡号" prop="id"  width="170" />
+      <el-table-column label="卡号" prop="id" width="170" />
       <el-table-column label="手机" prop="phoneNumber" align="center" />
       <el-table-column label="可用余额" prop="availableBalance" align="center">
         <template #default="scope">
           <span>￥{{ scope.row.availableBalance }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="可用积分" prop="availablePoints" align="center" />
+      <el-table-column label="可用积分" prop="availablePoints" align="center">
+        <template #default="scope">￥{{ scope.row.availablePoints }}</template>
+      </el-table-column>
       <el-table-column label="累计消费金额" prop="accumulativeconsumption" align="center" />
       <el-table-column label="累计消费次数" prop="comsumerNumber" align="center" />
       <el-table-column label="操作" width="260">
@@ -616,8 +618,8 @@ const fetchCustomerList = async () => {
   const res = await getCustomerList(params);
   if (res) {
     tableData.value = res.data;
-    page.totleCount = res.totleCount;
-    page.totlePage = res.totlePage;
+    //   page.totleCount = res.totleCount;
+    //  page.totlePage = res.totlePage;
   }
 };
 
@@ -669,15 +671,15 @@ const onSearch = () => {
 // }
 
 // ===================== 客户类型选项 =====================
-// 明确类型，避免 never 报错
-const customerTypeOptions = ref<{ id: string; customerTypeName: string }[]>([]); // 客户类型下拉选项
-// 获取客户类型选项
+const customerTypeOptions = ref();
+
 const fetchCustomerTypeOptions = async () => {
   const res = await getCustomerTypeList();
-  if (res && res.data) {
-    customerTypeOptions.value = res.data as { id: string; customerTypeName: string }[];
+  if (res) {
+    customerTypeOptions.value = res;
   }
 };
+
 
 // ===================== 多选相关 =====================
 const selectedCustomerIds = ref<string[]>([]); // 选中的客户ID集合
@@ -796,7 +798,7 @@ async function submitEditLevel() {
     }
     await updateCustomerLevel(selectedCustomerIds.value, editLevelForm.value.customerType);
     showEditLevelDialog.value = false;
-    ElMessage.success("批量修改成功！");
+    ElMessage.success("修改成功！");
     fetchCustomerList();
   });
 }
@@ -1020,6 +1022,7 @@ const submitConsume = async () => {
       sumofconsumption: amount,
       consumerNumber: 0,
       consumerDesc: consumeForm.value.consumerDesc || "",
+      accumulativeconsumption: 0, // 或实际累计金额
     });
     ElMessage.success("消费成功");
     showConsumeDialog.value = false;
