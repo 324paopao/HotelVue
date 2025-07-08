@@ -10,8 +10,8 @@
         "
       >
         <div>
-          <el-button type="primary" @click="openAddDrawer">新增房型</el-button>
-          <el-button :disabled="multipleSelection.length === 0" @click="handleBatchDelete">
+          <el-button v-if="hasAction('新增房型')" type="primary" @click="openAddDrawer">新增房型</el-button>
+          <el-button v-if="hasAction('批量删除')" :disabled="multipleSelection.length === 0" @click="handleBatchDelete">
             批量删除
           </el-button>
         </div>
@@ -50,12 +50,12 @@
         </el-table-column>
         <el-table-column label="操作" width="220">
           <template #default="scope">
-            <el-link type="primary" @click="onEdit(scope.row)">编辑</el-link>
-            <el-link type="primary" style="margin-left: 8px" @click="openRoomNumDialog(scope.row)">
+            <el-link v-if="hasAction('编辑')" type="primary" @click="onEdit(scope.row)">编辑</el-link>
+            <el-link v-if="hasAction('设置房号')" type="primary" style="margin-left: 8px" @click="openRoomNumDialog(scope.row)">
               设置房号
             </el-link>
             <el-link type="primary" style="margin-left: 8px">投放</el-link>
-            <el-link type="danger" style="margin-left: 8px" @click="handleDelete(scope.row.id)">
+            <el-link v-if="hasAction('删除')" type="danger" style="margin-left: 8px" @click="handleDelete(scope.row.id)">
               删除
             </el-link>
           </template>
@@ -324,7 +324,18 @@ onMounted(() => {
 });
 
 import axios from "axios";
-
+//#region 操作权限
+import { useMenuStore } from '@/store';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+const menuStore = useMenuStore();
+const route = useRoute();
+const actions = computed(() => menuStore.getActionsByPath(route.path));
+console.log("actions", actions.value)
+function hasAction(actionName: string) {
+  return actions.value.some(a => a.name === actionName);
+}
+//#endregion
 //const videoUrl = ref("");
 const uploadProgress = ref(0);
 
