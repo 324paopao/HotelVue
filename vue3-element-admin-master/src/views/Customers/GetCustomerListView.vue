@@ -646,18 +646,11 @@ const fetchCustomerList = async () => {
   const res = await getCustomerList(params);
   if (res) {
     tableData.value = res.data;
-      page.totleCount = res.totleCount;
-      page.totlePage = res.totlePage;
+    page.totleCount = res.totleCount;
+    page.totlePage = res.totlePage;
   }
 };
-const goToDetail = (row: any) => {
-  router.push(`/customers/detail/${row.id}`);
 
-
-
-
-
-};
 // 构建查询参数（只传递有值的参数，分页参数必传）
 function buildQueryParams() {
   const params: Record<string, any> = {};
@@ -1171,6 +1164,9 @@ const handleGivePoints = async () => {
   }
 };
 
+const goToDetail = (row: any) => {
+  router.push(`/customers/detail/${row.id}`);
+
 
 // ===================== 导入客户弹窗相关 =====================
 const showImportDialog = ref(false);
@@ -1192,6 +1188,7 @@ const beforeUpload = (file: File) => {
     ElMessage.error("只能上传 Excel 文件！");
   }
   return isExcel;
+
 };
 </script>
 
