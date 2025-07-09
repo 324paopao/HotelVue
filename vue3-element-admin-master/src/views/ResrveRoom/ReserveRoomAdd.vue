@@ -52,19 +52,19 @@
         <el-table :data="roomTypes" border style="width: 100%" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" />
           <el-table-column prop="name" label="房型列表" />
-          <el-table-column prop="canReserve" label="可定数" />
+          <!-- <el-table-column prop="canReserve" label="可定数" /> -->
           <el-table-column prop="price" label="门市价" />
-          <el-table-column prop="avgPrice" label="房间均价" />
+          <!-- <el-table-column prop="avgPrice" label="房间均价" /> -->
           <el-table-column prop="" label="房间数量">
             {{ 1 }}
           </el-table-column>
 
-          <el-table-column prop="sort" label="排序">
+          <!-- <el-table-column prop="sort" label="排序">
             <div v-if="form.roomNum = ''">未排房</div>
             <div v-else>
               {{ form.roomNum }}
             </div>
-          </el-table-column>
+          </el-table-column> -->
 
           <el-table-column prop="breakfast" label="早餐份数">
             <el-input v-model="form.breakfastNum" size="small" placeholder="请输入" />
