@@ -8,7 +8,7 @@ const DEPT_BASE_URL = "/api/v1/dept";
  * @returns 返回一个Promise对象，表示异步操作的最终完成或失败及其结果值。
  */
 export function addCustomer(data: any) {
-  return request({
+  return request.httpRequest({
     url: "/api/app/customer/customer",
     method: "post",
     data,
@@ -21,7 +21,7 @@ export function addCustomer(data: any) {
  * @returns Promise
  */
 export function getCustomerList(params: any) {
-  return request({
+  return request.httpRequest({
     url: "/api/app/customer/customer-list",
     method: "get",
     params,
@@ -33,7 +33,7 @@ export function getCustomerList(params: any) {
  * @returns Promise
  */
 export function getCustomerTypeList() {
-  return request({
+  return request.httpRequest({
     url: "/api/app/customer/customer-type-name",
     method: "get",
   });
@@ -46,7 +46,7 @@ export function getCustomerTypeList() {
  * @returns Promise
  */
 export function updateCustomerLevel(ids: string[], customerType: string) {
-  return request({
+  return request.httpRequest({
     url: "/api/app/customer/customer",
     method: "put",
     data: {
@@ -62,7 +62,7 @@ export function updateCustomerLevel(ids: string[], customerType: string) {
  * @returns Promise 文件下载流
  */
 export function exportCustomerData(params?: any) {
-  return request({
+  return request.httpRequest({
     url: "/api/app/customer/export-all-customers",
     method: "post",
     data: params,
@@ -76,7 +76,7 @@ export function exportCustomerData(params?: any) {
  * @returns Promise
  */
 export function createTag(data: any) {
-  return request({
+  return request.httpRequest({
     url: "/api/app/label/label",
     method: "post",
     data,
@@ -89,7 +89,7 @@ export function createTag(data: any) {
  * @returns Promise
  */
 export function getTagList(params?: any) {
-  return request({
+  return request.httpRequest({
     url: "/api/app/label/customer-list",
     method: "get",
     params,
@@ -102,7 +102,7 @@ export function getTagList(params?: any) {
  * @returns Promise
  */
 export function getLabelCustomerList(params: any) {
-  return request({
+  return request.httpRequest({
     url: "/api/app/label/customer-list",
     method: "get",
     params,
@@ -120,7 +120,7 @@ export function rechargeCustomerBalance(data: {
   rechargeamount: number;
   customerDesc: string;
 }) {
-  return request({
+  return request.httpRequest({
     url: "/api/app/customer/up-available-balance",
     method: "post",
     data,
@@ -141,7 +141,7 @@ export function customerConsume(data: {
   consumerDesc: string;
   accumulativeconsumption: number;
 }) {
-  return request({
+  return request.httpRequest({
     url: "/api/app/customer/up-sumofconsumption",
     method: "post",
     data,
@@ -155,7 +155,7 @@ export function customerConsume(data: {
  * @returns Promise
  */
 export function updateCustomerStatus(ids: string[], status: boolean) {
-  return request({
+  return request.httpRequest    ({
     url: "/api/app/customer/customer-status",
     method: "put",
     data: { ids, status },
@@ -173,7 +173,7 @@ export function giveCustomerPoints(data: {
   accumulativeintegral: number;
   pointsmodifydesc: string;
 }) {
-  return request({
+  return request.httpRequest({
     url: "/api/app/customer/available-points",
     method: "put",
     data,
@@ -186,7 +186,7 @@ export function giveCustomerPoints(data: {
  * @returns Promise
  */
 export function getCustomerDetailById(id: string) {
-  return request({
+  return request.httpRequest({
     url: `/api/app/customer/${id}/customer-by-id`,
     method: "get",
     transformResponse: [
@@ -199,5 +199,17 @@ export function getCustomerDetailById(id: string) {
         }
       },
     ],
+  });
+}
+
+/**
+ * 删除标签
+ * @param id 标签ID
+ * @returns Promise
+ */
+export function deleteTag(id: string) {
+  return request.httpRequest({
+    url: `/api/app/label/label/${id}`,
+    method: "delete",
   });
 }

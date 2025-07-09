@@ -49,32 +49,25 @@
         </el-form-item>
       </el-form>
       <div class="room-table-wrapper">
-        <el-table
-          :data="roomTypes"
-          border
-          style="width: 100%"
-          @selection-change="handleSelectionChange"
-        >
+        <el-table :data="roomTypes" border style="width: 100%" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" />
           <el-table-column prop="name" label="房型列表" />
-          <el-table-column prop="canReserve" label="可定数" />
+          <!-- <el-table-column prop="canReserve" label="可定数" /> -->
           <el-table-column prop="price" label="门市价" />
-          <el-table-column prop="avgPrice" label="房间均价" />
+          <!-- <el-table-column prop="avgPrice" label="房间均价" /> -->
           <el-table-column prop="" label="房间数量">
             {{ 1 }}
           </el-table-column>
 
-          <el-table-column prop="sort" label="排序">
+          <!-- <el-table-column prop="sort" label="排序">
             <div v-if="form.roomNum = ''">未排房</div>
             <div v-else>
               {{ form.roomNum }}
             </div>
-          </el-table-column>
+          </el-table-column> -->
 
           <el-table-column prop="breakfast" label="早餐份数">
-            <template #default="scope">
-              <el-input v-model="form.breakfastNum" size="small" placeholder="请输入" />
-            </template>
+            <el-input v-model="form.breakfastNum" size="small" placeholder="请输入" />
           </el-table-column>
 
           <el-table-column prop="price" label="自定义价格">
@@ -82,12 +75,7 @@
               <el-input v-model="scop.row.price" size="small" />
             </template>
           </el-table-column>
-          <el-table-column label="操作">
-            <template #default="scope">
-              <el-link type="primary">设置房价</el-link>
-              <el-link type="primary" class="ml-10">排序</el-link>
-            </template>
-          </el-table-column>
+
         </el-table>
       </div>
     </el-card>
@@ -107,12 +95,11 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from "vue";
 import AuthAPI from "@/api/Reserve/ReservRoom.api";
-
-import { useRouter } from "vue-router";
-
-import { random } from "lodash-es";
 import { useStore } from '@/store/Usertinfo';
+import { useRouter } from 'vue-router'
+
 const store = useStore()
+const router = useRouter()
 
 const form = reactive({
   infomation: "",
@@ -127,7 +114,7 @@ const form = reactive({
   breakfastNum: 0,
   price: 0,
   status: 0,
-  roomNum: "",
+  roomNum: "未排房",
   message: "",
   idCard: "",
   aaa: [],
@@ -135,10 +122,10 @@ const form = reactive({
 
 
 });
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 const roomTypes = ref();
-const router = useRouter();
-
 onMounted(() => {
   load();
 });
@@ -158,7 +145,7 @@ watch(
     }
   }
 );
-const selectedRows = ref([]);
+
 function handleSelectionChange(selection: any) {
   form.aaa = selection;
   // 你可以在这里做其它操作，比如
@@ -166,11 +153,12 @@ function handleSelectionChange(selection: any) {
 }
 
 const save = () => {
+  form.roomNum = route.query.num;
   const res = AuthAPI.RoomAdd(form);
   console.log("qweqw", res);
   ElMessage.success("添加成功");
-  router.push("/listRoomState");
-};
+  router.push('/ReserverGetlist')
+}
 </script>
 
 <style scoped>

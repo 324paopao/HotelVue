@@ -5,7 +5,7 @@ const ROLE_BASE_URL = "/api/v1/roles";
 const RoleAPI = {
   /** 获取角色分页数据 */
   getPage(queryParams?: RolePageQuery) {
-    return request<any, PageResult<RolePageVO[]>>({
+    return request.httpRequest<any, PageResult<RolePageVO[]>>({
       url: `${ROLE_BASE_URL}/page`,
       method: "get",
       params: queryParams,
@@ -14,7 +14,7 @@ const RoleAPI = {
 
   /** 获取角色下拉数据源 */
   getOptions() {
-    return request<any, OptionType[]>({
+    return request.httpRequest<any, OptionType[]>({
       url: `${ROLE_BASE_URL}/options`,
       method: "get",
     });
@@ -26,7 +26,7 @@ const RoleAPI = {
    * @returns 角色的菜单ID集合
    */
   getRoleMenuIds(roleId: string) {
-    return request<any, string[]>({
+    return request.httpRequest<any, string[]>({
       url: `${ROLE_BASE_URL}/${roleId}/menuIds`,
       method: "get",
     });
@@ -39,7 +39,7 @@ const RoleAPI = {
    * @param data 菜单ID集合
    */
   updateRoleMenus(roleId: string, data: number[]) {
-    return request({
+    return request.httpRequest({
       url: `${ROLE_BASE_URL}/${roleId}/menus`,
       method: "put",
       data,
@@ -53,7 +53,7 @@ const RoleAPI = {
    * @returns 角色表单数据
    */
   getFormData(id: string) {
-    return request<any, RoleForm>({
+    return request.httpRequest<any, RoleForm>({
       url: `${ROLE_BASE_URL}/${id}/form`,
       method: "get",
     });
@@ -61,7 +61,7 @@ const RoleAPI = {
 
   /** 添加角色 */
   create(data: RoleForm) {
-    return request({
+    return request.httpRequest({
       url: `${ROLE_BASE_URL}`,
       method: "post",
       data,
@@ -75,7 +75,7 @@ const RoleAPI = {
    * @param data 角色表单数据
    */
   update(id: string, data: RoleForm) {
-    return request({
+    return request.httpRequest({
       url: `${ROLE_BASE_URL}/${id}`,
       method: "put",
       data,
@@ -88,7 +88,7 @@ const RoleAPI = {
    * @param ids 角色ID字符串，多个以英文逗号(,)分割
    */
   deleteByIds(ids: string) {
-    return request({
+    return request.httpRequest({
       url: `${ROLE_BASE_URL}/${ids}`,
       method: "delete",
     });

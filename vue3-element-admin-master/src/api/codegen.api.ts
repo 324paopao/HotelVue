@@ -5,7 +5,7 @@ const GENERATOR_BASE_URL = "/api/v1/codegen";
 const GeneratorAPI = {
   /** 获取数据表分页列表 */
   getTablePage(params: TablePageQuery) {
-    return request<any, PageResult<TablePageVO[]>>({
+    return request.httpRequest<any, PageResult<TablePageVO[]>>({
       url: `${GENERATOR_BASE_URL}/table/page`,
       method: "get",
       params,
@@ -14,7 +14,7 @@ const GeneratorAPI = {
 
   /** 获取代码生成配置 */
   getGenConfig(tableName: string) {
-    return request<any, GenConfigForm>({
+    return request.httpRequest<any, GenConfigForm>({
       url: `${GENERATOR_BASE_URL}/${tableName}/config`,
       method: "get",
     });
@@ -22,7 +22,7 @@ const GeneratorAPI = {
 
   /** 获取代码生成配置 */
   saveGenConfig(tableName: string, data: GenConfigForm) {
-    return request({
+    return request.httpRequest({
       url: `${GENERATOR_BASE_URL}/${tableName}/config`,
       method: "post",
       data,
@@ -31,7 +31,7 @@ const GeneratorAPI = {
 
   /** 获取代码生成预览数据 */
   getPreviewData(tableName: string) {
-    return request<any, GeneratorPreviewVO[]>({
+    return request.httpRequest<any, GeneratorPreviewVO[]>({
       url: `${GENERATOR_BASE_URL}/${tableName}/preview`,
       method: "get",
     });
@@ -39,7 +39,7 @@ const GeneratorAPI = {
 
   /** 重置代码生成配置 */
   resetGenConfig(tableName: string) {
-    return request({
+    return request.httpRequest({
       url: `${GENERATOR_BASE_URL}/${tableName}/config`,
       method: "delete",
     });
@@ -51,7 +51,7 @@ const GeneratorAPI = {
    * @param fileName
    */
   download(tableName: string) {
-    return request({
+    return request.httpRequest({
       url: `${GENERATOR_BASE_URL}/${tableName}/download`,
       method: "get",
       responseType: "blob",

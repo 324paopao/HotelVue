@@ -11,7 +11,7 @@ const MenuAPI = {
    * @returns 路由列表
    */
   getRoutes() {
-    return request<any, RouteVO[]>({
+    return request.httpRequest<any, RouteVO[]>({
       url: `${MENU_BASE_URL}/routes`,
       method: "get",
     });
@@ -24,7 +24,7 @@ const MenuAPI = {
    * @returns 菜单树形列表
    */
   getList(queryParams: MenuQuery) {
-    return request<any, MenuVO[]>({
+    return request.httpRequest<any, MenuVO[]>({
       url: `${MENU_BASE_URL}`,
       method: "get",
       params: queryParams,
@@ -37,7 +37,7 @@ const MenuAPI = {
    * @returns 菜单下拉数据源
    */
   getOptions(onlyParent?: boolean) {
-    return request<any, OptionType[]>({
+    return request.httpRequest<any, OptionType[]>({
       url: `${MENU_BASE_URL}/options`,
       method: "get",
       params: { onlyParent },
@@ -50,7 +50,7 @@ const MenuAPI = {
    * @param id 菜单ID
    */
   getFormData(id: string) {
-    return request<any, MenuForm>({
+    return request.httpRequest<any, MenuForm>({
       url: `${MENU_BASE_URL}/${id}/form`,
       method: "get",
     });
@@ -63,7 +63,7 @@ const MenuAPI = {
    * @returns 请求结果
    */
   create(data: MenuForm) {
-    return request({
+    return request.httpRequest({
       url: `${MENU_BASE_URL}`,
       method: "post",
       data,
@@ -78,7 +78,7 @@ const MenuAPI = {
    * @returns 请求结果
    */
   update(id: string, data: MenuForm) {
-    return request({
+    return request.httpRequest({
       url: `${MENU_BASE_URL}/${id}`,
       method: "put",
       data,
@@ -92,7 +92,7 @@ const MenuAPI = {
    * @returns 请求结果
    */
   deleteById(id: string) {
-    return request({
+    return request.httpRequest({
       url: `${MENU_BASE_URL}/${id}`,
       method: "delete",
     });

@@ -7,7 +7,7 @@ const FileAPI = {
    * @param formData
    */
   upload(formData: FormData) {
-    return request<any, FileInfo>({
+    return request.httpRequest<any, FileInfo>({
       url: "/api/v1/files",
       method: "post",
       data: formData,
@@ -23,7 +23,7 @@ const FileAPI = {
   uploadFile(file: File) {
     const formData = new FormData();
     formData.append("files", file);
-    return request<any, FileInfo>({
+    return request.httpRequest<any, FileInfo>({
       url: "/api/FileImg",
       method: "post",
       data: formData,
@@ -39,7 +39,7 @@ const FileAPI = {
    * @param filePath 文件完整路径
    */
   delete(filePath?: string) {
-    return request({
+    return request.httpRequest({
       url: "/api/v1/files",
       method: "delete",
       params: { filePath },
@@ -52,7 +52,7 @@ const FileAPI = {
    * @param fileName
    */
   download(url: string, fileName?: string) {
-    return request({
+    return request.httpRequest({
       url,
       method: "get",
       responseType: "blob",
