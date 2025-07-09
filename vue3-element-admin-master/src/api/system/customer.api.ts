@@ -207,9 +207,10 @@ export function getCustomerDetailById(id: string) {
  * @param id 标签ID
  * @returns Promise
  */
-export function deleteTag(id: string) {
+export function deleteTag(id: any) {
   return request.httpRequest({
-    url: `/api/app/label/label/${id}`,
+    url: `/api/app/label/del-label`,
     method: "delete",
+    params:id
   });
 }

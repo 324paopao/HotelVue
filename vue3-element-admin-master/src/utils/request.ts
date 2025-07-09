@@ -152,8 +152,10 @@ httpRequest1.interceptors.response.use(
     }
 
     // 业务错误
-    const errorMessage = msg || "系统出错";
-    ElMessage.error(errorMessage);
+    // 在响应拦截器中修改
+   const errorMessage = `错误(${code}): ${msg || "系统出错"}`;
+   console.error("API响应详情:", response.data); // 添加详细日志
+   ElMessage.error(errorMessage);
     return Promise.reject(new Error(msg || "Business Error"));
   },
   async (error) => {

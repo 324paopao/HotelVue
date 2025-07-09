@@ -450,6 +450,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         AccountAPI.addAccount(ruleForm).then(res => {
           console.log("添加", res)
           ElMessage.success('添加成功')
+          getAccountList()
           dialogVisible.value = false
         })
       }
@@ -457,6 +458,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         AccountAPI.updateAccount(currentrow.value, ruleForm).then(res => {
           console.log("修改", res)
           ElMessage.success('修改成功')
+          getAccountList()
           dialogVisible.value = false
         })
       }

@@ -48,16 +48,61 @@ let chartInstance: echarts.ECharts | null = null;
 // 初始化图表
 const initChart = () => {
   if (chartRef.value) {
-    chartInstance = echarts.init(chartRef.value);
-    if (props.options) {
-      chartInstance.setOption(props.options);
+    try {
+      chartInstance = echarts.init(chartRef.value);
+      if (props.options) {
+        // 确保所有选项都是有效的，避免undefined数据
+        const safeOptions = validateOptions(props.options);
+        chartInstance.setOption(safeOptions);
+      }
+    } catch (error) {
+      console.error('初始化图表时出错:', error);
     }
+  }
+};
+
+// 验证并修复选项中可能存在的问题
+const validateOptions = (options: any) => {
+  try {
+    // 创建一个深拷贝，避免修改原始数据
+    const safeOptions = JSON.parse(JSON.stringify(options));
+    
+    // 确保series是数组
+    if (!Array.isArray(safeOptions.series)) {
+      safeOptions.series = [];
+    }
+    
+    // 确保每个系列的data都是数组
+    safeOptions.series.forEach((series: any) => {
+      if (!Array.isArray(series.data)) {
+        series.data = [];
+      }
+    });
+    
+    // 确保xAxis.data是数组(如果存在)
+    if (safeOptions.xAxis && !Array.isArray(safeOptions.xAxis.data)) {
+      safeOptions.xAxis.data = [];
+    }
+    
+    return safeOptions;
+  } catch (error) {
+    console.error('验证图表选项时出错:', error);
+    // 返回一个最小化的有效选项
+    return { 
+      series: [] 
+    };
   }
 };
 
 // 监听尺寸变化，自动调整
 useResizeObserver(chartRef, () => {
-  chartInstance?.resize();
+  if (chartInstance) {
+    try {
+      chartInstance.resize();
+    } catch (error) {
+      console.error('调整图表大小时出错:', error);
+    }
+  }
 });
 
 // 监听 options 变化，更新图表
@@ -65,17 +110,35 @@ watch(
   () => props.options,
   (newOptions) => {
     if (chartInstance && newOptions) {
-      chartInstance.setOption(newOptions);
+      try {
+        // 同样验证新的选项
+        const safeOptions = validateOptions(newOptions);
+        chartInstance.setOption(safeOptions);
+      } catch (error) {
+        console.error('更新图表选项时出错:', error);
+      }
     }
   },
   { deep: true }
 );
 
 onMounted(() => {
-  nextTick(() => initChart());
+  nextTick(() => {
+    try {
+      initChart();
+    } catch (error) {
+      console.error('挂载图表时出错:', error);
+    }
+  });
 });
 
 onBeforeUnmount(() => {
-  chartInstance?.dispose();
+  if (chartInstance) {
+    try {
+      chartInstance.dispose();
+    } catch (error) {
+      console.error('销毁图表时出错:', error);
+    }
+  }
 });
 </script>

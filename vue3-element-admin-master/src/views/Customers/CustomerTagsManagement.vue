@@ -135,6 +135,36 @@ const formatDate = (dateStr: string) => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 };
 
+// 删除标签
+const handleDeleteTag = (tag: any) => {
+  ElMessageBox.confirm(
+    `确定要删除标签"${tag.labelName}"吗？`,
+    '删除标签',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(async () => {
+    try {
+      const params = { guid: tag.id };
+      await deleteTag(params);
+      ElMessage.success('删除成功');
+      fetchTagList();
+    } catch (error) {
+      ElMessage.error('删除失败');
+    }
+  }).catch(() => {});
+};
+
+// 查看标签详情
+const viewTagDetail = (tag: any) => {
+  router.push(`/customers/tag-detail?id=${tag.id}`);
+};
+
+onMounted(() => {
+  fetchTagList();
+});
 onMounted(fetchTagList);
 </script>
 

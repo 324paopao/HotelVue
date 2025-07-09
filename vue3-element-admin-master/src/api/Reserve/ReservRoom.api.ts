@@ -6,14 +6,14 @@ const AuthAPI = {
 
  ///房型
   getCaptcha() {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/room-types-list`,
       method: "get",
     });
   },
   ///房间号
   getRoomNum(data:any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/room-nmlist`,
       method: "get",
       params:data
@@ -21,7 +21,7 @@ const AuthAPI = {
   },
   ///房间预定添加
   RoomAdd(data:any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/reserve-room`,
       method: "post",
       data
@@ -29,7 +29,7 @@ const AuthAPI = {
   },
   ///取消房间预定
   NotReserveRoom(data:any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/not-reserc`,
       method: "put",
       data
@@ -37,7 +37,7 @@ const AuthAPI = {
   },
   ///排房
   RoomOrderby(data:any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/terraces`,
       method: "put",
       data
@@ -45,14 +45,14 @@ const AuthAPI = {
   },
   ///取消排房
   RoomNoOrderby(id:any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/${id}/no-terraces`,
       method: "put",
     });
   },
   ///入住
   ZhuRoom(data:any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/checkin`,
       method: "put",
       data
@@ -60,7 +60,7 @@ const AuthAPI = {
   },
   ///预定显示
   RoomShow(data:any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/show-reserve-room`,
       method: "post",
       params:data
@@ -69,7 +69,7 @@ const AuthAPI = {
 
    ///结算
   RoomJiesuan(data:any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/settlement`,
       method: "put",
       data
@@ -77,7 +77,7 @@ const AuthAPI = {
   },
   ///反填房
   FanRoom(id:any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/${id}/show-fan-reserve-room`,
       method: "get"
     });
@@ -85,7 +85,7 @@ const AuthAPI = {
 
   ///退房
   NoRoom(id:any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/${id}/no-room`,
       method: "put"
     });
