@@ -109,8 +109,8 @@ export const constantRoutes: RouteRecordRaw[] = [
       {
         path: "customers/detail/:id",
         name: "CustomerDetail",
-        component: () => import('@/views/Customers/CustomerDetailView.vue'),
-        meta: { title: '客户详情' }
+        component: () => import("@/views/Customers/CustomerDetailView.vue"),
+        meta: { title: "客户详情", icon: "user", hidden: true },
       },
       {
         path: "businessRoomtype",
@@ -166,7 +166,6 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/Setting/OperationLog.vue"),
         meta: { title: "操作日志管理", icon: "user", hidden: true },
       },
-     
     ],
   },
 ];
