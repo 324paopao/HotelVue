@@ -151,7 +151,8 @@ const handleDeleteTag = (tag: any) => {
     }
   ).then(async () => {
     try {
-      await deleteTag(tag.id);
+      const params = { guid: tag.id };
+      await deleteTag(params);
       ElMessage.success('删除成功');
       fetchTagList();
     } catch (error) {
