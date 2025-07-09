@@ -21,13 +21,13 @@ const httpRequest = axios.create({
  */
 httpRequest.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // 不再处理 token
-    // const accessToken = Auth.getAccessToken();
-    // if (config.headers.Authorization !== "no-auth" && accessToken) {
-    //   config.headers.Authorization = `Bearer ${accessToken}`;
-    // } else {
-    //   delete config.headers.Authorization;
-    // }
+    // 恢复处理 token
+    const accessToken = Auth.getAccessToken();
+    if (config.headers.Authorization !== "no-auth" && accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    } else {
+      delete config.headers.Authorization;
+    }
     return config;
   },
   (error) => {
@@ -73,8 +73,8 @@ httpRequest.interceptors.response.use(
 
     switch (code) {
       case ResultEnum.ACCESS_TOKEN_INVALID:
-        // Access Token 过期，尝试刷新
-        // return refreshTokenAndRetry(config);
+      // Access Token 过期，尝试刷新
+      // return refreshTokenAndRetry(config);
 
       case ResultEnum.REFRESH_TOKEN_INVALID:
         // Refresh Token 过期，跳转登录页

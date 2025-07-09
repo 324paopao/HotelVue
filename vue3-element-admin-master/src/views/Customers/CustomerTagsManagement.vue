@@ -1,4 +1,5 @@
 <template>
+    <div>
   <div class="tag-list-page">
     <el-card>
       <div class="header-bar">
@@ -79,6 +80,8 @@
         @current-change="fetchTagList"
       />
     </el-card>
+  </div>
+
   </div>
 </template>
 

@@ -189,5 +189,15 @@ export function getCustomerDetailById(id: string) {
   return request({
     url: `/api/app/customer/${id}/customer-by-id`,
     method: "get",
+    transformResponse: [
+      (data) => {
+        // 尝试解析数据
+        try {
+          return JSON.parse(data);
+        } catch (error) {
+          return data;
+        }
+      },
+    ],
   });
 }

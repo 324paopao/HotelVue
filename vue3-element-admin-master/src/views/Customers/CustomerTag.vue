@@ -1,4 +1,5 @@
 <template>
+    <div>
   <div class="tag-edit-container">
     <el-card class="tag-edit-card" shadow="never">
       <div class="tag-form">
@@ -203,6 +204,8 @@
       <el-button type="primary" @click="saveTag">保存</el-button>
       <el-button @click="cancel">取消</el-button>
     </div>
+  </div>
+
   </div>
 </template>
 
