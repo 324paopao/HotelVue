@@ -15,6 +15,7 @@
             <el-button v-if="hasAction('批量下架')" :disabled="multipleSelection.length === 0" @click="BatchDownState">
               批量下架
             </el-button>
+            <el-button @click="BatchImport">批量导入</el-button>
           </div>
         </el-col>
         <el-col :span="12">
@@ -124,6 +125,23 @@
         <el-button type="primary" @click="submitAddRoomNum">确认</el-button>
       </template>
     </el-dialog>
+
+    <!-- 批量导入弹窗 -->
+    <el-dialog v-model="importDialogVisible" title="批量导入" width="400px">
+      <el-upload
+        :action="'https://localhost:44384/api/Import/excel'"
+        :show-file-list="false"
+        :on-success="handleImportSuccess"
+        :on-error="handleImportError"
+        :before-upload="beforeUpload"
+        accept=".xls,.xlsx"
+      >
+        <el-button type="primary">选择Excel文件</el-button>
+      </el-upload>
+      <template #footer>
+        <el-button @click="importDialogVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -132,6 +150,7 @@ import { ref, reactive, onMounted } from "vue";
 import RoomTypeAPI from "@/api/system/roomtype";
 import { ElMessageBox, ElMessage } from "element-plus";
 
+const importDialogVisible = ref(false);
 //#region 操作权限
 import { useMenuStore } from '@/store';
 import { useRoute } from 'vue-router';
@@ -354,6 +373,30 @@ async function BatchDownState() {
       }
     });
   });
+}
+
+function BatchImport() {
+  importDialogVisible.value = true;
+}
+
+function handleImportSuccess(response: any) {
+  ElMessage.success("导入成功");
+  importDialogVisible.value = false;
+  getList(); // 刷新表格
+}
+
+function handleImportError() {
+  ElMessage.error("导入失败");
+}
+
+function beforeUpload(file: File) {
+  const isExcel =
+    file.type === "application/vnd.ms-excel" ||
+    file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  if (!isExcel) {
+    ElMessage.error("只能上传Excel文件");
+  }
+  return isExcel;
 }
 </script>
 

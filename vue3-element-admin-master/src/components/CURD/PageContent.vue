@@ -322,8 +322,8 @@
 </template>
 
 <script setup lang="ts">
-import { hasAuth } from "@/plugins/permission";
-import { useDateFormat, useThrottleFn } from "@vueuse/core";
+// import { hasAuth } from "@/plugins/permission";
+// import { useDateFormat, useThrottleFn } from "@vueuse/core";
 import {
   genFileId,
   type FormInstance,
