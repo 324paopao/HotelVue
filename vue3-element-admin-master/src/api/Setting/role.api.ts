@@ -9,7 +9,7 @@ export const RoleAPI ={
    * @returns Promise
    */
   getRole (data:any){
-    return request({
+    return request.httpRequest({
       url:`${Role_BASE_URL}/role-list`,
       method:'get',
       params:data
@@ -21,7 +21,7 @@ export const RoleAPI ={
    * @returns Promise
    */
   getPermissionByRoleId(data:any){
-    return request({
+    return request.httpRequest({
       url:`${Role_BASE_URL}/perm-by-role`,
       method:'get',
       params:data
@@ -32,7 +32,7 @@ export const RoleAPI ={
    * @returns Promise
    */
   getPermissionTree(){
-    return request({
+    return request.httpRequest({
       url:`${Role_BASE_URL}/permission-tree`,
       method:'get'
     })
@@ -43,7 +43,7 @@ export const RoleAPI ={
    * @returns Promise
    */
   addRole(data:any){
-    return request({
+    return request.httpRequest({
       url:`${Role_BASE_URL}/role`,
       method:'post',
       data
@@ -55,7 +55,7 @@ export const RoleAPI ={
    * @returns Promise
    */
   deleteRole(data:any){
-    return request({
+    return request.httpRequest({
       url:`${Role_BASE_URL}/del-role/${data}`,
       method:'delete',
     })
@@ -67,7 +67,7 @@ export const RoleAPI ={
    * @returns Promise
    */
   updateRole(id:string,data:any){
-    return request({
+    return request.httpRequest({
       url:`${Role_BASE_URL}/role/${id}`,
       method:'put',
       data
@@ -79,7 +79,7 @@ export const RoleAPI ={
    * @returns Promise
    */
   deleteRange(ids:any){
-    return request({
+    return request.httpRequest({
       url:`${Role_BASE_URL}/range`,
       method:'delete',
       params:ids

@@ -14,7 +14,7 @@ const DictAPI = {
    * @returns 字典分页结果
    */
   getPage(queryParams: DictPageQuery) {
-    return request<any, PageResult<DictPageVO[]>>({
+    return request.httpRequest<any, PageResult<DictPageVO[]>>({
       url: `${DICT_BASE_URL}/page`,
       method: "get",
       params: queryParams,
@@ -27,7 +27,7 @@ const DictAPI = {
    * @returns 字典列表
    */
   getList() {
-    return request<any, OptionType[]>({
+    return request.httpRequest<any, OptionType[]>({
       url: `${DICT_BASE_URL}`,
       method: "get",
     });
@@ -40,7 +40,7 @@ const DictAPI = {
    * @returns 字典表单数据
    */
   getFormData(id: string) {
-    return request<any, DictForm>({
+    return request.httpRequest<any, DictForm>({
       url: `${DICT_BASE_URL}/${id}/form`,
       method: "get",
     });
@@ -52,7 +52,7 @@ const DictAPI = {
    * @param data 字典表单数据
    */
   create(data: DictForm) {
-    return request({
+    return request.httpRequest({
       url: `${DICT_BASE_URL}`,
       method: "post",
       data,
@@ -66,7 +66,7 @@ const DictAPI = {
    * @param data 字典表单数据
    */
   update(id: string, data: DictForm) {
-    return request({
+    return request.httpRequest({
       url: `${DICT_BASE_URL}/${id}`,
       method: "put",
       data,
@@ -79,7 +79,7 @@ const DictAPI = {
    * @param ids 字典ID，多个以英文逗号(,)分隔
    */
   deleteByIds(ids: string) {
-    return request({
+    return request.httpRequest({
       url: `${DICT_BASE_URL}/${ids}`,
       method: "delete",
     });
@@ -95,7 +95,7 @@ const DictAPI = {
    * @returns 字典分页结果
    */
   getDictItemPage(dictCode: string, queryParams: DictItemPageQuery) {
-    return request<any, PageResult<DictItemPageVO[]>>({
+    return request.httpRequest<any, PageResult<DictItemPageVO[]>>({
       url: `${DICT_BASE_URL}/${dictCode}/items/page`,
       method: "get",
       params: queryParams,
@@ -106,7 +106,7 @@ const DictAPI = {
    * 获取字典项列表
    */
   getDictItems(dictCode: string) {
-    return request<any, DictItemOption[]>({
+    return request.httpRequest<any, DictItemOption[]>({
       url: `${DICT_BASE_URL}/${dictCode}/items`,
       method: "get",
     });
@@ -116,7 +116,7 @@ const DictAPI = {
    * 新增字典项
    */
   createDictItem(dictCode: string, data: DictItemForm) {
-    return request({
+    return request.httpRequest({
       url: `${DICT_BASE_URL}/${dictCode}/items`,
       method: "post",
       data,
@@ -130,7 +130,7 @@ const DictAPI = {
    * @returns 字典项表单数据
    */
   getDictItemFormData(dictCode: string, id: string) {
-    return request<any, DictItemForm>({
+    return request.httpRequest<any, DictItemForm>({
       url: `${DICT_BASE_URL}/${dictCode}/items/${id}/form`,
       method: "get",
     });
@@ -140,7 +140,7 @@ const DictAPI = {
    * 修改字典项
    */
   updateDictItem(dictCode: string, id: string, data: DictItemForm) {
-    return request({
+    return request.httpRequest({
       url: `${DICT_BASE_URL}/${dictCode}/items/${id}`,
       method: "put",
       data,
@@ -151,7 +151,7 @@ const DictAPI = {
    * 删除字典项
    */
   deleteDictItems(dictCode: string, ids: string) {
-    return request({
+    return request.httpRequest({
       url: `${DICT_BASE_URL}/${dictCode}/items/${ids}`,
       method: "delete",
     });

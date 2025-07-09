@@ -9,7 +9,7 @@ const MenuAPI = {
    * @returns Promise
    */
   getMenuListByUserId(userId: number) {
-    return request({
+    return request.httpRequest({
       url: `${MENU_BASE_URL}/menu-list/${userId}`,
       method: "get",
     });

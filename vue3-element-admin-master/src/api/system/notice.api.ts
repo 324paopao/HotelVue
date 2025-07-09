@@ -5,7 +5,7 @@ const NOTICE_BASE_URL = "/api/v1/notices";
 const NoticeAPI = {
   /** 获取通知公告分页数据 */
   getPage(queryParams?: NoticePageQuery) {
-    return request<any, PageResult<NoticePageVO[]>>({
+    return request.httpRequest<any, PageResult<NoticePageVO[]>>({
       url: `${NOTICE_BASE_URL}/page`,
       method: "get",
       params: queryParams,
@@ -19,7 +19,7 @@ const NoticeAPI = {
    * @returns 通知表单数据
    */
   getFormData(id: string) {
-    return request<any, NoticeForm>({
+    return request.httpRequest<any, NoticeForm>({
       url: `${NOTICE_BASE_URL}/${id}/form`,
       method: "get",
     });
@@ -32,7 +32,7 @@ const NoticeAPI = {
    * @returns
    */
   create(data: NoticeForm) {
-    return request({
+    return request.httpRequest({
       url: `${NOTICE_BASE_URL}`,
       method: "post",
       data,
@@ -46,7 +46,7 @@ const NoticeAPI = {
    * @param data 通知表单数据
    */
   update(id: string, data: NoticeForm) {
-    return request({
+    return request.httpRequest({
       url: `${NOTICE_BASE_URL}/${id}`,
       method: "put",
       data,
@@ -59,7 +59,7 @@ const NoticeAPI = {
    * @param ids 通知公告ID字符串，多个以英文逗号(,)分割
    */
   deleteByIds(ids: string) {
-    return request({
+    return request.httpRequest({
       url: `${NOTICE_BASE_URL}/${ids}`,
       method: "delete",
     });
@@ -72,7 +72,7 @@ const NoticeAPI = {
    * @returns
    */
   publish(id: string) {
-    return request({
+    return request.httpRequest({
       url: `${NOTICE_BASE_URL}/${id}/publish`,
       method: "put",
     });
@@ -85,7 +85,7 @@ const NoticeAPI = {
    * @returns
    */
   revoke(id: string) {
-    return request({
+    return request.httpRequest({
       url: `${NOTICE_BASE_URL}/${id}/revoke`,
       method: "put",
     });
@@ -96,7 +96,7 @@ const NoticeAPI = {
    * @param id
    */
   getDetail(id: string) {
-    return request<any, NoticeDetailVO>({
+    return request.httpRequest<any, NoticeDetailVO>({
       url: `${NOTICE_BASE_URL}/${id}/detail`,
       method: "get",
     });
@@ -104,7 +104,7 @@ const NoticeAPI = {
 
   /* 全部已读 */
   readAll() {
-    return request({
+    return request.httpRequest({
       url: `${NOTICE_BASE_URL}/read-all`,
       method: "put",
     });
@@ -112,7 +112,7 @@ const NoticeAPI = {
 
   /** 获取我的通知分页列表 */
   getMyNoticePage(queryParams?: NoticePageQuery) {
-    return request<any, PageResult<NoticePageVO[]>>({
+    return request.httpRequest<any, PageResult<NoticePageVO[]>>({
       url: `${NOTICE_BASE_URL}/my-page`,
       method: "get",
       params: queryParams,
