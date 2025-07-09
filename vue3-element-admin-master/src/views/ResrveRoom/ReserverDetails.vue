@@ -100,7 +100,7 @@ const load = async () => {
   const res = await AuthAPI.FanRoom(id);
   console.log(res);
   Object.assign(form, res);
-  
+
   const dataArr = Array.isArray(res) ? res : [res];
   tableData.value = dataArr as RoomInfo[];
   console.log("tableData", tableData.value);
