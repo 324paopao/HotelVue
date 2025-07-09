@@ -10,7 +10,7 @@ const DeptAPI = {
    * @returns 部门树形表格数据
    */
   getList(queryParams?: DeptQuery) {
-    return request<any, DeptVO[]>({
+    return request.httpRequest<any, DeptVO[]>({
       url: `${DEPT_BASE_URL}`,
       method: "get",
       params: queryParams,
@@ -19,7 +19,7 @@ const DeptAPI = {
 
   /** 获取部门下拉列表 */
   getOptions() {
-    return request<any, OptionType[]>({
+    return request.httpRequest<any, OptionType[]>({
       url: `${DEPT_BASE_URL}/options`,
       method: "get",
     });
@@ -32,7 +32,7 @@ const DeptAPI = {
    * @returns 部门表单数据
    */
   getFormData(id: string) {
-    return request<any, DeptForm>({
+    return request.httpRequest<any, DeptForm>({
       url: `${DEPT_BASE_URL}/${id}/form`,
       method: "get",
     });
@@ -45,7 +45,7 @@ const DeptAPI = {
    * @returns 请求结果
    */
   create(data: DeptForm) {
-    return request({
+    return request.httpRequest({
       url: `${DEPT_BASE_URL}`,
       method: "post",
       data,
@@ -60,7 +60,7 @@ const DeptAPI = {
    * @returns 请求结果
    */
   update(id: string, data: DeptForm) {
-    return request({
+    return request.httpRequest({
       url: `${DEPT_BASE_URL}/${id}`,
       method: "put",
       data,
@@ -74,7 +74,7 @@ const DeptAPI = {
    * @returns 请求结果
    */
   deleteByIds(ids: string) {
-    return request({
+    return request.httpRequest({
       url: `${DEPT_BASE_URL}/${ids}`,
       method: "delete",
     });

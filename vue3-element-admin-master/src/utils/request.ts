@@ -21,13 +21,13 @@ const httpRequest = axios.create({
  */
 httpRequest.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // 不再处理 token
-    // const accessToken = Auth.getAccessToken();
-    // if (config.headers.Authorization !== "no-auth" && accessToken) {
-    //   config.headers.Authorization = `Bearer ${accessToken}`;
-    // } else {
-    //   delete config.headers.Authorization;
-    // }
+    // 添加处理token
+    const accessToken = Auth.getAccessToken();
+    if (config.headers.Authorization !== "no-auth" && accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    } else {
+      delete config.headers.Authorization;
+    }
     return config;
   },
   (error) => {
@@ -107,4 +107,84 @@ type RetryCallback = () => void;
  */
 // async function redirectToLogin(message: string = "请重新登录"): Promise<void> { ... }
 
-export default httpRequest;
+
+const httpRequest1 = axios.create({
+  baseURL: '/dev-api', // 使用代理前缀，这样请求会被Vite开发服务器拦截并处理
+  timeout: 50000,
+  headers: { "Content-Type": "application/json;charset=utf-8" },
+  paramsSerializer: (params) => qs.stringify(params),
+});
+
+/**
+ * 为httpRequest1添加请求拦截器
+ */
+httpRequest1.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    // 添加token到请求头
+    const accessToken = Auth.getAccessToken();
+    if (config.headers.Authorization !== "no-auth" && accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => {
+    console.error("Request interceptor error:", error);
+    return Promise.reject(error);
+  }
+);
+
+/**
+ * 响应拦截器 - 统一处理响应和错误
+ */
+httpRequest1.interceptors.response.use(
+  (response: AxiosResponse<ApiResponse>) => {
+    // 如果响应是二进制流，则直接返回（用于文件下载、Excel 导出等）
+    if (response.config.responseType === "blob") {
+      return response;
+    }
+
+    const { code, data, msg } = response.data;
+
+    // 请求成功
+    if (Number(code) === 1) {
+      return data;
+    }
+
+    // 业务错误
+    const errorMessage = msg || "系统出错";
+    ElMessage.error(errorMessage);
+    return Promise.reject(new Error(msg || "Business Error"));
+  },
+  async (error) => {
+    console.error("Response interceptor error:", error);
+
+    const { config, response } = error;
+
+    // 网络错误或服务器无响应
+    if (!response) {
+      ElMessage.error("网络连接失败，请检查网络设置");
+      return Promise.reject(error);
+    }
+
+    const { code, msg } = response.data as ApiResponse;
+
+    switch (code) {
+      case ResultEnum.ACCESS_TOKEN_INVALID:
+        // Access Token 过期，尝试刷新
+        // return refreshTokenAndRetry(config);
+
+      case ResultEnum.REFRESH_TOKEN_INVALID:
+        // Refresh Token 过期，跳转登录页
+        // await redirectToLogin("登录已过期，请重新登录");
+        return Promise.reject(new Error(msg || "Refresh Token Invalid"));
+
+      default:
+        ElMessage.error(msg || "请求失败");
+        return Promise.reject(new Error(msg || "Request Error"));
+    }
+  }
+);
+
+export default { httpRequest, httpRequest1 };

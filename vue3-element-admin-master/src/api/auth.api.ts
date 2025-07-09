@@ -11,7 +11,7 @@ const AuthAPI = {
       captchaKey: data.captchaKey,
       captchaCode: data.captchaCode,
     };
-    return request<any, LoginResult>({
+    return request.httpRequest<any, LoginResult>({
       url: `${AUTH_BASE_URL}/Login`,
       method: "get",
       // eslint-disable-next-line object-shorthand
@@ -46,7 +46,7 @@ const AuthAPI = {
 
   /** 获取验证码接口*/
   async getCaptcha (id:any) {
-    return request<any, Blob>({
+    return request.httpRequest<any, Blob>({
       url: `${AUTH_BASE_URL}/${id}/captcha`,
       method: "get",
       responseType: "blob" // 关键点：加上这一行
