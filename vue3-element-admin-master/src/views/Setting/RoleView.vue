@@ -12,7 +12,7 @@
       <el-row>
         <el-col :span="12">
           <el-button v-if="hasAction('添加角色')" @click="handleAddRole">添加角色</el-button>
-          <el-button v-if="hasAction('批量删除')"  :disabled="disabled" @click="delRange()">批量删除</el-button>
+          <el-button v-if="hasAction('批量删除')" :disabled="disabled" @click="delRange()">批量删除</el-button>
         </el-col>
         <el-col :span="12" style="text-align: right;">
           <el-form :inline="true" :model="SearchData" class="demo-form-inline">
@@ -33,8 +33,7 @@
           <el-input v-model="ruleForm.roleName" />
         </el-form-item>
         <el-form-item label="角色权限" prop="permissionIds">
-          <el-tree 
-          ref="treeRef" :data="treeData" show-checkbox node-key="id" :props="treeProps"
+          <el-tree ref="treeRef" :data="treeData" show-checkbox node-key="id" :props="treeProps"
             :default-checked-keys="ruleForm.permissionIds" :check-strictly="true" @check="onTreeCheck" />
         </el-form-item>
         <el-form-item>
@@ -57,15 +56,16 @@
         </el-table-column>
         <el-table-column prop="address" label="操作" align="center">
           <template #default="scope">
-            <span v-if="hasAction('编辑权限')" style="color: #409EFF; cursor: pointer;" @click="handleUpdRole(scope.row)">编辑</span>&nbsp;&nbsp;
-            <span v-if="hasAction('删除')"  style="color: #409EFF; cursor: pointer;" @click="handleDeleteRole(scope.row)">删除</span>
+            <span v-if="hasAction('编辑权限')" style="color: #409EFF; cursor: pointer;"
+              @click="handleUpdRole(scope.row)">编辑</span>&nbsp;&nbsp;
+            <span v-if="hasAction('删除')" style="color: #409EFF; cursor: pointer;"
+              @click="handleDeleteRole(scope.row)">删除</span>
           </template>
         </el-table-column>
       </el-table>
       <!-- 分页控件 -->
       <div style="margin: 20px 0; text-align: right;">
-        <el-pagination 
-        v-model:current-page="page.PageIndex" v-model:page-size="page.PageSize"
+        <el-pagination v-model:current-page="page.PageIndex" v-model:page-size="page.PageSize"
           :page-sizes="[10, 20, 30, 40]" :background="true" layout="total, sizes, prev, pager, next, jumper"
           :total="page.totleCount" @current-change="handleCurrentChange" @size-change="handleSizeChange" />
       </div>
@@ -240,17 +240,17 @@ const params = reactive({
   PageSize: page.PageSize,
   RoleName: SearchData.RoleName
 })
-function getRole() {
+async function getRole() {
   // 保证每次请求参数都是最新的
   params.PageIndex = page.PageIndex
   params.PageSize = page.PageSize
   params.RoleName = SearchData.RoleName
-  RoleAPI.getRole(params).then(res => {
-    // 适配后端返回结构
-    tableData.value = res.data
-    page.totleCount = res.totleCount
-    page.totlePage = res.totlePage
-  })
+  const res: any = await RoleAPI.getRole(params)
+  // 适配后端返回结构
+  tableData.value = res.data
+  page.totleCount = res.totleCount
+  page.totlePage = res.totlePage
+
 }
 function handleCurrentChange(val: number) {
   page.PageIndex = val
@@ -314,7 +314,7 @@ function handleUpdRole(row: any) {
 // 递归收集所有 isSelected: true 的 id
 function collectSelectedIds(tree: any) {
   let ids: any = [];
-  tree.forEach(node => {
+  tree.forEach((node: { isSelected: any; id: any; children: string | any[] }) => {
     if (node.isSelected) {
       ids.push(node.id);
     }
@@ -333,36 +333,34 @@ const selectedRoles = ref<{ id: number; roleName: string }[]>([]); // 存储多�
 function handleRoleSelectionChange(val: any) {
   console.log("val", val)
   selectedRoles.value = val
-  if(selectedRoles.value.length==0)
-  {
-    disabled.value=true
+  if (selectedRoles.value.length == 0) {
+    disabled.value = true
   }
-  else
-  {
-    disabled.value=false
+  else {
+    disabled.value = false
   }
 }
 
-function delRange (){
+function delRange() {
   const param = reactive({
-  guids: selectedRoles.value.map(item => item.id)
-})
-ElMessageBox.confirm(
-  '确认批量删除吗?',
-  '警告',
-  {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }
-)
-  .then(() => {
-    RoleAPI.deleteRange(param).then(res => {
-      console.log(res)
-      ElMessage.success('批量删除成功')
-      getRole()
-    })
+    guids: selectedRoles.value.map(item => item.id)
   })
+  ElMessageBox.confirm(
+    '确认批量删除吗?',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      RoleAPI.deleteRange(param).then(res => {
+        console.log(res)
+        ElMessage.success('批量删除成功')
+        getRole()
+      })
+    })
 }
 
 
