@@ -5,7 +5,7 @@ const CONFIG_BASE_URL = "/api/v1/config";
 const ConfigAPI = {
   /** 系统配置分页 */
   getPage(queryParams?: ConfigPageQuery) {
-    return request<any, PageResult<ConfigPageVO[]>>({
+    return request.httpRequest<any, PageResult<ConfigPageVO[]>>({
       url: `${CONFIG_BASE_URL}/page`,
       method: "get",
       params: queryParams,
@@ -14,7 +14,7 @@ const ConfigAPI = {
 
   /** 系统配置表单数据 */
   getFormData(id: string) {
-    return request<any, ConfigForm>({
+    return request.httpRequest<any, ConfigForm>({
       url: `${CONFIG_BASE_URL}/${id}/form`,
       method: "get",
     });
@@ -22,7 +22,7 @@ const ConfigAPI = {
 
   /** 新增系统配置 */
   create(data: ConfigForm) {
-    return request({
+    return request.httpRequest({
       url: `${CONFIG_BASE_URL}`,
       method: "post",
       data,
@@ -31,7 +31,7 @@ const ConfigAPI = {
 
   /** 更新系统配置 */
   update(id: string, data: ConfigForm) {
-    return request({
+    return request.httpRequest({
       url: `${CONFIG_BASE_URL}/${id}`,
       method: "put",
       data,
@@ -44,14 +44,14 @@ const ConfigAPI = {
    * @param ids 系统配置ID
    */
   deleteById(id: string) {
-    return request({
+    return request.httpRequest({
       url: `${CONFIG_BASE_URL}/${id}`,
       method: "delete",
     });
   },
 
   refreshCache() {
-    return request({
+    return request.httpRequest({
       url: `${CONFIG_BASE_URL}/refresh`,
       method: "PUT",
     });

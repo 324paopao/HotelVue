@@ -9,7 +9,7 @@ const AccountAPI ={
    * @returns 返回一个Promise对象，表示异步操作的最终完成或失败及其结果值。
    */
   addAccount (data: any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/account`,
       method: "post",
       data
@@ -22,7 +22,7 @@ const AccountAPI ={
    * @returns 返回一个Promise对象，表示异步操作的最终完成或失败及其结果值。
    */
   updateAccount(id: string, data: any){
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/${id}/account`,
       method: "put",
       data
@@ -34,7 +34,7 @@ const AccountAPI ={
    * @returns 获取用户列表的返回值对象
    */
   getAccountList(data: any){
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/account-list`,
       method: "get",
       params: data
@@ -46,7 +46,7 @@ const AccountAPI ={
    * @returns 删除用户的返回值对象
    */
   deleteAccount (data: any){
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/del-account/${data}`,
       method: "delete",
     });

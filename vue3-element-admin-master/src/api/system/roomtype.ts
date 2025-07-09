@@ -5,7 +5,7 @@ const RoomNumServicesUrl = "/api/app/reserve-room-server";
 const RoomTypeAPI = {
   /** 获取房型列表加分页条件 */
   GetRoomTypeAxios(Query: any) {
-    return request<any, RoomTypeSeach>({
+    return request.httpRequest<any, RoomTypeSeach>({
       url: `${RoomTypeUrl}/show`,
       method: "get",
       params: Query,
@@ -13,7 +13,7 @@ const RoomTypeAPI = {
   },
   /** 获取房型列表 */
   GetRoomTypeListAxios(Query: any) {
-    return request<any, RoomTypeSeach>({
+    return request.httpRequest<any, RoomTypeSeach>({
       url: `${RoomNumServicesUrl}/room-types-list`,
       method: "get",
       params: Query,
@@ -21,14 +21,14 @@ const RoomTypeAPI = {
   },
   /** 删除房型 */
   DeleteRoomTypeAxios(Query: any) {
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomTypeUrl}/${Query}/room-type-del`,
       method: "delete",
     });
   },
   /** 新增房型 */
   AddRoomTypeAxios(data: any) {
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomTypeUrl}/add`,
       method: "post",
       data,
@@ -38,21 +38,21 @@ const RoomTypeAPI = {
   /** 批量删除房型 */
   BatchDeleteRoomTypeAxios(ids: string[]) {
     const params = ids.map((id) => `ids=${id}`).join("&");
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomTypeUrl}/batch-room-type?${params}`,
       method: "delete",
     });
   },
   /** 修改房型 */
   UpdataRoomTypeAxios(id: string, data: RoomTypeUpdate) {
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomTypeUrl}/${id}/room-type`,
       method: "put",
       data,
     });
   },
   UpdataRoomTypeOrder(data: any) {
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomTypeUrl}/room-type-order`,
       method: "put",
       data,
@@ -60,7 +60,7 @@ const RoomTypeAPI = {
   },
   // 获取房号列表根据房型id
   GetRoomNumListAxios(Query: any) {
-    return request<any, RoomNumToRoomTypeId>({
+    return request.httpRequest<any, RoomNumToRoomTypeId>({
       url: `${RoomNumUrl}/to-room-type-id`,
       method: "get",
       params: Query,
@@ -68,7 +68,7 @@ const RoomTypeAPI = {
   },
   // 获取房号列表
   GetRoomNumAxios(data: any) {
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomNumUrl}/room-num-list`,
       method: "get",
       params: data,
@@ -77,7 +77,7 @@ const RoomTypeAPI = {
 
   // 添加房号
   AddRoomNumAxios(data: any) {
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomNumUrl}/room-num-add`,
       method: "post",
       data,
@@ -85,7 +85,7 @@ const RoomTypeAPI = {
   },
   // 修改房号
   UpdataRoomNumAxios(Id: string, data: any) {
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomNumUrl}/room-numm/${Id}`,
       method: "put",
       data,
@@ -93,14 +93,14 @@ const RoomTypeAPI = {
   },
   // 删除房号
   DeleteRoomNumAxios(Id: string) {
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomNumUrl}/room-num/${Id}`,
       method: "delete",
     });
   },
   // 修改房号状态(上架下架)
   UpdataRoomNumStateAxios(Id: string, data: any) {
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomNumUrl}/${Id}/state-to-room-num`,
       method: "put",
       params: data,
@@ -109,7 +109,7 @@ const RoomTypeAPI = {
   // 批量删除房号
   BatchDeleteRoomNumAxios(ids: string[]) {
     const paramas = ids.map((id) => `ids=${id}`).join("&");
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomNumUrl}/room-num-batch?${paramas}`,
       method: "delete",
       params: ids,
@@ -117,7 +117,7 @@ const RoomTypeAPI = {
   },
   // 批量上下架房号
   BatchUpdateRoomNumStateAxios(ids: string[], state: boolean) {
-    return request<any>({
+    return request.httpRequest<any>({
       url: `${RoomNumUrl}/state-to-room-num-batch?state=${state}`,
       method: "put",
       data: ids,

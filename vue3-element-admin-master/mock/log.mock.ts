@@ -5,7 +5,7 @@ export default defineMock([
     url: "logs/page",
     method: ["GET"],
     body: {
-      code: "00000",
+      code: 1,
       data: {
         list: [
           {
@@ -95,7 +95,7 @@ export default defineMock([
             os: "Windows 10 or Windows Server 2016",
             executionTime: 92,
             createBy: null,
-            createTime: "2024-07-07 20:38:42",
+            createTime: "2025-07-07 20:38:42",
             operator: "系统管理员",
           },
           {
@@ -168,7 +168,7 @@ export default defineMock([
     url: "logs/visit-trend",
     method: ["GET"],
     body: {
-      code: "00000",
+      code: 1,
       data: {
         dates: [
           "2024-06-30",
@@ -192,7 +192,7 @@ export default defineMock([
     url: "logs/visit-stats",
     method: ["GET"],
     body: {
-      code: "00000",
+      code: 1,
       data: {
         todayPvCount: 1629,
         totalPvCount: 286086,

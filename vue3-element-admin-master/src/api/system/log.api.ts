@@ -9,7 +9,7 @@ const LogAPI = {
    * @param queryParams 查询参数
    */
   getPage(queryParams: LogPageQuery) {
-    return request<any, PageResult<LogPageVO[]>>({
+    return request.httpRequest1<any, PageResult<LogPageVO[]>>({
       url: `${LOG_BASE_URL}/page`,
       method: "get",
       params: queryParams,
@@ -23,7 +23,7 @@ const LogAPI = {
    * @returns
    */
   getVisitTrend(queryParams: VisitTrendQuery) {
-    return request<any, VisitTrendVO>({
+    return request.httpRequest1<any, VisitTrendVO>({
       url: `${LOG_BASE_URL}/visit-trend`,
       method: "get",
       params: queryParams,
@@ -37,7 +37,7 @@ const LogAPI = {
    * @returns
    */
   getVisitStats() {
-    return request<any, VisitStatsVO>({
+    return request.httpRequest1<any, VisitStatsVO>({
       url: `${LOG_BASE_URL}/visit-stats`,
       method: "get",
     });
