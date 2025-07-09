@@ -155,7 +155,7 @@ export function customerConsume(data: {
  * @returns Promise
  */
 export function updateCustomerStatus(ids: string[], status: boolean) {
-  return request.httpRequest    ({
+  return request.httpRequest({
     url: "/api/app/customer/customer-status",
     method: "put",
     data: { ids, status },
@@ -211,6 +211,42 @@ export function deleteTag(id: any) {
   return request.httpRequest({
     url: `/api/app/label/del-label`,
     method: "delete",
-    params:id
+    params: id,
+  });
+}
+
+/**
+ * 修改标签
+ * @param data 标签数据对象
+ * @returns Promise
+ */
+export function updateTag(data: any) {
+  const { id, ...updateData } = data;
+  return request.httpRequest({
+    url: `/api/app/label/label`,
+    method: "put",
+    params: { guid: id }, // 将id作为guid查询参数
+    data: updateData, // 其他数据作为请求体
+  });
+}
+
+/**
+ * 根据ID查询标签详情
+ * @param id 标签ID
+ * @returns Promise
+ */
+export function getTagById(id: string) {
+  return request.httpRequest({
+    url: `/api/app/label/${id}/label-by-id`,
+    method: "get",
+    transformResponse: [
+      (data) => {
+        try {
+          return JSON.parse(data);
+        } catch (e) {
+          return data;
+        }
+      },
+    ],
   });
 }

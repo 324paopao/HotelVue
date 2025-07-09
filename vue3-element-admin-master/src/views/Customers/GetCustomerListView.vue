@@ -171,8 +171,8 @@
             </template>
           </el-table-column>
           <el-table-column label="标签" width="120">
-            <template #default="">
-              <el-link type="primary">添加标签</el-link>
+            <template #default="scope">
+              <el-link type="primary" @click="openAddTagDialog(scope.row)">添加标签</el-link>
             </template>
           </el-table-column>
           <el-table-column label="卡号" prop="id" width="170" />
@@ -631,6 +631,61 @@
         <el-button @click="showImportDialog = false">关闭</el-button>
       </template>
     </el-dialog>
+
+    <!-- 添加标签弹窗 -->
+    <el-dialog
+      v-model="showAddTagDialog"
+      title="添加标签"
+      width="500px"
+      :close-on-click-modal="false"
+      align-center
+    >
+      <div class="tag-dialog-content">
+        <!-- 搜索框 -->
+        <el-input
+          v-model="tagSearchKeyword"
+          placeholder="标签名称"
+          class="tag-search-input"
+          :suffix-icon="Search"
+        />
+
+        <!-- 标签列表表格 -->
+        <div class="tag-table">
+          <div class="tag-table-header">
+            <div class="tag-table-cell checkbox-cell"></div>
+            <div class="tag-table-cell">标签名称</div>
+            <div class="tag-table-cell">标签类型</div>
+          </div>
+
+          <div class="tag-table-body">
+            <div v-for="tag in filteredTags" :key="tag.id" class="tag-table-row">
+              <div class="tag-table-cell checkbox-cell">
+                <el-checkbox v-model="tag.checked" />
+              </div>
+              <div class="tag-table-cell">{{ tag.name }}</div>
+              <div class="tag-table-cell">{{ tag.type }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 分页 -->
+        <div class="pagination-container">
+          <el-pagination
+            v-model:current-page="tagPage.current"
+            :page-size="tagPage.pageSize"
+            layout="prev, pager, next"
+            :total="tagPage.total"
+            @current-change="handleTagPageChange"
+          />
+        </div>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="showAddTagDialog = false">取消</el-button>
+          <el-button type="primary" @click="handleAddTags">确定</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -655,6 +710,7 @@ import { regionData } from "element-china-area-data";
 // import Pagination from "@/components/Pagination/index.vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
+import { Search } from "@element-plus/icons-vue";
 
 const router = useRouter();
 // #region 操作权限相关
@@ -1291,6 +1347,83 @@ const showFrozenMessage = () => {
   ElMessage.warning("客户已冻结，无法进行此操作");
 };
 
+// 添加标签相关
+const showAddTagDialog = ref(false);
+const selectedCustomer = ref({
+  id: "",
+  customerName: "",
+});
+const tagSearchKeyword = ref("");
+
+// 打开添加标签弹窗
+const openAddTagDialog = (row: any) => {
+  selectedCustomer.value = {
+    id: row.id,
+    customerName: row.customerName || row.customerNickName || "未知客户",
+  };
+  // 重置所有标签的选中状态
+  allTags.value.forEach((tag) => (tag.checked = false));
+  // 清空搜索关键词
+  tagSearchKeyword.value = "";
+  // 重置分页
+  tagPage.current = 1;
+  // 显示弹窗
+  showAddTagDialog.value = true;
+};
+
+// 标签分页数据
+const tagPage = reactive({
+  current: 1,
+  pageSize: 10,
+  total: 30,
+});
+
+// 模拟标签数据，实际应该从API获取
+const allTags = ref([
+  { id: "1", name: "活跃客户", type: "手动标签", checked: false },
+  { id: "2", name: "新客户", type: "手动标签", checked: false },
+  { id: "3", name: "高消费", type: "条件标签", checked: false },
+]);
+
+// 根据搜索关键词过滤标签
+const filteredTags = computed(() => {
+  if (!tagSearchKeyword.value) return allTags.value;
+  return allTags.value.filter((tag) =>
+    tag.name.toLowerCase().includes(tagSearchKeyword.value.toLowerCase())
+  );
+});
+
+// 处理标签分页变化
+const handleTagPageChange = (page: number) => {
+  tagPage.current = page;
+  // TODO: 调用API获取对应页的标签数据
+};
+
+// 处理添加标签
+const handleAddTags = async () => {
+  const selectedTagIds = allTags.value.filter((tag) => tag.checked).map((tag) => tag.id);
+
+  if (selectedTagIds.length === 0) {
+    ElMessage.warning("请至少选择一个标签");
+    return;
+  }
+
+  try {
+    // TODO: 调用添加标签API
+    console.log("添加标签:", {
+      customerId: selectedCustomer.value.id,
+      tagIds: selectedTagIds,
+    });
+
+    ElMessage.success("添加标签成功");
+    showAddTagDialog.value = false;
+    fetchCustomerList(); // 刷新列表
+  } catch (error) {
+    console.error("添加标签失败:", error);
+    ElMessage.error("添加标签失败");
+  }
+};
+
 // 当组件被缓存并离开视图时设置刷新标志
 onDeactivated(() => {
   needRefresh.value = true;
@@ -1752,5 +1885,83 @@ onActivated(() => {
   background: #fff;
   box-shadow: 0 2px 8px -4px #d3d3d3;
   border-bottom: 1px solid #ebeef5;
+}
+
+/* 添加标签弹窗样式 */
+.tag-dialog-content {
+  padding: 20px;
+}
+
+.tag-search-input {
+  margin-bottom: 20px;
+}
+
+.tag-table {
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
+}
+
+.tag-table-header {
+  display: flex;
+  background-color: #f5f7fa;
+  border-bottom: 1px solid #ebeef5;
+  font-weight: 500;
+}
+
+.tag-table-row {
+  display: flex;
+  border-bottom: 1px solid #ebeef5;
+  &:last-child {
+    border-bottom: none;
+  }
+  &:nth-child(even) {
+    background-color: #fafafa;
+  }
+}
+
+.tag-table-cell {
+  padding: 12px 10px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-cell {
+  flex: 0 0 40px;
+  justify-content: center;
+}
+
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+:deep(.el-dialog__header) {
+  margin: 0;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+:deep(.el-dialog__body) {
+  padding: 0;
+}
+
+:deep(.el-dialog__footer) {
+  padding: 10px 20px;
+  border-top: 1px solid #ebeef5;
+}
+
+:deep(.el-checkbox) {
+  margin-right: 0;
+}
+
+:deep(.el-dialog__title) {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+:deep(.el-input__wrapper) {
+  border-radius: 4px;
 }
 </style>

@@ -3,11 +3,11 @@
     <div class="page-header">
       <div class="breadcrumb">客户管理 - 标签管理</div>
     </div>
-    
+
     <div class="search-bar">
-      <el-input 
-        v-model="searchQuery" 
-        placeholder="标签名称" 
+      <el-input
+        v-model="searchQuery"
+        placeholder="标签名称"
         class="search-input"
         clearable
         @keyup.enter="handleSearch"
@@ -16,20 +16,20 @@
           <el-button :icon="Search" @click="handleSearch"></el-button>
         </template>
       </el-input>
-      
+
       <el-button class="add-tag-btn" @click="handleAddTag">新增标签</el-button>
     </div>
-    
+
     <!-- 手动标签区域 -->
     <div class="tag-section">
       <div class="section-title">手动标签</div>
-      
+
       <div class="tag-list">
-        <div 
-          v-for="tag in manualTags" 
-          :key="tag.id" 
-          class="tag-card" 
-          :class="{'tag-active': tag.labelName === '活跃客户'}"
+        <div
+          v-for="tag in manualTags"
+          :key="tag.id"
+          class="tag-card"
+          :class="{ 'tag-active': tag.labelName === '活跃客户' }"
         >
           <div class="tag-header">
             <span class="tag-name">{{ tag.labelName }}</span>
@@ -38,30 +38,26 @@
               <el-button type="text" :icon="Delete" @click="handleDeleteTag(tag)"></el-button>
             </div>
           </div>
-          
+
           <div class="tag-footer">
             <div class="tag-count">人数：{{ tag.customerCount || 0 }}</div>
-            <el-button type="text" class="tag-detail-btn" @click="viewTagDetail(tag)">详情</el-button>
+            <el-button type="text" class="tag-detail-btn" @click="viewTagDetail(tag)">
+              详情
+            </el-button>
           </div>
         </div>
-        
+
         <!-- 如果没有手动标签，显示空状态 -->
-        <div v-if="manualTags.length === 0" class="empty-tags">
-          暂无手动标签
-        </div>
+        <div v-if="manualTags.length === 0" class="empty-tags">暂无手动标签</div>
       </div>
     </div>
-    
+
     <!-- 条件标签区域 -->
     <div class="tag-section">
       <div class="section-title">条件标签</div>
-      
+
       <div class="tag-list">
-        <div 
-          v-for="tag in conditionTags" 
-          :key="tag.id" 
-          class="tag-card condition-tag"
-        >
+        <div v-for="tag in conditionTags" :key="tag.id" class="tag-card condition-tag">
           <div class="tag-header">
             <span class="tag-name">{{ tag.labelName }}</span>
             <div class="tag-actions">
@@ -69,17 +65,17 @@
               <el-button type="text" :icon="Delete" @click="handleDeleteTag(tag)"></el-button>
             </div>
           </div>
-          
+
           <div class="tag-footer">
             <div class="tag-count">人数：{{ tag.customerCount || 0 }}</div>
-            <el-button type="text" class="tag-detail-btn" @click="viewTagDetail(tag)">详情</el-button>
+            <el-button type="text" class="tag-detail-btn" @click="viewTagDetail(tag)">
+              详情
+            </el-button>
           </div>
         </div>
-        
+
         <!-- 如果没有条件标签，显示空状态 -->
-        <div v-if="conditionTags.length === 0" class="empty-tags">
-          暂无条件标签
-        </div>
+        <div v-if="conditionTags.length === 0" class="empty-tags">暂无条件标签</div>
       </div>
     </div>
   </div>
@@ -90,19 +86,19 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { getTagList, deleteTag } from "@/api/system/customer.api";
-import { Search, Edit, Delete } from '@element-plus/icons-vue';
+import { Search, Edit, Delete } from "@element-plus/icons-vue";
 
 const router = useRouter();
 const searchQuery = ref("");
 const tagList = ref<any[]>([]);
 
 // 分类标签
-const manualTags = computed(() => 
-  tagList.value.filter(tag => tag.tagType === 0 || tag.tagType === '0')
+const manualTags = computed(() =>
+  tagList.value.filter((tag) => tag.tagType === 0 || tag.tagType === "0")
 );
 
-const conditionTags = computed(() => 
-  tagList.value.filter(tag => tag.tagType === 1 || tag.tagType === '1')
+const conditionTags = computed(() =>
+  tagList.value.filter((tag) => tag.tagType === 1 || tag.tagType === "1")
 );
 
 // 获取标签列表
@@ -111,9 +107,9 @@ const fetchTagList = async () => {
     const params = {
       PageIndex: 1,
       PageSize: 100, // 获取足够多的标签
-      LabelName: searchQuery.value.trim() || undefined
+      LabelName: searchQuery.value.trim() || undefined,
     };
-    
+
     const response = await getTagList(params);
     if (response && response.data) {
       tagList.value = response.data || [];
@@ -141,24 +137,23 @@ const handleEditTag = (tag: any) => {
 
 // 删除标签
 const handleDeleteTag = (tag: any) => {
-  ElMessageBox.confirm(
-    `确定要删除标签"${tag.labelName}"吗？`,
-    '删除标签',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }
-  ).then(async () => {
-    try {
-      const params = { guid: tag.id };
-      await deleteTag(params);
-      ElMessage.success('删除成功');
-      fetchTagList();
-    } catch (error) {
-      ElMessage.error('删除失败');
-    }
-  }).catch(() => {});
+  ElMessageBox.confirm(`确定要删除标签"${tag.labelName}"吗？`, "删除标签", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(async () => {
+      try {
+        const params = { guid: tag.id };
+        await deleteTag(params);
+        ElMessage.success("删除成功");
+        fetchTagList();
+      } catch (error: any) {
+        console.error("删除失败", error);
+        ElMessage.error("删除失败");
+      }
+    })
+    .catch(() => {});
 };
 
 // 查看标签详情
@@ -237,12 +232,12 @@ onMounted(() => {
 }
 
 .tag-active {
-  background-color: #409EFF;
+  background-color: #409eff;
   color: white;
 }
 
 .condition-tag {
-  background-color: #67C23A;
+  background-color: #67c23a;
   color: white;
 }
 
