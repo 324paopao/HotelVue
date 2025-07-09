@@ -531,7 +531,7 @@ const SearchData = ref({
 })
 
 //获取用户列表
-function getAccountList() {
+async function getAccountList() {
   const params = reactive({
     PageIndex: page.PageIndex,
     PageSize: page.PageSize,
@@ -539,12 +539,12 @@ function getAccountList() {
     NickName: SearchData.value.NickName,
     RoleId: SearchData.value.RoleId
   })
-  AccountAPI.getAccountList(params).then(res => {
+  const res:any=await AccountAPI.getAccountList(params)
     tableData.value = res.data
     page.totleCount = res.totleCount
     page.totlePage = res.totlePage
     console.log("user", res.data)
-  })
+  
 }
 
 watch(page, () => {

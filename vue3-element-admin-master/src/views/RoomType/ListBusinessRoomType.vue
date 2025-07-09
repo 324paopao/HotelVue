@@ -734,7 +734,7 @@ function getImageUrl(path: string) {
   return "https://localhost:44384" + path;
 }
 
-const beforeAvatarUpload = (rawFile) => {
+const beforeAvatarUpload = (rawFile:any) => {
   const isImage = ["image/jpeg", "image/png", "image/bmp"].includes(rawFile.type);
   if (!isImage) {
     ElMessage.error("图片格式仅支持 JPG/PNG/BMP!");
