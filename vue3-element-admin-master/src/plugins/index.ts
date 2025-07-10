@@ -9,6 +9,8 @@ import { setupPermission } from "./permission";
 import { setupWebSocket } from "./websocket";
 import { InstallCodeMirror } from "codemirror-editor-vue3";
 import { setupVxeTable } from "./vxeTable";
+// 暂时移除百度地图插件
+// import baiduMap from "./baiduMap";
 
 export default {
   install(app: App<Element>) {
@@ -30,5 +32,7 @@ export default {
     setupVxeTable(app);
     // 注册 CodeMirror
     app.use(InstallCodeMirror);
+    // 百度地图 - 暂时移除
+    // app.use(baiduMap);
   },
 };
