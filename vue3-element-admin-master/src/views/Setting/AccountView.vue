@@ -77,7 +77,7 @@
               </span>
               <template #footer>
                 <div class="dialog-footer">
-                  <el-button @click="dialogVisible = false">取消</el-button>
+                  <el-button @click="roleDialogVisible = false">取消</el-button>
                   <el-button type="primary" @click="confirmRole">
                     确定
                   </el-button>
@@ -119,8 +119,12 @@
             </el-dropdown>
             <el-input 
             v-model="searchInput" :placeholder="searchType === 'mobile' ? '请输入手机号' : '请输入姓名'"
-              style="width: 200px; margin-left: 10px;" clearable />
-            <el-button type="primary" style="margin-left: 10px;" @click="handleSearch">查询</el-button>
+              style="width: 200px; margin-left: 10px;" clearable >
+              <template #append>
+                <el-button :icon="Search" @click="handleSearch" />
+              </template>
+            </el-input>
+            <!-- <el-button type="primary" style="margin-left: 10px;" @click="handleSearch">查询</el-button> -->
           </el-col>
         </el-row>
         <!-- 显示用户表格 -->
@@ -242,7 +246,7 @@
 
 <script setup lang="ts">
 import PermissionNode from './PermissionNode.vue'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown, Search } from '@element-plus/icons-vue'
 import { ref, onMounted, reactive, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import RoleAPI from '@/api/Setting/role.api'

@@ -1,4 +1,5 @@
 import request from "@/utils/request";
+import axios from "axios";
 
 const FileAPI = {
   /**
@@ -23,13 +24,16 @@ const FileAPI = {
   uploadFile(file: File) {
     const formData = new FormData();
     formData.append("files", file);
-    return request.httpRequest<any, FileInfo>({
-      url: "/api/FileImg",
-      method: "post",
-      data: formData,
-      // headers: {
-      //   "Content-Type": "multipart/form-data",
-      // },
+    // 使用axios直接发送请求，确保正确解析返回值
+    return axios.post("/api/FileImg", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      }
+    }).then((response) => {
+      // 确保返回正确的数据结构
+      return {
+        filePaths: response.data.filePaths || [response.data.filePath] || [`/uploads/${file.name}`]
+      };
     });
   },
 
@@ -75,7 +79,11 @@ export default FileAPI;
  */
 export interface FileInfo {
   /** 文件名 */
-  name: string;
+  name?: string;
   /** 文件路径 */
-  url: string;
+  url?: string;
+  /** 文件路径（服务器返回） */
+  filePath?: string;
+  /** 文件路径数组（服务器返回） */
+  filePaths?: string[];
 }
