@@ -172,6 +172,12 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/Setting/OperationLog.vue"),
         meta: { title: "操作日志管理", icon: "user", hidden: true },
       },
+      {
+        path: "storeview",
+        name: "storeview",
+        component: () => import("@/views/StoreManage/StoreView.vue"),
+        meta: { title: "门店管理", icon: "user", hidden: true },
+      },
     ],
   },
 ];
