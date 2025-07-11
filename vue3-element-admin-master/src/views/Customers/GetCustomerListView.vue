@@ -173,17 +173,6 @@
           <el-table-column label="标签" min-width="150">
             <template #default="scope">
               <div class="tag-container">
-                <div v-if="scope.row.labels && scope.row.labels.length > 0" class="tag-list">
-                  <el-tag
-                    v-for="tag in scope.row.labels"
-                    :key="tag.labelId"
-                    size="small"
-                    :type="getTagType(tag.tagType)"
-                    class="tag-item"
-                  >
-                    {{ tag.labelName }}
-                  </el-tag>
-                </div>
                 <el-link type="primary" class="add-tag-link" @click="openAddTagDialog(scope.row)">
                   <el-icon class="add-icon"><Plus /></el-icon>
                   添加标签
@@ -194,8 +183,10 @@
           <el-table-column label="卡号" prop="id" min-width="130" show-overflow-tooltip>
             <template #default="scope">
               <div class="card-number-container">
-                <div class="card-number-text">{{ scope.row.id.slice(0, 18) }}</div>
-                <div class="card-number-text">{{ scope.row.id.slice(18) }}</div>
+                <div class="card-number-text">
+                  {{ scope.row.id ? scope.row.id.slice(0, 18) : "--" }}
+                </div>
+                <div class="card-number-text">{{ scope.row.id ? scope.row.id.slice(18) : "" }}</div>
               </div>
             </template>
           </el-table-column>
@@ -813,6 +804,11 @@ const tableData = ref<Customer[]>([]);
 const fetchCustomerList = async () => {
   try {
     const params = buildQueryParams();
+    // 如果是按卡号查询，需要处理ID格式
+    if (params.Id) {
+      // 移除所有非字母数字字符
+      params.Id = params.Id.replace(/[^a-zA-Z0-9]/g, "");
+    }
     const response = await getCustomerList(params);
     console.log("客户列表API返回数据结构:", response);
 
@@ -826,8 +822,7 @@ const fetchCustomerList = async () => {
         try {
           const labelsResponse = await getCustomerLabels(customer.id);
           customer.labels = labelsResponse.data || [];
-        } catch (error) {
-          console.error(`获取客户${customer.id}的标签失败:`, error);
+        } catch  {
           customer.labels = [];
         }
       }
@@ -1586,12 +1581,7 @@ onActivated(() => {
   }
 });
 
-// 添加 getTagType 函数
-const getTagType = (tagType: number): "success" | "warning" | "info" => {
-  if (tagType === 0) return "success"; // 手动标签
-  if (tagType === 1) return "warning"; // 条件标签
-  return "info"; // 默认标签类型
-};
+
 </script>
 
 <style scoped>

@@ -54,6 +54,10 @@ httpRequest.interceptors.response.use(
 
     // 业务错误
     const errorMessage = msg || "系统出错";
+    if (errorMessage && errorMessage.includes("Unrecognized Guid format")) {
+      // 不弹窗，直接返回错误
+      return Promise.reject(new Error(msg || "Business Error"));
+    }
     ElMessage.error(errorMessage);
     return Promise.reject(new Error(msg || "Business Error"));
   },
@@ -69,12 +73,16 @@ httpRequest.interceptors.response.use(
     }
 
     const { code, msg } = response.data as ApiResponse;
+    if ((msg || "").includes("Unrecognized Guid format")) {
+      // 不弹窗，直接返回错误
+      return Promise.reject(new Error(msg || "Request Error"));
+    }
 
     switch (code) {
       case ResultEnum.ACCESS_TOKEN_INVALID:
-      // Access Token 过期，尝试刷新
-      // return refreshTokenAndRetry(config);
-
+        // Access Token 过期，尝试刷新
+        // return refreshTokenAndRetry(config);
+        break;
       case ResultEnum.REFRESH_TOKEN_INVALID:
         // Refresh Token 过期，跳转登录页
         // await redirectToLogin("登录已过期，请重新登录");
@@ -105,9 +113,8 @@ type RetryCallback = () => void;
  */
 // async function redirectToLogin(message: string = "请重新登录"): Promise<void> { ... }
 
-
 const httpRequest1 = axios.create({
-  baseURL: '/dev-api', // 使用代理前缀，这样请求会被Vite开发服务器拦截并处理
+  baseURL: "/dev-api", // 使用代理前缀，这样请求会被Vite开发服务器拦截并处理
   timeout: 50000,
   headers: { "Content-Type": "application/json;charset=utf-8" },
   paramsSerializer: (params) => qs.stringify(params),
@@ -152,9 +159,9 @@ httpRequest1.interceptors.response.use(
 
     // 业务错误
     // 在响应拦截器中修改
-   const errorMessage = `错误(${code}): ${msg || "系统出错"}`;
-   console.error("API响应详情:", response.data); // 添加详细日志
-   ElMessage.error(errorMessage);
+    const errorMessage = `错误(${code}): ${msg || "系统出错"}`;
+    console.error("API响应详情:", response.data); // 添加详细日志
+    ElMessage.error(errorMessage);
     return Promise.reject(new Error(msg || "Business Error"));
   },
   async (error) => {
