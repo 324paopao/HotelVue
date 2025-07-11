@@ -2,13 +2,8 @@
   <div class="dashboard-container">
     <!-- 动态操作权限按钮演示 -->
     <div style="margin-bottom: 16px;">
-      <el-button
-        v-for="action in actions"
-        :key="action.id"
-        type="primary"
-        style="margin-right: 8px;"
-        @click="() => ElMessage.success('点击了：' + action.name)"
-      >
+      <el-button v-for="action in actions" :key="action.id" type="primary" style="margin-right: 8px;"
+        @click="() => ElMessage.success('点击了：' + action.name)">
         {{ action.name }}
       </el-button>
     </div>
@@ -345,7 +340,7 @@
                 </div>
               </el-timeline-item>
             </el-timeline>
-            <div v-else class="text-center py-20 text-gray">暂无动态数据</div>
+            <!-- <div v-else class="text-center py-20 text-gray">暂无动态数据</div> -->
           </el-scrollbar>
         </el-card>
       </el-col>

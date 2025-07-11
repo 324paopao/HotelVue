@@ -1,43 +1,27 @@
 <template>
   <div style="height: 100vh; background: #f7f7fa; padding: 32px 24px">
     <div style="background: #fff; border-radius: 10px; padding: 24px">
-      <div
-        style="
+      <div style="
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 16px;
-        "
-      >
+        ">
         <div>
           <el-button v-if="hasAction('新增房型')" type="primary" @click="openAddDrawer">
             新增房型
           </el-button>
-          <el-button
-            v-if="hasAction('批量删除')"
-            :disabled="multipleSelection.length === 0"
-            @click="handleBatchDelete"
-          >
+          <el-button v-if="hasAction('批量删除')" :disabled="multipleSelection.length === 0" @click="handleBatchDelete">
             批量删除
           </el-button>
         </div>
-        <el-input
-          v-model="Query.Name"
-          placeholder="房型名称"
-          style="width: 200px"
-          @keyup.enter="GetListRoomType()"
-        >
+        <el-input v-model="Query.Name" placeholder="房型名称" style="width: 200px" @keyup.enter="GetListRoomType()">
           <template #append>
             <el-button icon="el-icon-search" @click="GetListRoomType()" />
           </template>
         </el-input>
       </div>
-      <el-table
-        :data="tableData"
-        border
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-      >
+      <el-table :data="tableData" border style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="name" label="房型名称" />
         <el-table-column prop="price" label="门市价（元）" />
@@ -45,13 +29,8 @@
         <el-table-column prop="roomTypeCount" label="房间数量" />
         <el-table-column prop="order" label="排序">
           <template #default="scope">
-            <el-input
-              v-model="scope.row.order"
-              size="small"
-              style="width: 60px"
-              @blur="saveOrder(scope.row)"
-              @keyup.enter="saveOrder(scope.row)"
-            />
+            <el-input v-model="scope.row.order" size="small" style="width: 60px" @blur="saveOrder(scope.row)"
+              @keyup.enter="saveOrder(scope.row)" />
           </template>
         </el-table-column>
         <el-table-column label="操作" width="220">
@@ -59,65 +38,35 @@
             <el-link v-if="hasAction('编辑')" type="primary" @click="onEdit(scope.row)">
               编辑
             </el-link>
-            <el-link
-              v-if="hasAction('设置房号')"
-              type="primary"
-              style="margin-left: 8px"
-              @click="openRoomNumDialog(scope.row)"
-            >
+            <el-link v-if="hasAction('设置房号')" type="primary" style="margin-left: 8px"
+              @click="openRoomNumDialog(scope.row)">
               设置房号
             </el-link>
             <el-link type="primary" style="margin-left: 8px">投放</el-link>
-            <el-link
-              v-if="hasAction('删除')"
-              type="danger"
-              style="margin-left: 8px"
-              @click="handleDelete(scope.row.id)"
-            >
+            <el-link v-if="hasAction('删除')" type="danger" style="margin-left: 8px" @click="handleDelete(scope.row.id)">
               删除
             </el-link>
           </template>
         </el-table-column>
       </el-table>
 
-      <el-pagination
-        v-model:current-page="Query.PageIndex"
-        v-model:page-size="Query.PageSize"
-        :page-sizes="[1, 3, 5, 10]"
-        :background="true"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="Query.totleCount"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
+      <el-pagination v-model:current-page="Query.PageIndex" v-model:page-size="Query.PageSize"
+        :page-sizes="[1, 3, 5, 10]" :background="true" layout="total, sizes, prev, pager, next, jumper"
+        :total="Query.totleCount" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
     <!-- 只保留一个右侧弹出抽屉 -->
-    <el-drawer
-      v-model="drawerVisible"
-      title="房型管理-新增房型"
-      direction="rtl"
-      size="800px"
-      :close-on-click-modal="false"
-    >
+    <el-drawer v-model="drawerVisible" title="房型管理-新增房型" direction="rtl" size="800px" :close-on-click-modal="false">
       <el-form :model="form" label-width="120px" style="padding: 0 24px">
         <!-- 基本信息 -->
-        <div
-          style="
+        <div style="
             background: #f7f7fa;
             padding: 24px 16px 8px 16px;
             border-radius: 8px;
             margin-bottom: 24px;
-          "
-        >
+          ">
           <div style="font-weight: bold; font-size: 16px; margin-bottom: 16px">基本信息</div>
           <el-form-item label="房间名称" required>
-            <el-input
-              v-model="form.name"
-              maxlength="20"
-              show-word-limit
-              placeholder="房间名称"
-              style="width: 300px"
-            />
+            <el-input v-model="form.name" maxlength="20" show-word-limit placeholder="房间名称" style="width: 300px" />
           </el-form-item>
           <el-form-item label="门市价" required>
             <el-input v-model="form.price" placeholder="￥0.00" style="width: 180px">
@@ -130,12 +79,8 @@
               <el-radio :label="false">不需要</el-radio>
               <el-radio :label="true">需要</el-radio>
             </el-radio-group>
-            <el-input
-              v-if="form.depositRequired"
-              v-model="form.depositAmount"
-              placeholder="0"
-              style="width: 100px; margin-left: 8px"
-            >
+            <el-input v-if="form.depositRequired" v-model="form.depositAmount" placeholder="0"
+              style="width: 100px; margin-left: 8px">
               <template #append>元</template>
             </el-input>
           </el-form-item>
@@ -178,14 +123,12 @@
           </el-form-item>
         </div>
         <!-- 展示信息 -->
-        <div
-          style="
+        <div style="
             background: #f7f7fa;
             padding: 24px 16px 8px 16px;
             border-radius: 8px;
             margin-bottom: 24px;
-          "
-        >
+          ">
           <div style="font-weight: bold; font-size: 16px; margin-bottom: 16px">展示信息</div>
           <el-form-item label="房型视频">
             <div class="upload-container">
@@ -196,54 +139,30 @@
               <div v-if="uploadProgress > 0">上传进度：{{ uploadProgress }}%</div>
 
               <!-- 上传成功后显示视频 -->
-              <video
-                v-if="form.videoUrl"
-                :src="form.videoUrl"
-                controls
-                width="440"
-                height="160"
-                class="mt-4"
-              ></video>
+              <video v-if="form.videoUrl" :src="form.videoUrl" controls width="440" height="160" class="mt-4"></video>
             </div>
             <div class="el-form-item__tip">
               最多上传一个视频，上传视频封面图片尺寸建议和房型图片保持一致：750PX*448PX
             </div>
           </el-form-item>
           <el-form-item label="房型介绍" required>
-            <el-input
-              v-model="form.description"
-              type="textarea"
-              :rows="4"
-              maxlength="1000"
-              show-word-limit
-              placeholder="房型介绍"
-            />
+            <el-input v-model="form.description" type="textarea" :rows="4" maxlength="1000" show-word-limit
+              placeholder="房型介绍" />
           </el-form-item>
           <el-form-item label="房型标签">
-            <el-tag
-              v-for="tag in form.displayChannelses"
-              :key="tag"
-              closable
-              style="margin-right: 8px"
-              @close="removeTag(tag)"
-            >
+            <el-tag v-for="tag in form.displayChannelses" :key="tag" closable style="margin-right: 8px"
+              @close="removeTag(tag)">
               {{ tag }}
             </el-tag>
             <el-link type="primary" style="margin-left: 8px" @click="addTag()">添加</el-link>
           </el-form-item>
           <el-form-item label="房型图片">
-            <el-upload
-              class="avatar-uploader"
-              action="http://8.152.98.56:8080/api/FileImg"
-              :show-file-list="true"
-              :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload"
-              :file-list="fileList"
-              name="files"
-              list-type="picture-card"
-              :multiple="true"
-            >
-              <el-icon><Plus /></el-icon>
+            <el-upload class="avatar-uploader" action="http://8.152.98.56:8080/api/FileImg" :show-file-list="true"
+              :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :file-list="fileList" name="files"
+              list-type="picture-card" :multiple="true">
+              <el-icon>
+                <Plus />
+              </el-icon>
             </el-upload>
             <div class="el-form-item__tip">
               支持jpg、jpeg、bmp、png格式，大小不超过2M，建议尺寸：750px*448px
@@ -274,11 +193,7 @@
       </template>
     </el-dialog>
     <!-- 房号设置弹窗 -->
-    <el-dialog
-      v-model="roomNumDialogVisible"
-      :title="`设置房号(${currentRoomTypeName})`"
-      width="600px"
-    >
+    <el-dialog v-model="roomNumDialogVisible" :title="`设置房号(${currentRoomTypeName})`" width="600px">
       <el-button type="primary" style="margin-bottom: 12px" @click="openAddRoomNumDialog">
         新增房号
       </el-button>
@@ -295,16 +210,10 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination
-        v-model:current-page="roomNumQuery.PageIndex"
-        v-model:page-size="roomNumQuery.PageSize"
-        :page-sizes="[1, 3, 5, 10]"
-        :background="true"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="roomNumQuery.totleCount"
-        @size-change="handleSizeRoomNumChange"
-        @current-change="handleCurrentRoomNumChange"
-      />
+      <el-pagination v-model:current-page="roomNumQuery.PageIndex" v-model:page-size="roomNumQuery.PageSize"
+        :page-sizes="[1, 3, 5, 10]" :background="true" layout="total, sizes, prev, pager, next, jumper"
+        :total="roomNumQuery.totleCount" @size-change="handleSizeRoomNumChange"
+        @current-change="handleCurrentRoomNumChange" />
     </el-dialog>
 
     <!-- 新增房号弹窗 -->
@@ -317,11 +226,7 @@
           <el-input v-model.number="addRoomNumForm.order" type="number" min="0" />
         </el-form-item>
         <el-form-item label="备注">
-          <el-input
-            v-model="addRoomNumForm.description"
-            maxlength="9"
-            placeholder="备注不超过9个字符"
-          />
+          <el-input v-model="addRoomNumForm.description" maxlength="9" placeholder="备注不超过9个字符" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -337,7 +242,7 @@ import { ref, reactive, onMounted } from "vue";
 import RoomTypeAPI from "@/api/system/roomtype";
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
-import { uploadVideo } from "@/api/system/upload";
+//import { uploadVideo } from "@/api/system/upload";
 
 onMounted(() => {
   GetListRoomType();
@@ -788,11 +693,13 @@ function openAddDrawer() {
 .el-table td {
   text-align: center;
 }
+
 .el-form-item__tip {
   color: #999;
   font-size: 12px;
   margin-top: 4px;
 }
+
 .avatar-uploader .avatar {
   width: 120px;
   height: 120px;
@@ -800,6 +707,7 @@ function openAddDrawer() {
   object-fit: cover;
   border-radius: 8px;
 }
+
 .avatar-uploader-icon {
   font-size: 32px;
   color: #8c939d;

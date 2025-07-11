@@ -1,11 +1,7 @@
 <template>
   <div>
     <div>
-      <el-card
-        class="query-card sticky-header"
-        shadow="never"
-        style="margin-bottom: 24px; width: 100%"
-      >
+      <el-card class="query-card sticky-header" shadow="never" style="margin-bottom: 24px; width: 100%">
         <div class="filter-card">
           <el-form :inline="true" class="filter-form" label-width="100px">
             <template v-if="isExpand">
@@ -23,24 +19,14 @@
                   <el-option label="微信昵称" value="nickname" />
                   <el-option label="姓名" value="name" />
                 </el-select>
-                <el-input
-                  v-model="filters.infoValue"
-                  placeholder="请输入"
-                  style="width: 140px; margin-left: 22px; height: 45px"
-                />
+                <el-input v-model="filters.infoValue" placeholder="请输入"
+                  style="width: 140px; margin-left: 22px; height: 45px" />
 
-                <el-select
-                  v-model="filters.CustomerType"
-                  placeholder="请选择客户类型"
-                  style="width: 180px; margin-left: 16px; height: 45px"
-                >
+                <el-select v-model="filters.CustomerType" placeholder="请选择客户类型"
+                  style="width: 180px; margin-left: 16px; height: 45px">
                   <el-option label="不限" value="" />
-                  <el-option
-                    v-for="item in customerTypeOptions"
-                    :key="item.id"
-                    :label="item.customerTypeName"
-                    :value="item.id"
-                  />
+                  <el-option v-for="item in customerTypeOptions" :key="item.id" :label="item.customerTypeName"
+                    :value="item.id" />
                 </el-select>
               </div>
               <!-- 第二行label -->
@@ -50,27 +36,14 @@
               </div>
               <!-- 第二行输入框 -->
               <div class="filter-row input-row">
-                <el-select
-                  v-model="filters.Gender"
-                  placeholder="不限"
-                  style="width: 120px; height: 32px"
-                >
+                <el-select v-model="filters.Gender" placeholder="不限" style="width: 120px; height: 32px">
                   <el-option label="不限" value="" />
                   <el-option label="男" :value="0" />
                   <el-option label="女" :value="1" />
                 </el-select>
-                <el-date-picker
-                  v-model="filters.openCardTime"
-                  type="daterange"
-                  start-placeholder="开始时间"
-                  end-placeholder="结束时间"
-                  class="open-card-date"
-                  style="width: 220px; margin-left: 20px; height: 32px"
-                  :clearable="true"
-                  :editable="false"
-                  range-separator="~"
-                  size="small"
-                />
+                <el-date-picker v-model="filters.openCardTime" type="daterange" start-placeholder="开始时间"
+                  end-placeholder="结束时间" class="open-card-date" style="width: 220px; margin-left: 20px; height: 32px"
+                  :clearable="true" :editable="false" range-separator="~" size="small" />
               </div>
               <!-- 按钮区 -->
               <div class="filter-row flex-row" style="margin-top: 8px">
@@ -104,12 +77,7 @@
                     <el-option label="姓名" value="name" />
                   </el-select>
                   <el-input v-model="filters.infoValue" placeholder="请输入关键词" />
-                  <el-button
-                    icon="el-icon-search"
-                    circle
-                    class="search-btn"
-                    @click="onSearch"
-                  ></el-button>
+                  <el-button icon="el-icon-search" circle class="search-btn" @click="onSearch"></el-button>
                   <el-button class="expand-btn" @click="toggleExpand">展开</el-button>
                 </div>
                 <div class="flex-row-right">
@@ -135,12 +103,7 @@
 
       <el-card class="table-card" shadow="never">
         <!-- 客户信息表格 -->
-        <el-table
-          :data="tableData"
-          border
-          style="width: 100%"
-          @selection-change="handleSelectionChange"
-        >
+        <el-table :data="tableData" border style="width: 100%" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" />
           <el-table-column label="客户信息" width="180">
             <template #default="scope">
@@ -174,18 +137,15 @@
             <template #default="scope">
               <div class="tag-container">
                 <div v-if="scope.row.labels && scope.row.labels.length > 0" class="tag-list">
-                  <el-tag
-                    v-for="tag in scope.row.labels"
-                    :key="tag.labelId"
-                    size="small"
-                    :type="getTagType(tag.tagType)"
-                    class="tag-item"
-                  >
+                  <el-tag v-for="tag in scope.row.labels" :key="tag.labelId" size="small"
+                    :type="getTagType(tag.tagType)" class="tag-item">
                     {{ tag.labelName }}
                   </el-tag>
                 </div>
                 <el-link type="primary" class="add-tag-link" @click="openAddTagDialog(scope.row)">
-                  <el-icon class="add-icon"><Plus /></el-icon>
+                  <el-icon class="add-icon">
+                    <Plus />
+                  </el-icon>
                   添加标签
                 </el-link>
               </div>
@@ -208,12 +168,7 @@
           <el-table-column label="可用积分" prop="availablePoints" align="center" width="100">
             <template #default="scope">{{ Math.floor(scope.row.availablePoints || 0) }}</template>
           </el-table-column>
-          <el-table-column
-            label="累计消费金额"
-            prop="accumulativeconsumption"
-            align="center"
-            width="120"
-          >
+          <el-table-column label="累计消费金额" prop="accumulativeconsumption" align="center" width="120">
             <template #default="scope">
               ￥{{ Number(scope.row.accumulativeconsumption || 0).toFixed(2) }}
             </template>
@@ -224,62 +179,38 @@
               <el-link type="primary" @click="goToDetail(scope.row)">详情</el-link>
 
               <el-divider direction="vertical" />
-              <el-link
-                v-if="scope.row.status !== false"
-                type="danger"
-                @click="handleFreeze(scope.row)"
-              >
+              <el-link v-if="scope.row.status !== false" type="danger" @click="handleFreeze(scope.row)">
                 冻结
               </el-link>
-              <el-link
-                v-if="scope.row.status === false"
-                type="success"
-                @click="handleUnfreeze(scope.row)"
-              >
+              <el-link v-if="scope.row.status === false" type="success" @click="handleUnfreeze(scope.row)">
                 解冻
               </el-link>
               <el-divider direction="vertical" />
-              <el-link
-                :type="scope.row.status === false ? 'info' : 'primary'"
-                :disabled="scope.row.status === false"
+              <el-link :type="scope.row.status === false ? 'info' : 'primary'" :disabled="scope.row.status === false"
                 @click="
                   scope.row.status === false ? showFrozenMessage() : handleSetLevel(scope.row)
-                "
-              >
+                  ">
                 设置等级
               </el-link>
               <el-divider direction="vertical" />
-              <el-link
-                :type="scope.row.status === false ? 'info' : 'primary'"
-                :disabled="scope.row.status === false"
+              <el-link :type="scope.row.status === false ? 'info' : 'primary'" :disabled="scope.row.status === false"
                 @click="
                   scope.row.status === false ? showFrozenMessage() : openGivePointsDialog(scope.row)
-                "
-              >
+                  ">
                 送积分
               </el-link>
               <el-divider direction="vertical" />
               <el-link v-if="scope.row.status !== false" @click="openRechargeDialog(scope.row)">
                 充值
               </el-link>
-              <el-link
-                v-if="scope.row.status === false"
-                type="info"
-                disabled
-                @click="showFrozenMessage()"
-              >
+              <el-link v-if="scope.row.status === false" type="info" disabled @click="showFrozenMessage()">
                 充值
               </el-link>
               <el-divider direction="vertical" />
               <el-link v-if="scope.row.status !== false" @click="openConsumeDialog(scope.row)">
                 消费
               </el-link>
-              <el-link
-                v-if="scope.row.status === false"
-                type="info"
-                disabled
-                @click="showFrozenMessage()"
-              >
+              <el-link v-if="scope.row.status === false" type="info" disabled @click="showFrozenMessage()">
                 消费
               </el-link>
             </template>
@@ -287,34 +218,15 @@
         </el-table>
         <!-- 分页控件 -->
         <div style="margin: 20px 0; text-align: right">
-          <el-pagination
-            v-model:current-page="page.PageIndex"
-            v-model:page-size="page.PageSize"
-            :page-sizes="[5, 10, 20, 50]"
-            :background="true"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="page.totleCount"
-            @current-change="handleCurrentChange"
-            @size-change="handleSizeChange"
-          />
+          <el-pagination v-model:current-page="page.PageIndex" v-model:page-size="page.PageSize"
+            :page-sizes="[5, 10, 20, 50]" :background="true" layout="total, sizes, prev, pager, next, jumper"
+            :total="page.totleCount" @current-change="handleCurrentChange" @size-change="handleSizeChange" />
         </div>
       </el-card>
 
       <!-- 添加客户弹窗 -->
-      <el-dialog
-        v-model="showAddDialog"
-        title="添加客户"
-        width="620px"
-        :close-on-click-modal="false"
-        align-center
-      >
-        <el-form
-          ref="addFormRef"
-          :model="addForm"
-          :rules="addRules"
-          label-width="120px"
-          class="add-customer-form"
-        >
+      <el-dialog v-model="showAddDialog" title="添加客户" width="620px" :close-on-click-modal="false" align-center>
+        <el-form ref="addFormRef" :model="addForm" :rules="addRules" label-width="120px" class="add-customer-form">
           <el-form-item label="客户类型" prop="customerType" required>
             <el-radio-group v-model="addForm.customerType">
               <el-radio :label="customerKindGuid.member">会员</el-radio>
@@ -327,49 +239,18 @@
           <el-form-item label="手机号" prop="phoneNumber" required>
             <el-input v-model="addForm.phoneNumber" placeholder="请输入手机号" />
           </el-form-item>
-          <el-form-item
-            v-if="addForm.customerType === customerKindGuid.member"
-            label="成长值"
-            prop="growthValue"
-          >
-            <el-input
-              v-model="addForm.growthValue"
-              placeholder="不填为零，上限10亿"
-              maxlength="10"
-            />
+          <el-form-item v-if="addForm.customerType === customerKindGuid.member" label="成长值" prop="growthValue">
+            <el-input v-model="addForm.growthValue" placeholder="不填为零，上限10亿" maxlength="10" />
           </el-form-item>
-          <el-form-item
-            v-if="addForm.customerType === customerKindGuid.member"
-            label="可用实充余额"
-            prop="availableBalance"
-          >
-            <el-input
-              v-model="addForm.availableBalance"
-              placeholder="不填为零，上限95万"
-              maxlength="8"
-            />
+          <el-form-item v-if="addForm.customerType === customerKindGuid.member" label="可用实充余额" prop="availableBalance">
+            <el-input v-model="addForm.availableBalance" placeholder="不填为零，上限95万" maxlength="8" />
           </el-form-item>
-          <el-form-item
-            v-if="addForm.customerType === customerKindGuid.member"
-            label="可用赠送余额"
-            prop="availableGiftBalance"
-          >
-            <el-input
-              v-model="addForm.availableGiftBalance"
-              placeholder="不填为零，上限95万"
-              maxlength="8"
-            />
+          <el-form-item v-if="addForm.customerType === customerKindGuid.member" label="可用赠送余额"
+            prop="availableGiftBalance">
+            <el-input v-model="addForm.availableGiftBalance" placeholder="不填为零，上限95万" maxlength="8" />
           </el-form-item>
-          <el-form-item
-            v-if="addForm.customerType === customerKindGuid.member"
-            label="可用积分"
-            prop="availablePoints"
-          >
-            <el-input
-              v-model="addForm.availablePoints"
-              placeholder="不填为零，上限10亿"
-              maxlength="10"
-            />
+          <el-form-item v-if="addForm.customerType === customerKindGuid.member" label="可用积分" prop="availablePoints">
+            <el-input v-model="addForm.availablePoints" placeholder="不填为零，上限10亿" maxlength="10" />
           </el-form-item>
           <el-form-item label="性别" prop="gender">
             <el-select v-model="addForm.gender" placeholder="请选择">
@@ -378,30 +259,15 @@
             </el-select>
           </el-form-item>
           <el-form-item label="生日" prop="birthday">
-            <el-date-picker
-              v-model="addForm.birthday"
-              type="date"
-              placeholder="请选择日期"
-              style="width: 100%"
-            />
+            <el-date-picker v-model="addForm.birthday" type="date" placeholder="请选择日期" style="width: 100%" />
           </el-form-item>
           <el-form-item label="地址" prop="region">
-            <el-cascader
-              v-model="addForm.region"
-              :options="regionOptions"
-              :props="{ value: 'label', label: 'label', children: 'children' }"
-              placeholder="请选择省市区"
-              style="width: 100%"
-            />
+            <el-cascader v-model="addForm.region" :options="regionOptions"
+              :props="{ value: 'label', label: 'label', children: 'children' }" placeholder="请选择省市区"
+              style="width: 100%" />
           </el-form-item>
           <el-form-item label=" " prop="address">
-            <el-input
-              v-model="addForm.address"
-              type="textarea"
-              :maxlength="20"
-              show-word-limit
-              placeholder="请输入详细地址"
-            />
+            <el-input v-model="addForm.address" type="textarea" :maxlength="20" show-word-limit placeholder="请输入详细地址" />
           </el-form-item>
         </el-form>
         <template #footer>
@@ -411,40 +277,14 @@
       </el-dialog>
 
       <!-- 会员等级弹窗 -->
-      <el-dialog
-        v-model="showEditLevelDialog"
-        title="会员等级"
-        width="600px"
-        :close-on-click-modal="false"
-        :show-close="true"
-        align-center
-      >
-        <el-form
-          ref="editLevelFormRef"
-          :model="editLevelForm"
-          :rules="editLevelRules"
-          label-width="160px"
-          style="margin: 40px 0 20px 0; display: flex; flex-direction: column; align-items: center"
-        >
-          <el-form-item
-            label="请选择会员等级："
-            prop="customerType"
-            required
-            style="width: 100%; justify-content: center"
-          >
-            <el-select
-              v-model="editLevelForm.customerType"
-              placeholder="请选择"
-              style="width: 300px"
-              filterable
-              clearable
-            >
-              <el-option
-                v-for="item in customerTypeOptions"
-                :key="item.id"
-                :label="item.customerTypeName"
-                :value="item.id"
-              />
+      <el-dialog v-model="showEditLevelDialog" title="会员等级" width="600px" :close-on-click-modal="false"
+        :show-close="true" align-center>
+        <el-form ref="editLevelFormRef" :model="editLevelForm" :rules="editLevelRules" label-width="160px"
+          style="margin: 40px 0 20px 0; display: flex; flex-direction: column; align-items: center">
+          <el-form-item label="请选择会员等级：" prop="customerType" required style="width: 100%; justify-content: center">
+            <el-select v-model="editLevelForm.customerType" placeholder="请选择" style="width: 300px" filterable clearable>
+              <el-option v-for="item in customerTypeOptions" :key="item.id" :label="item.customerTypeName"
+                :value="item.id" />
             </el-select>
           </el-form-item>
         </el-form>
@@ -457,13 +297,7 @@
       </el-dialog>
 
       <!-- 会员充值弹窗 -->
-      <el-dialog
-        v-model="showRechargeDialog"
-        title="充值"
-        width="750px"
-        :close-on-click-modal="false"
-        align-center
-      >
+      <el-dialog v-model="showRechargeDialog" title="充值" width="750px" :close-on-click-modal="false" align-center>
         <div class="simple-form-item">
           <div class="simple-form-label">客户信息：</div>
           <div class="simple-form-content customer-info">{{ rechargeForm.customerName }}</div>
@@ -486,14 +320,8 @@
         <div class="simple-form-item">
           <div class="simple-form-label">备注：</div>
           <div class="simple-form-content">
-            <el-input
-              v-model="rechargeForm.remark"
-              type="textarea"
-              :maxlength="30"
-              show-word-limit
-              placeholder="最多30个字"
-              class="remark-textarea"
-            />
+            <el-input v-model="rechargeForm.remark" type="textarea" :maxlength="30" show-word-limit placeholder="最多30个字"
+              class="remark-textarea" />
           </div>
         </div>
 
@@ -511,13 +339,7 @@
       </el-dialog>
 
       <!-- 客户消费弹窗 -->
-      <el-dialog
-        v-model="showConsumeDialog"
-        title="客户消费"
-        width="750px"
-        :close-on-click-modal="false"
-        align-center
-      >
+      <el-dialog v-model="showConsumeDialog" title="客户消费" width="750px" :close-on-click-modal="false" align-center>
         <div class="simple-form-item">
           <div class="simple-form-label">客户信息：</div>
           <div class="simple-form-content customer-info">
@@ -547,14 +369,8 @@
         <div class="simple-form-item">
           <div class="simple-form-label">备注：</div>
           <div class="simple-form-content">
-            <el-input
-              v-model="consumeForm.consumerDesc"
-              type="textarea"
-              :maxlength="30"
-              show-word-limit
-              placeholder="最多30个字"
-              class="remark-textarea"
-            />
+            <el-input v-model="consumeForm.consumerDesc" type="textarea" :maxlength="30" show-word-limit
+              placeholder="最多30个字" class="remark-textarea" />
           </div>
         </div>
         <div class="simple-form-item">
@@ -569,122 +385,86 @@
             <el-button type="primary" @click="submitConsume">确定</el-button>
           </div>
         </template>
+        <el-table-column label="标签" width="120">
+          <template #default="">
+            <el-link type="primary">添加标签</el-link>
+          </template>
+        </el-table-column>
+        <el-table-column label="卡号" prop="id" width="170" />
+        <el-table-column label="手机" prop="phoneNumber" align="center" />
+        <el-table-column label="可用余额" prop="availableBalance" align="center">
+          <template #default="scope">
+            <span>￥{{ scope.row.availableBalance }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="可用积分" prop="availablePoints" align="center">
+          <template #default="scope">￥{{ scope.row.availablePoints }}</template>
+        </el-table-column>
+        <el-table-column label="累计消费金额" prop="accumulativeconsumption" align="center" />
+        <el-table-column label="累计消费次数" prop="comsumerNumber" align="center" />
+        <el-table-column label="操作" width="260">
+          <template #default="scope">
+            <el-link type="primary">详情</el-link>
+            <el-divider direction="vertical" />
+            <el-link v-if="scope.row.status !== false" type="danger" @click="handleFreeze(scope.row)">
+              冻结
+            </el-link>
+            <el-link v-if="scope.row.status === false" type="success" @click="handleUnfreeze(scope.row)"
+           </el-dialog>
 
-      </el-table-column>
-      <el-table-column label="标签" width="120">
-        <template #default="">
-          <el-link type="primary">添加标签</el-link>
-        </template>
-      </el-table-column>
-      <el-table-column label="卡号" prop="id" width="170" />
-      <el-table-column label="手机" prop="phoneNumber" align="center" />
-      <el-table-column label="可用余额" prop="availableBalance" align="center">
-        <template #default="scope">
-          <span>￥{{ scope.row.availableBalance }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="可用积分" prop="availablePoints" align="center">
-        <template #default="scope">￥{{ scope.row.availablePoints }}</template>
-      </el-table-column>
-      <el-table-column label="累计消费金额" prop="accumulativeconsumption" align="center" />
-      <el-table-column label="累计消费次数" prop="comsumerNumber" align="center" />
-      <el-table-column label="操作" width="260">
-        <template #default="scope">
-          <el-link type="primary">详情</el-link>
-          <el-divider direction="vertical" />
-          <el-link v-if="scope.row.status !== false" type="danger" @click="handleFreeze(scope.row)">
-            冻结
-          </el-link>
-          <el-link
-            v-if="scope.row.status === false"
-            type="success"
-            @click="handleUnfreeze(scope.row)"
+              <!-- 送积分弹窗 -->
+              <el-dialog v-model="showGivePointsDialog" title="手动修改积分" width="650px" :close-on-click-modal="false"
+                align-center>
+                <div style="margin-bottom: 16px">
+                  <div style="padding-left: 65px; font-size: 14px; color: #606266; margin-bottom: 8px">
+                    客户信息： 客户：{{ givePointsForm.customerName }}，等级：{{ givePointsForm.level }}
+                  </div>
 
-      </el-dialog>
-
-      <!-- 送积分弹窗 -->
-      <el-dialog
-        v-model="showGivePointsDialog"
-        title="手动修改积分"
-        width="650px"
-        :close-on-click-modal="false"
-        align-center
-      >
-        <div style="margin-bottom: 16px">
-          <div style="padding-left: 65px; font-size: 14px; color: #606266; margin-bottom: 8px">
-            客户信息： 客户：{{ givePointsForm.customerName }}，等级：{{ givePointsForm.level }}
-          </div>
-
-          <div
-            style="
+                  <div style="
               padding-left: 140px;
               font-size: 12px;
               color: #606266;
               line-height: 22px;
               margin-top: 4px;
-            "
-
-          >
-            余额：{{ Math.floor(givePointsForm.balance || 0) }}，积分：{{
-              Math.floor(givePointsForm.availablePoints || 0)
-            }}
-          </div>
-        </div>
-        <el-form :model="givePointsForm" label-width="140px">
-          <!-- 调整 label-width -->
-          <el-form-item label="修改积分(增减)" required>
-            <!-- 确保 required 存在以显示红星 -->
-            <el-input
-              v-model="givePointsForm.accumulativeintegral"
-              type="number"
-              style="width: 200px"
-            />
-          </el-form-item>
-          <div style="color: #909399; margin-bottom: 12px; padding-left: 160px">
-            <!-- 调整 margin-left -->
-            可用积分{{
-              Math.floor(givePointsForm.availablePoints || 0)
-            }},输入500，表示增加500，表示减少500
-          </div>
-          <el-form-item label="操作员">
-            <span>{{ givePointsForm.operator }}</span>
-          </el-form-item>
-          <el-form-item label="备注：">
-            <el-input
-              v-model="givePointsForm.pointsmodifydesc"
-              type="textarea"
-              maxlength="100"
-              show-word-limit
-              style="width: 200px"
-            />
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <el-button @click="showGivePointsDialog = false">取消</el-button>
-          <el-button type="primary" :loading="givePointsLoading" @click="handleGivePoints">
-            确定
-          </el-button>
-        </template>
-      </el-dialog>
+            ">
+                    余额：{{ Math.floor(givePointsForm.balance || 0) }}，积分：{{
+                      Math.floor(givePointsForm.availablePoints || 0)
+                    }}
+                  </div>
+                </div>
+                <el-form :model="givePointsForm" label-width="140px">
+                  <!-- 调整 label-width -->
+                  <el-form-item label="修改积分(增减)" required>
+                    <!-- 确保 required 存在以显示红星 -->
+                    <el-input v-model="givePointsForm.accumulativeintegral" type="number" style="width: 200px" />
+                  </el-form-item>
+                  <div style="color: #909399; margin-bottom: 12px; padding-left: 160px">
+                    <!-- 调整 margin-left -->
+                    可用积分{{
+                      Math.floor(givePointsForm.availablePoints || 0)
+                    }},输入500，表示增加500，表示减少500
+                  </div>
+                  <el-form-item label="操作员">
+                    <span>{{ givePointsForm.operator }}</span>
+                  </el-form-item>
+                  <el-form-item label="备注：">
+                    <el-input v-model="givePointsForm.pointsmodifydesc" type="textarea" maxlength="100" show-word-limit
+                      style="width: 200px" />
+                  </el-form-item>
+                </el-form>
+                <template #footer>
+                  <el-button @click="showGivePointsDialog = false">取消</el-button>
+                  <el-button type="primary" :loading="givePointsLoading" @click="handleGivePoints">
+                    确定
+                  </el-button>
+                </template>
+              </el-dialog>
     </div>
     <!-- 导入客户弹窗 -->
-    <el-dialog
-      v-model="showImportDialog"
-      title="导入客户"
-      width="400px"
-      :close-on-click-modal="false"
-      align-center
-    >
-      <el-upload
-        class="upload-demo"
-        :action="importCustomersUrl"
-        :headers="uploadHeaders"
-        :show-file-list="false"
-        :on-success="handleImportSuccess"
-        :on-error="handleImportError"
-        accept=".xlsx,.xls"
-        :before-upload="beforeUpload"
-      >
+    <el-dialog v-model="showImportDialog" title="导入客户" width="400px" :close-on-click-modal="false" align-center>
+      <el-upload class="upload-demo" :action="importCustomersUrl" :headers="uploadHeaders" :show-file-list="false"
+        :on-success="handleImportSuccess" :on-error="handleImportError" accept=".xlsx,.xls"
+        :before-upload="beforeUpload">
         <el-button type="primary">选择Excel文件上传</el-button>
       </el-upload>
       <template #footer>
@@ -693,30 +473,15 @@
     </el-dialog>
 
     <!-- 添加标签弹窗 -->
-    <el-dialog
-      v-model="showAddTagDialog"
-      title="添加标签"
-      width="500px"
-      :close-on-click-modal="false"
-      align-center
-    >
+    <el-dialog v-model="showAddTagDialog" title="添加标签" width="500px" :close-on-click-modal="false" align-center>
       <div class="tag-dialog-content">
         <!-- 搜索框 -->
-        <el-input
-          v-model="tagSearchKeyword"
-          placeholder="标签名称"
-          class="tag-search-input"
-          :prefix-icon="Search"
-          clearable
-        />
+        <el-input v-model="tagSearchKeyword" placeholder="标签名称" class="tag-search-input" :prefix-icon="Search"
+          clearable />
 
         <!-- 标签列表 -->
-        <el-table
-          :loading="tagLoading"
-          :data="tagList"
-          style="width: 100%"
-          @selection-change="handleTagSelectionChange"
-        >
+        <el-table :loading="tagLoading" :data="tagList" style="width: 100%"
+          @selection-change="handleTagSelectionChange">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="labelName" label="标签名称" />
           <el-table-column prop="tagType" label="标签类型" width="100" align="center">
@@ -729,15 +494,9 @@
         <!-- 分页 -->
         <div class="pagination-container">
           <span class="total-text">共 {{ tagPage.total }} 条</span>
-          <el-pagination
-            v-model:current-page="tagPage.current"
-            v-model:page-size="tagPage.pageSize"
-            :page-sizes="[10, 20, 50]"
-            :total="tagPage.total"
-            layout="prev, pager, next"
-            @size-change="handleTagSizeChange"
-            @current-change="handleTagPageChange"
-          />
+          <el-pagination v-model:current-page="tagPage.current" v-model:page-size="tagPage.pageSize"
+            :page-sizes="[10, 20, 50]" :total="tagPage.total" layout="prev, pager, next"
+            @size-change="handleTagSizeChange" @current-change="handleTagPageChange" />
         </div>
       </div>
       <template #footer>
@@ -1466,8 +1225,8 @@ const fetchTagList = async () => {
       // 过滤搜索关键词
       const filteredTags = tagSearchKeyword.value
         ? res.filter((tag) =>
-            tag.labelName.toLowerCase().includes(tagSearchKeyword.value.toLowerCase())
-          )
+          tag.labelName.toLowerCase().includes(tagSearchKeyword.value.toLowerCase())
+        )
         : res;
 
       // 分页处理
@@ -1655,12 +1414,14 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
 .filter-form {
   margin-bottom: 0;
 }
+
 .filter-row {
   display: flex;
   align-items: center;
   margin-bottom: 12px;
   height: 32px !important;
 }
+
 .flex-row {
   display: flex;
   width: 100%;
@@ -1668,23 +1429,27 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   align-items: center;
   height: 32px !important;
 }
+
 .flex-row-left {
   display: flex;
   align-items: center;
   gap: 12px;
   height: 32px !important;
 }
+
 .flex-row-left :deep(.el-select),
 .flex-row-left :deep(.el-input) {
   width: 170px !important;
   height: 32px !important;
 }
+
 .flex-row-right {
   display: flex;
   align-items: center;
   gap: 12px;
   height: 32px !important;
 }
+
 .customer-info-label {
   font-size: 14px;
   margin-right: 8px;
@@ -1692,6 +1457,7 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   white-space: nowrap;
   height: 32px !important;
 }
+
 .ops-row {
   margin-bottom: 0;
   margin-top: 0;
@@ -1699,15 +1465,18 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   gap: 8px;
   height: 32px !important;
 }
+
 .el-form-item {
   margin-bottom: 0;
   margin-right: 16px;
 }
+
 .el-form-item__label {
   font-weight: normal;
   font-size: 14px;
   color: #606266;
 }
+
 .el-input,
 .el-select,
 .el-date-editor {
@@ -1715,6 +1484,7 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   height: 32px !important;
   font-size: 14px;
 }
+
 .search-btn {
   margin-right: 8px;
   height: 32px;
@@ -1724,6 +1494,7 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   align-items: center;
   justify-content: center;
 }
+
 .expand-btn {
   height: 32px;
   min-width: 56px;
@@ -1732,6 +1503,7 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   font-size: 14px;
   margin-left: 0;
 }
+
 .filter-label {
   font-size: 14px;
   color: #606266;
@@ -1739,21 +1511,25 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   margin-right: 16px;
   text-align: left;
 }
+
 .label-row {
   display: flex;
   align-items: center;
   margin-bottom: 2px;
 }
+
 .input-row {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
 }
+
 .double-col {
   flex: 2;
   display: flex;
   align-items: center;
 }
+
 .filter-label.double-col {
   white-space: nowrap;
   min-width: 400px;
@@ -1761,6 +1537,7 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   height: 32px;
   line-height: 32px;
 }
+
 .el-button {
   height: 32px !important;
   line-height: 32px !important;
@@ -1772,9 +1549,11 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   justify-content: center;
   border-radius: 4px;
 }
+
 :deep(.el-input-number) {
   width: 100% !important;
 }
+
 :deep(.el-input-number .el-input__wrapper) {
   height: 32px !important;
   min-height: 32px !important;
@@ -1783,12 +1562,14 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   box-sizing: border-box;
   padding: 0 11px;
 }
+
 :deep(.el-input-number .el-input__inner) {
   height: 32px !important;
   line-height: 32px !important;
   font-size: 14px;
   padding: 0;
 }
+
 .add-customer-form :deep(.el-input),
 .add-customer-form :deep(.el-select),
 .add-customer-form :deep(.el-date-editor),
@@ -1796,20 +1577,24 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   width: 100% !important;
   min-width: 0;
 }
+
 .add-customer-form .el-form-item {
   margin-bottom: 18px;
 }
+
 .query-card {
   margin-bottom: 16px;
   background: #fafbfc;
   border-radius: 4px;
   border: 1px solid #ebeef5;
 }
+
 .table-card {
   background: #fff;
   border-radius: 4px;
   border: 1px solid #ebeef5;
 }
+
 .input-row :deep(.el-input),
 .input-row :deep(.el-select),
 .input-row :deep(.el-date-picker),
@@ -1826,6 +1611,7 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   border-radius: 4px !important;
   box-sizing: border-box;
 }
+
 .open-card-date,
 .open-card-date :deep(.el-range-editor),
 .open-card-date :deep(.el-range-input) {
@@ -1834,15 +1620,18 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   max-width: 100% !important;
   padding: 0;
 }
+
 .open-card-date {
   flex-shrink: 0 !important;
 }
+
 .open-card-date :deep(.el-range__icon),
 .open-card-date :deep(.el-range-separator),
 .open-card-date :deep(.el-range__close-icon) {
   line-height: 20px;
   height: 20px;
 }
+
 .open-card-date :deep(.el-range-input) {
   font-size: 14px !important;
   line-height: 20px !important;
@@ -1850,9 +1639,11 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   min-height: 20px !important;
   padding: 0;
 }
+
 .open-card-date :deep(.el-input__wrapper) {
   padding: 0 8px;
 }
+
 .input-row .el-select,
 .input-row .el-select .el-input,
 .input-row .el-select .el-input__wrapper {
@@ -1861,51 +1652,63 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   line-height: 32px !important;
   box-sizing: border-box;
 }
+
 :deep(.el-select-dropdown__item) {
   height: 32px !important;
   line-height: 32px !important;
   font-size: 14px;
 }
+
 .dialog-footer.center-footer {
   text-align: center;
   justify-content: center;
   display: flex;
   padding-right: 0;
 }
-.dialog-footer .el-button + .el-button {
+
+.dialog-footer .el-button+.el-button {
   margin-left: 12px;
 }
+
 .dialog-footer .el-button {
   min-width: 80px;
   height: 32px;
   font-size: 14px;
 }
+
 .el-dialog__title {
   font-weight: bold;
   font-size: 16px;
 }
+
 .el-form-item__label {
   font-size: 14px;
 }
+
 .el-select {
   font-size: 14px;
 }
+
 ::v-deep(.el-dialog) {
   margin: auto !important;
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
 }
+
 .recharge-form {
   margin: 20px 0;
 }
+
 .recharge-info {
   padding: 0 20px;
   font-size: 14px;
 }
+
 .recharge-dialog {
   height: 300px;
 }
+
 :deep(.recharge-dialog .el-dialog__body) {
   height: 150px;
   overflow-y: auto;
@@ -1993,32 +1796,38 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
 :deep(.dialog-footer .el-button) {
   padding: 8px 20px;
 }
+
 .balance-info {
   color: #999;
   font-size: 14px;
   margin-left: 8px;
 }
+
 .customer-info {
   display: flex;
   align-items: center;
   line-height: 32px;
   height: 32px;
 }
+
 .balance-label {
   color: #999;
   font-size: 14px;
 }
+
 .balance-value {
   color: #222;
   font-weight: 500;
   margin: 0 2px;
   font-size: 14px;
 }
+
 .balance-unit {
   color: #bbb;
   margin-left: 2px;
   font-size: 14px;
 }
+
 .operator-info {
   font-size: 14px;
   color: #606266;
@@ -2034,11 +1843,13 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   font-size: 12px;
   margin-top: 4px;
 }
+
 .insufficient-balance {
   color: #f56c6c;
   font-size: 12px;
   margin-top: 4px;
 }
+
 .frozen-tag {
   display: inline-block;
   background: #e5e5e5;
@@ -2052,6 +1863,7 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   min-width: 60px;
   font-weight: bold;
 }
+
 .frozen-status {
   color: #fff;
   background: #e5e5e5;
@@ -2064,6 +1876,7 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   display: inline-block;
   margin-top: 2px;
 }
+
 .sticky-header {
   position: sticky;
   top: 0;
@@ -2097,9 +1910,11 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
 .tag-table-row {
   display: flex;
   border-bottom: 1px solid #ebeef5;
+
   &:last-child {
     border-bottom: none;
   }
+
   &:nth-child(even) {
     background-color: #fafafa;
   }
@@ -2189,6 +2004,7 @@ const getTagType = (tagType: number): "success" | "warning" | "info" => {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .tag-container {
   display: flex;
   flex-direction: column;
