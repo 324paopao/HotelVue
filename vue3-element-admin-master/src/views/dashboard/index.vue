@@ -2,13 +2,8 @@
   <div class="dashboard-container">
     <!-- 动态操作权限按钮演示 -->
     <div style="margin-bottom: 16px;">
-      <el-button
-        v-for="action in actions"
-        :key="action.id"
-        type="primary"
-        style="margin-right: 8px;"
-        @click="() => $message.success('点击了：' + action.name)"
-      >
+      <el-button v-for="action in actions" :key="action.id" type="primary" style="margin-right: 8px;"
+        @click="() => $message.success('点击了：' + action.name)">
         {{ action.name }}
       </el-button>
     </div>
@@ -35,7 +30,9 @@
             <!-- 仓库 -->
             <div>
               <div class="font-bold color-#ff9a2e text-sm flex items-center">
-                <el-icon class="mr-2px"><Folder /></el-icon>
+                <el-icon class="mr-2px">
+                  <Folder />
+                </el-icon>
                 仓库
               </div>
               <div class="mt-3 whitespace-nowrap">
@@ -56,7 +53,9 @@
             <!-- 文档 -->
             <div>
               <div class="font-bold color-#4080ff text-sm flex items-center">
-                <el-icon class="mr-2px"><Document /></el-icon>
+                <el-icon class="mr-2px">
+                  <Document />
+                </el-icon>
                 文档
               </div>
               <div class="mt-3 whitespace-nowrap">
@@ -64,10 +63,7 @@
                   <div class="i-svg:juejin text-lg" />
                 </el-link>
                 <el-divider direction="vertical" />
-                <el-link
-                  href="https://youlai.blog.csdn.net/article/details/130191394"
-                  target="_blank"
-                >
+                <el-link href="https://youlai.blog.csdn.net/article/details/130191394" target="_blank">
                   <div class="i-svg:csdn text-lg" />
                 </el-link>
                 <el-divider direction="vertical" />
@@ -80,7 +76,9 @@
             <!-- 视频 -->
             <div>
               <div class="font-bold color-#f76560 text-sm flex items-center">
-                <el-icon class="mr-2px"><VideoCamera /></el-icon>
+                <el-icon class="mr-2px">
+                  <VideoCamera />
+                </el-icon>
                 视频
               </div>
               <div class="mt-3 whitespace-nowrap">
@@ -144,11 +142,15 @@
                 {{ onlineUserCount }}
               </span>
               <span v-if="isConnected" class="ml-2 text-xs text-[#67c23a]">
-                <el-icon><Connection /></el-icon>
+                <el-icon>
+                  <Connection />
+                </el-icon>
                 已连接
               </span>
               <span v-else class="ml-2 text-xs text-[#f56c6c]">
-                <el-icon><Failed /></el-icon>
+                <el-icon>
+                  <Failed />
+                </el-icon>
                 未连接
               </span>
             </div>
@@ -196,13 +198,11 @@
               <div class="flex-x-between mt-2 flex-1">
                 <div class="flex-y-center">
                   <span class="text-lg">{{ Math.round(transitionUvCount) }}</span>
-                  <span
-                    :class="[
-                      'text-xs',
-                      'ml-2',
-                      computeGrowthRateClass(visitStatsData.uvGrowthRate),
-                    ]"
-                  >
+                  <span :class="[
+                    'text-xs',
+                    'ml-2',
+                    computeGrowthRateClass(visitStatsData.uvGrowthRate),
+                  ]">
                     <el-icon>
                       <Top v-if="visitStatsData.uvGrowthRate > 0" />
                       <Bottom v-else-if="visitStatsData.uvGrowthRate < 0" />
@@ -256,13 +256,11 @@
               <div class="flex-x-between mt-2 flex-1">
                 <div class="flex-y-center">
                   <span class="text-lg">{{ Math.round(transitionPvCount) }}</span>
-                  <span
-                    :class="[
-                      'text-xs',
-                      'ml-2',
-                      computeGrowthRateClass(visitStatsData.pvGrowthRate),
-                    ]"
-                  >
+                  <span :class="[
+                    'text-xs',
+                    'ml-2',
+                    computeGrowthRateClass(visitStatsData.pvGrowthRate),
+                  ]">
                     <el-icon>
                       <Top v-if="visitStatsData.pvGrowthRate > 0" />
                       <Bottom v-else-if="visitStatsData.pvGrowthRate < 0" />
@@ -285,7 +283,7 @@
 
     <el-row :gutter="10" class="mt-5">
       <!-- 访问趋势统计图 -->
-      <el-col :xs="24" :span="16">
+      <!-- <el-col :xs="24" :span="16">
         <el-card>
           <template #header>
             <div class="flex-x-between">
@@ -298,36 +296,27 @@
           </template>
           <ECharts :options="visitTrendChartOptions" height="400px" />
         </el-card>
-      </el-col>
+      </el-col> -->
       <!-- 最新动态 -->
       <el-col :xs="24" :span="8">
         <el-card>
           <template #header>
             <div class="flex-x-between">
               <span class="header-title">最新动态</span>
-              <el-link
-                type="primary"
-                underline="never"
-                href="https://gitee.com/youlaiorg/vue3-element-admin/releases"
-                target="_blank"
-              >
+              <el-link type="primary" underline="never" href="https://gitee.com/youlaiorg/vue3-element-admin/releases"
+                target="_blank">
                 完整记录
-                <el-icon class="link-icon"><TopRight /></el-icon>
+                <el-icon class="link-icon">
+                  <TopRight />
+                </el-icon>
               </el-link>
             </div>
           </template>
 
           <el-scrollbar height="400px">
             <el-timeline class="p-3">
-              <el-timeline-item
-                v-for="(item, index) in vesionList"
-                :key="index"
-                :timestamp="item.date"
-                placement="top"
-                :color="index === 0 ? '#67C23A' : '#909399'"
-                :hollow="index !== 0"
-                size="large"
-              >
+              <el-timeline-item v-for="(item, index) in vesionList" :key="index" :timestamp="item.date" placement="top"
+                :color="index === 0 ? '#67C23A' : '#909399'" :hollow="index !== 0" size="large">
                 <div class="version-item" :class="{ 'latest-item': index === 0 }">
                   <div>
                     <el-text tag="strong">{{ item.title }}</el-text>
@@ -339,14 +328,12 @@
                   <el-text class="version-content">{{ item.content }}</el-text>
 
                   <div v-if="item.link">
-                    <el-link
-                      :type="index === 0 ? 'primary' : 'info'"
-                      :href="item.link"
-                      target="_blank"
-                      underline="never"
-                    >
+                    <el-link :type="index === 0 ? 'primary' : 'info'" :href="item.link" target="_blank"
+                      underline="never">
                       详情
-                      <el-icon class="link-icon"><TopRight /></el-icon>
+                      <el-icon class="link-icon">
+                        <TopRight />
+                      </el-icon>
                     </el-link>
                   </div>
                 </div>
@@ -442,10 +429,10 @@ const currentDate = new Date();
 
 // 问候语：根据当前小时返回不同问候语
 const greetings = computed(() => {
-  console.log("store",store)
+  console.log("store", store)
   const hours = currentDate.getHours();
   const nickname = store.nickName;
-  console.log("nickname",store.nickName)
+  console.log("nickname", store.nickName)
   if (hours >= 6 && hours < 8) {
     return "晨起披衣出草堂，轩窗已自喜微凉🌅！";
   } else if (hours >= 8 && hours < 12) {
@@ -507,36 +494,36 @@ const transitionTotalPvCount = useTransition(
 // 访问趋势日期范围（单位：天）
 const visitTrendDateRange = ref(7);
 // 访问趋势图表配置
-const visitTrendChartOptions = ref();
+// visitTrendChartOptions = ref();
 
 /**
  * 获取访客统计数据
  */
 const fetchVisitStatsData = () => {
-  LogAPI.getVisitStats()
-    .then((data) => {
-      visitStatsData.value = data;
-    })
-    .finally(() => {
-      visitStatsLoading.value = false;
-    });
+  // LogAPI.getVisitStats()
+  //   .then((data) => {
+  //     visitStatsData.value = data;
+  //   })
+  //   .finally(() => {
+  //     visitStatsLoading.value = false;
+  //   });
 };
 
 /**
  * 获取访问趋势数据，并更新图表配置
  */
 const fetchVisitTrendData = () => {
-  const startDate = dayjs()
-    .subtract(visitTrendDateRange.value - 1, "day")
-    .toDate();
-  const endDate = new Date();
+  // const startDate = dayjs()
+  //   .subtract(visitTrendDateRange.value - 1, "day")
+  //   .toDate();
+  // const endDate = new Date();
 
-  LogAPI.getVisitTrend({
-    startDate: dayjs(startDate).format("YYYY-MM-DD"),
-    endDate: dayjs(endDate).format("YYYY-MM-DD"),
-  }).then((data) => {
-    updateVisitTrendChartOptions(data);
-  });
+  // LogAPI.getVisitTrend({
+  //   startDate: dayjs(startDate).format("YYYY-MM-DD"),
+  //   endDate: dayjs(endDate).format("YYYY-MM-DD"),
+  // }).then((data) => {
+  //   updateVisitTrendChartOptions(data);
+  // });
 };
 
 /**
@@ -544,68 +531,68 @@ const fetchVisitTrendData = () => {
  *
  * @param data - 访问趋势数据
  */
-const updateVisitTrendChartOptions = (data: VisitTrendVO) => {
-  visitTrendChartOptions.value = {
-    tooltip: {
-      trigger: "axis",
-    },
-    legend: {
-      data: ["浏览量(PV)", "访客数(UV)"],
-      bottom: 0,
-    },
-    grid: {
-      left: "1%",
-      right: "5%",
-      bottom: "10%",
-      containLabel: true,
-    },
-    xAxis: {
-      type: "category",
-      data: data.dates,
-    },
-    yAxis: {
-      type: "value",
-      splitLine: {
-        show: true,
-        lineStyle: {
-          type: "dashed",
-        },
-      },
-    },
-    series: [
-      {
-        name: "浏览量(PV)",
-        type: "line",
-        data: data.pvList,
-        areaStyle: {
-          color: "rgba(64, 158, 255, 0.1)",
-        },
-        smooth: true,
-        itemStyle: {
-          color: "#4080FF",
-        },
-        lineStyle: {
-          color: "#4080FF",
-        },
-      },
-      {
-        name: "访客数(UV)",
-        type: "line",
-        data: data.ipList,
-        areaStyle: {
-          color: "rgba(103, 194, 58, 0.1)",
-        },
-        smooth: true,
-        itemStyle: {
-          color: "#67C23A",
-        },
-        lineStyle: {
-          color: "#67C23A",
-        },
-      },
-    ],
-  };
-};
+// const updateVisitTrendChartOptions = (data: VisitTrendVO) => {
+//   visitTrendChartOptions.value = {
+//     tooltip: {
+//       trigger: "axis",
+//     },
+//     legend: {
+//       data: ["浏览量(PV)", "访客数(UV)"],
+//       bottom: 0,
+//     },
+//     grid: {
+//       left: "1%",
+//       right: "5%",
+//       bottom: "10%",
+//       containLabel: true,
+//     },
+//     xAxis: {
+//       type: "category",
+//       data: data.dates,
+//     },
+//     yAxis: {
+//       type: "value",
+//       splitLine: {
+//         show: true,
+//         lineStyle: {
+//           type: "dashed",
+//         },
+//       },
+//     },
+//     series: [
+//       {
+//         name: "浏览量(PV)",
+//         type: "line",
+//         data: data.pvList,
+//         areaStyle: {
+//           color: "rgba(64, 158, 255, 0.1)",
+//         },
+//         smooth: true,
+//         itemStyle: {
+//           color: "#4080FF",
+//         },
+//         lineStyle: {
+//           color: "#4080FF",
+//         },
+//       },
+//       {
+//         name: "访客数(UV)",
+//         type: "line",
+//         data: data.ipList,
+//         areaStyle: {
+//           color: "rgba(103, 194, 58, 0.1)",
+//         },
+//         smooth: true,
+//         itemStyle: {
+//           color: "#67C23A",
+//         },
+//         lineStyle: {
+//           color: "#67C23A",
+//         },
+//       },
+//     ],
+//   };
+// };
 
 /**
  * 根据增长率计算对应的 CSS 类名
@@ -667,9 +654,11 @@ const actions = computed(() => menuStore.getActionsByPath(route.path));
       background: var(--el-color-primary-light-9);
       border: 1px solid var(--el-color-primary-light-5);
     }
+
     &:hover {
       transform: translateX(5px);
     }
+
     .version-content {
       margin-bottom: 12px;
       font-size: 13px;

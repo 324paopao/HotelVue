@@ -73,14 +73,13 @@ httpRequest.interceptors.response.use(
 
     switch (code) {
       case ResultEnum.ACCESS_TOKEN_INVALID:
-        // Access Token 过期，尝试刷新
-        // return refreshTokenAndRetry(config);
+      // Access Token 过期，尝试刷新
+      // return refreshTokenAndRetry(config);
 
       case ResultEnum.REFRESH_TOKEN_INVALID:
         // Refresh Token 过期，跳转登录页
         // await redirectToLogin("登录已过期，请重新登录");
         return Promise.reject(new Error(msg || "Refresh Token Invalid"));
-
       default:
         ElMessage.error(msg || "请求失败");
         return Promise.reject(new Error(msg || "Request Error"));
@@ -172,8 +171,8 @@ httpRequest1.interceptors.response.use(
 
     switch (code) {
       case ResultEnum.ACCESS_TOKEN_INVALID:
-        // Access Token 过期，尝试刷新
-        // return refreshTokenAndRetry(config);
+      // Access Token 过期，尝试刷新
+      // return refreshTokenAndRetry(config);
 
       case ResultEnum.REFRESH_TOKEN_INVALID:
         // Refresh Token 过期，跳转登录页

@@ -22,13 +22,13 @@ const LogAPI = {
    * @param queryParams
    * @returns
    */
-  getVisitTrend(queryParams: VisitTrendQuery) {
-    return request.httpRequest1<any, VisitTrendVO>({
-      url: `${LOG_BASE_URL}/visit-trend`,
-      method: "get",
-      params: queryParams,
-    });
-  },
+  // getVisitTrend(queryParams: VisitTrendQuery) {
+  //   return request.httpRequest1<any, VisitTrendVO>({
+  //     url: `${LOG_BASE_URL}/visit-trend`,
+  //     method: "get",
+  //     params: queryParams,
+  //   });
+  // },
 
   /**
    * 获取访问统计
@@ -36,12 +36,12 @@ const LogAPI = {
    * @param queryParams
    * @returns
    */
-  getVisitStats() {
-    return request.httpRequest1<any, VisitStatsVO>({
-      url: `${LOG_BASE_URL}/visit-stats`,
-      method: "get",
-    });
-  },
+  // getVisitStats() {
+  //   return request.httpRequest1<any, VisitStatsVO>({
+  //     url: `${LOG_BASE_URL}/visit-stats`,
+  //     method: "get",
+  //   });
+  // },
 };
 
 export default LogAPI;

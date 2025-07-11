@@ -63,17 +63,7 @@
 import { ref, reactive, onMounted, watch } from "vue";
 import AuthAPI from "@/api/Reserve/ReservRoom.api";
 import { useRoute } from "vue-router";
-// 定义客房信息的数据类型
-interface RoomInfo {
-  roomTypeName?: string;
-  roomNum?: string;
-  sdate?: string;
-  edate?: string;
-  day?: number;
-  status?: number;
-  price?: number;
-  breakfast?: number;
-}
+
 const route = useRoute();
 const form = reactive({
   infomation: "",
@@ -101,8 +91,7 @@ const load = async () => {
   console.log(res);
   Object.assign(form, res);
 
-  const dataArr = Array.isArray(res) ? res : [res];
-  tableData.value = dataArr as RoomInfo[];
+  tableData.value = Array.isArray(res) ? res : [res];
   console.log("tableData", tableData.value);
   console.log("frpm", form)
 };
