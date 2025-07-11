@@ -126,6 +126,9 @@ const RoomTypeAPI = {
   },
 };
 
+
+
+
 export default RoomTypeAPI;
 export interface RoomTypeSeach {
   totleCount: number;

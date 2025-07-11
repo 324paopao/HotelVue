@@ -183,7 +183,7 @@
       <el-table-column label="累计消费次数" prop="comsumerNumber" align="center" />
       <el-table-column label="操作" width="260">
         <template #default="scope">
-          <el-link type="primary" >详情</el-link>
+          <el-link type="primary">详情</el-link>
           <el-divider direction="vertical" />
           <el-link v-if="scope.row.status !== false" type="danger" @click="handleFreeze(scope.row)">
             冻结
@@ -592,8 +592,6 @@ const menuStore = useMenuStore();
 const route = useRoute();
 const actions = computed(() => menuStore.getActionsByPath(route.path));
 console.log("actions", actions.value);
-
-
 
 function hasAction(actionName: string) {
   return actions.value.some((a) => a.name === actionName);
@@ -1163,10 +1161,9 @@ const handleGivePoints = async () => {
   }
 };
 
-
 // ===================== 导入客户弹窗相关 =====================
 const showImportDialog = ref(false);
-const importCustomersUrl = "https://localhost:44384/api/Import/customers";
+const importCustomersUrl = "https://8.152.98.56/api/Import/customers";
 const uploadHeaders = {}; // 如需token可在此加上
 const handleImportSuccess = () => {
   ElMessage.success("导入成功！");

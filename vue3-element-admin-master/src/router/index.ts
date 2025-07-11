@@ -109,14 +109,26 @@ export const constantRoutes: RouteRecordRaw[] = [
       {
         path: "customers/detail/:id",
         name: "CustomerDetail",
-        component: () => import('@/views/Customers/CustomerDetailView.vue'),
-        meta: { title: '客户详情' }
+        component: () => import("@/views/Customers/CustomerDetailView.vue"),
+        meta: { title: "客户详情" },
       },
       {
         path: "businessRoomtype",
         name: "businessRoomtype",
         component: () => import("@/views/RoomType/ListBusinessRoomType.vue"),
         meta: { title: "业务-房型管理-房型设置", icon: "user", hidden: true },
+      },
+      {
+        path: "RoomPrice",
+        name: "RoomPrice",
+        component: () => import("@/views/RoomType/RoomPrice.vue"),
+        meta: { title: "业务-房价管理", icon: "user", hidden: true },
+      },
+      {
+        path: "RoomPriceCalendars",
+        name: "RoomPriceCalendars",
+        component: () => import("@/views/RoomType/RoomPriceCalendars.vue"),
+        meta: { title: "业务-房价管理-房价日历", icon: "user", hidden: true },
       },
       {
         path: "listRoomState",
@@ -166,7 +178,6 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/Setting/OperationLog.vue"),
         meta: { title: "操作日志管理", icon: "user", hidden: true },
       },
-     
     ],
   },
 ];
