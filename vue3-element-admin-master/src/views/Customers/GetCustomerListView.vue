@@ -18,10 +18,10 @@
               <!-- 第一行输入框 -->
               <div class="filter-row input-row">
                 <el-select v-model="filters.infoType" style="width: 110px; height: 45px">
+                  <el-option label="会员卡号" value="cardNo" />
                   <el-option label="手机号" value="phone" />
                   <el-option label="微信昵称" value="nickname" />
                   <el-option label="姓名" value="name" />
-                  <el-option label="会员卡号" value="cardNo" />
                 </el-select>
                 <el-input
                   v-model="filters.infoValue"
@@ -76,7 +76,7 @@
               <div class="filter-row flex-row" style="margin-top: 8px">
                 <div>
                   <el-button @click="handleExportCustomers">导出客户数据</el-button>
-                  <el-button>打标签</el-button>
+                  <el-button @click="handleBatchAddTags">打标签</el-button>
                   <el-button @click="openEditLevelDialog">修改等级</el-button>
                   <el-button @click="handleBatchFreeze">冻结</el-button>
                   <el-button @click="handleBatchUnfreeze">解冻</el-button>
@@ -98,10 +98,10 @@
               <div class="filter-row flex-row">
                 <div class="flex-row-left">
                   <el-select v-model="filters.infoType">
+                    <el-option label="会员卡号" value="cardNo" />
                     <el-option label="手机号" value="phone" />
                     <el-option label="微信昵称" value="nickname" />
                     <el-option label="姓名" value="name" />
-                    <el-option label="会员卡号" value="cardNo" />
                   </el-select>
                   <el-input v-model="filters.infoValue" placeholder="请输入关键词" />
                   <el-button
@@ -121,7 +121,7 @@
               </div>
               <div class="filter-row ops-row">
                 <el-button @click="handleExportCustomers">导出客户数据</el-button>
-                <el-button>打标签</el-button>
+                <el-button @click="handleBatchAddTags">打标签</el-button>
                 <el-button @click="openEditLevelDialog">修改等级</el-button>
                 <el-button @click="handleBatchFreeze">冻结</el-button>
                 <el-button @click="handleBatchUnfreeze">解冻</el-button>
@@ -170,28 +170,56 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="标签" width="120">
+          <el-table-column label="标签" min-width="150">
             <template #default="scope">
-              <el-link type="primary" @click="openAddTagDialog(scope.row)">添加标签</el-link>
+              <div class="tag-container">
+                <div v-if="scope.row.labels && scope.row.labels.length > 0" class="tag-list">
+                  <el-tag
+                    v-for="tag in scope.row.labels"
+                    :key="tag.labelId"
+                    size="small"
+                    :type="getTagType(tag.tagType)"
+                    class="tag-item"
+                  >
+                    {{ tag.labelName }}
+                  </el-tag>
+                </div>
+                <el-link type="primary" class="add-tag-link" @click="openAddTagDialog(scope.row)">
+                  <el-icon class="add-icon"><Plus /></el-icon>
+                  添加标签
+                </el-link>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column label="卡号" prop="id" width="170" />
-          <el-table-column label="手机" prop="phoneNumber" align="center" />
-          <el-table-column label="可用余额" prop="availableBalance" align="center">
+          <el-table-column label="卡号" prop="id" min-width="130" show-overflow-tooltip>
+            <template #default="scope">
+              <div class="card-number-container">
+                <div class="card-number-text">{{ scope.row.id.slice(0, 18) }}</div>
+                <div class="card-number-text">{{ scope.row.id.slice(18) }}</div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="手机" prop="phoneNumber" width="120" align="center" />
+          <el-table-column label="可用余额" prop="availableBalance" align="center" width="100">
             <template #default="scope">
               <span>￥{{ Math.floor(scope.row.availableBalance || 0) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="可用积分" prop="availablePoints" align="center">
+          <el-table-column label="可用积分" prop="availablePoints" align="center" width="100">
             <template #default="scope">{{ Math.floor(scope.row.availablePoints || 0) }}</template>
           </el-table-column>
-          <el-table-column label="累计消费金额" prop="accumulativeconsumption" align="center">
+          <el-table-column
+            label="累计消费金额"
+            prop="accumulativeconsumption"
+            align="center"
+            width="120"
+          >
             <template #default="scope">
               ￥{{ Number(scope.row.accumulativeconsumption || 0).toFixed(2) }}
             </template>
           </el-table-column>
-          <el-table-column label="累计消费次数" prop="comsumerNumber" align="center" />
-          <el-table-column label="操作" width="260">
+          <el-table-column label="累计消费次数" prop="comsumerNumber" align="center" width="120" />
+          <el-table-column label="操作" width="260" fixed="right">
             <template #default="scope">
               <el-link type="primary" @click="goToDetail(scope.row)">详情</el-link>
 
@@ -646,35 +674,36 @@
           v-model="tagSearchKeyword"
           placeholder="标签名称"
           class="tag-search-input"
-          :suffix-icon="Search"
+          :prefix-icon="Search"
+          clearable
         />
 
-        <!-- 标签列表表格 -->
-        <div class="tag-table">
-          <div class="tag-table-header">
-            <div class="tag-table-cell checkbox-cell"></div>
-            <div class="tag-table-cell">标签名称</div>
-            <div class="tag-table-cell">标签类型</div>
-          </div>
-
-          <div class="tag-table-body">
-            <div v-for="tag in filteredTags" :key="tag.id" class="tag-table-row">
-              <div class="tag-table-cell checkbox-cell">
-                <el-checkbox v-model="tag.checked" />
-              </div>
-              <div class="tag-table-cell">{{ tag.name }}</div>
-              <div class="tag-table-cell">{{ tag.type }}</div>
-            </div>
-          </div>
-        </div>
+        <!-- 标签列表 -->
+        <el-table
+          :loading="tagLoading"
+          :data="tagList"
+          style="width: 100%"
+          @selection-change="handleTagSelectionChange"
+        >
+          <el-table-column type="selection" width="50" align="center" />
+          <el-table-column prop="labelName" label="标签名称" />
+          <el-table-column prop="tagType" label="标签类型" width="100" align="center">
+            <template #default="scope">
+              {{ scope.row.tagType === 0 ? "手动标签" : "条件标签" }}
+            </template>
+          </el-table-column>
+        </el-table>
 
         <!-- 分页 -->
         <div class="pagination-container">
+          <span class="total-text">共 {{ tagPage.total }} 条</span>
           <el-pagination
             v-model:current-page="tagPage.current"
-            :page-size="tagPage.pageSize"
-            layout="prev, pager, next"
+            v-model:page-size="tagPage.pageSize"
+            :page-sizes="[10, 20, 50]"
             :total="tagPage.total"
+            layout="prev, pager, next"
+            @size-change="handleTagSizeChange"
             @current-change="handleTagPageChange"
           />
         </div>
@@ -704,13 +733,14 @@ import {
   customerConsume,
   updateCustomerStatus,
   giveCustomerPoints,
+  getLabelList,
+  getCustomerLabels,
+  addCustomerLabels,
 } from "@/api/system/customer.api";
 import { regionData } from "element-china-area-data";
-// 移除未用的 Pagination 组件
-// import Pagination from "@/components/Pagination/index.vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
-import { Search } from "@element-plus/icons-vue";
+import { Search, Plus } from "@element-plus/icons-vue";
 
 const router = useRouter();
 // #region 操作权限相关
@@ -753,8 +783,9 @@ const filters = ref({
   PhoneNumber: "",
   Gender: "",
   openCardTime: [],
-  infoType: "phone",
+  infoType: "cardNo", // 默认改为卡号查询
   infoValue: "",
+  Id: "", // 添加ID字段
 });
 
 // ===================== 分页参数对象 =====================
@@ -766,8 +797,16 @@ const page = reactive({
 });
 
 // ===================== 客户数据 =====================
+// 定义客户类型接口
+interface Customer {
+  id: string;
+  customerName: string;
+  customerNickName: string;
+  [key: string]: any;
+}
+
 // 客户表格数据
-const tableData = ref([]);
+const tableData = ref<Customer[]>([]);
 
 // 完全替换函数
 // 获取客户列表数据（带分页）
@@ -777,13 +816,24 @@ const fetchCustomerList = async () => {
     const response = await getCustomerList(params);
     console.log("客户列表API返回数据结构:", response);
 
-    // 使用as any临时绕过TypeScript类型检查
     const apiResponse = response as any;
 
     if (apiResponse) {
-      tableData.value = apiResponse.data || [];
+      const customerList = apiResponse.data || [];
 
-      // 安全地设置分页信息
+      // 获取每个客户的标签
+      for (const customer of customerList) {
+        try {
+          const labelsResponse = await getCustomerLabels(customer.id);
+          customer.labels = labelsResponse.data || [];
+        } catch (error) {
+          console.error(`获取客户${customer.id}的标签失败:`, error);
+          customer.labels = [];
+        }
+      }
+
+      tableData.value = customerList;
+
       if (typeof apiResponse.totleCount === "number") {
         page.totleCount = apiResponse.totleCount;
       }
@@ -810,6 +860,7 @@ function buildQueryParams() {
     if (filters.value.infoType === "phone") params.PhoneNumber = filters.value.infoValue;
     if (filters.value.infoType === "nickname") params.CustomerNickName = filters.value.infoValue;
     if (filters.value.infoType === "name") params.CustomerName = filters.value.infoValue;
+    if (filters.value.infoType === "cardNo") params.Id = filters.value.infoValue;
   }
   if (filters.value.CustomerType) params.CustomerType = filters.value.CustomerType;
   if (filters.value.Gender !== "" && filters.value.Gender !== undefined)
@@ -992,8 +1043,9 @@ const resetFilters = () => {
     PhoneNumber: "",
     Gender: "",
     openCardTime: [],
-    infoType: "phone",
+    infoType: "cardNo", // 默认改为卡号查询
     infoValue: "",
+    Id: "", // 添加ID字段
   };
   pageIndex.value = 1;
   fetchCustomerList();
@@ -1353,75 +1405,170 @@ const selectedCustomer = ref({
   id: "",
   customerName: "",
 });
+
+// 定义标签类型接口
+interface Tag {
+  id: string;
+  labelName: string;
+  tagType: number;
+  checked?: boolean;
+  peopleNumber?: number;
+}
+
+// 标签相关数据和方法
+const tagList = ref<Tag[]>([]);
+const tagLoading = ref(false);
 const tagSearchKeyword = ref("");
-
-// 打开添加标签弹窗
-const openAddTagDialog = (row: any) => {
-  selectedCustomer.value = {
-    id: row.id,
-    customerName: row.customerName || row.customerNickName || "未知客户",
-  };
-  // 重置所有标签的选中状态
-  allTags.value.forEach((tag) => (tag.checked = false));
-  // 清空搜索关键词
-  tagSearchKeyword.value = "";
-  // 重置分页
-  tagPage.current = 1;
-  // 显示弹窗
-  showAddTagDialog.value = true;
-};
-
-// 标签分页数据
 const tagPage = reactive({
   current: 1,
   pageSize: 10,
-  total: 30,
+  total: 0,
 });
 
-// 模拟标签数据，实际应该从API获取
-const allTags = ref([
-  { id: "1", name: "活跃客户", type: "手动标签", checked: false },
-  { id: "2", name: "新客户", type: "手动标签", checked: false },
-  { id: "3", name: "高消费", type: "条件标签", checked: false },
-]);
+// 获取标签列表
+const fetchTagList = async () => {
+  try {
+    tagLoading.value = true;
+    const res: any = await getLabelList();
+    if (res && Array.isArray(res)) {
+      // 过滤搜索关键词
+      const filteredTags = tagSearchKeyword.value
+        ? res.filter((tag) =>
+            tag.labelName.toLowerCase().includes(tagSearchKeyword.value.toLowerCase())
+          )
+        : res;
 
-// 根据搜索关键词过滤标签
-const filteredTags = computed(() => {
-  if (!tagSearchKeyword.value) return allTags.value;
-  return allTags.value.filter((tag) =>
-    tag.name.toLowerCase().includes(tagSearchKeyword.value.toLowerCase())
-  );
-});
+      // 分页处理
+      const start = (tagPage.current - 1) * tagPage.pageSize;
+      const end = start + tagPage.pageSize;
 
-// 处理标签分页变化
-const handleTagPageChange = (page: number) => {
-  tagPage.current = page;
-  // TODO: 调用API获取对应页的标签数据
+      tagList.value = filteredTags.slice(start, end).map((tag: any) => ({
+        id: tag.id,
+        labelName: tag.labelName,
+        tagType: tag.tagType,
+        peopleNumber: tag.peopleNumber,
+        checked: false,
+      }));
+
+      tagPage.total = filteredTags.length;
+    }
+  } catch (error) {
+    console.error("获取标签列表失败:", error);
+    ElMessage.error("获取标签列表失败");
+  } finally {
+    tagLoading.value = false;
+  }
 };
 
-// 处理添加标签
-const handleAddTags = async () => {
-  const selectedTagIds = allTags.value.filter((tag) => tag.checked).map((tag) => tag.id);
+// 添加批量打标签的方法
+const handleBatchAddTags = () => {
+  if (selectedCustomerIds.value.length === 0) {
+    ElMessage.warning("请先选择要打标签的客户！");
+    return;
+  }
+  // 设置选中的客户信息
+  selectedCustomer.value = {
+    id: selectedCustomerIds.value[0],
+    customerName: "已选择" + selectedCustomerIds.value.length + "个客户",
+  };
+  showAddTagDialog.value = true;
+};
 
-  if (selectedTagIds.length === 0) {
+// 修改handleAddTags方法
+const handleAddTags = async () => {
+  const selectedLabelIds = tagList.value
+    .filter((tag: Tag) => tag.checked)
+    .map((tag: Tag) => tag.id);
+
+  if (selectedLabelIds.length === 0) {
     ElMessage.warning("请至少选择一个标签");
     return;
   }
 
   try {
-    // TODO: 调用添加标签API
-    console.log("添加标签:", {
-      customerId: selectedCustomer.value.id,
-      tagIds: selectedTagIds,
-    });
+    let customerIds;
+    if (selectedCustomerIds.value.length > 0) {
+      // 批量打标签模式
+      customerIds = selectedCustomerIds.value;
+    } else {
+      // 单个客户打标签模式
+      customerIds = [selectedCustomer.value.id];
+    }
+
+    console.log("发送的请求数据:", { customerIds, labelIds: selectedLabelIds });
+    await addCustomerLabels(customerIds, selectedLabelIds);
 
     ElMessage.success("添加标签成功");
     showAddTagDialog.value = false;
-    fetchCustomerList(); // 刷新列表
-  } catch (error) {
-    console.error("添加标签失败:", error);
-    ElMessage.error("添加标签失败");
+    // 重新获取客户列表数据
+    fetchCustomerList();
+  } catch (err: any) {
+    console.error("添加标签失败:", err);
+    if (err.response) {
+      console.error("错误响应:", err.response);
+      ElMessage.error(`添加标签失败: ${err.response.data?.message || "服务器错误"}`);
+    } else {
+      ElMessage.error("添加标签失败，请重试");
+    }
   }
+};
+
+// 修改openAddTagDialog方法
+const openAddTagDialog = async (row?: any) => {
+  if (row) {
+    // 单个客户打标签模式
+    selectedCustomer.value = {
+      id: row.id,
+      customerName: row.customerName || row.customerNickName || "未知客户",
+    };
+    selectedCustomerIds.value = []; // 清空批量选择
+  }
+  tagSearchKeyword.value = "";
+  tagPage.current = 1;
+  showAddTagDialog.value = true;
+  await fetchTagList();
+
+  // 获取客户现有标签并标记选中状态
+  try {
+    if (row) {
+      const res = await getCustomerLabels(row.id);
+      if (res && Array.isArray(res.data)) {
+        const customerTagIds = res.data.map((tag: any) => tag.labelId);
+        // 标记客户已有的标签
+        tagList.value.forEach((tag) => {
+          tag.checked = customerTagIds.includes(tag.id);
+        });
+      }
+    }
+  } catch (error) {
+    console.error("获取客户标签失败:", error);
+  }
+};
+
+// 处理标签搜索
+watch(tagSearchKeyword, () => {
+  tagPage.current = 1;
+  fetchTagList();
+});
+
+// 处理标签分页变化
+const handleTagPageChange = (page: number) => {
+  tagPage.current = page;
+  fetchTagList();
+};
+
+// 处理标签选择变化
+const handleTagSelectionChange = (selection: Tag[]) => {
+  // 更新选中状态
+  tagList.value.forEach((tag) => {
+    tag.checked = selection.some((selected) => selected.id === tag.id);
+  });
+};
+
+// 处理标签每页条数变化
+const handleTagSizeChange = (size: number) => {
+  tagPage.pageSize = size;
+  fetchTagList();
 };
 
 // 当组件被缓存并离开视图时设置刷新标志
@@ -1438,6 +1585,13 @@ onActivated(() => {
     needRefresh.value = false;
   }
 });
+
+// 添加 getTagType 函数
+const getTagType = (tagType: number): "success" | "warning" | "info" => {
+  if (tagType === 0) return "success"; // 手动标签
+  if (tagType === 1) return "warning"; // 条件标签
+  return "info"; // 默认标签类型
+};
 </script>
 
 <style scoped>
@@ -1934,7 +2088,13 @@ onActivated(() => {
 .pagination-container {
   margin-top: 20px;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.total-text {
+  color: #606266;
+  font-size: 13px;
 }
 
 :deep(.el-dialog__header) {
@@ -1963,5 +2123,111 @@ onActivated(() => {
 
 :deep(.el-input__wrapper) {
   border-radius: 4px;
+}
+
+/* 添加表格相关样式 */
+:deep(.el-table) {
+  width: 100%;
+  font-size: 14px;
+}
+
+:deep(.el-table .cell) {
+  padding: 0 8px;
+  line-height: 23px;
+  word-break: break-all;
+}
+
+:deep(.el-table__header) {
+  font-weight: 500;
+  color: #606266;
+}
+
+:deep(.el-table__row) {
+  height: 50px;
+}
+
+:deep(.el-table__row td) {
+  padding: 6px 0;
+}
+
+:deep(.el-table .el-tooltip__trigger) {
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tag-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag-item {
+  margin: 0;
+  font-size: 12px;
+}
+
+.add-tag-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.add-icon {
+  margin-right: 2px;
+  font-size: 12px;
+}
+
+:deep(.el-tag) {
+  border-radius: 2px;
+}
+
+:deep(.el-tag--success) {
+  --el-tag-bg-color: var(--el-color-success-light-9);
+  --el-tag-border-color: var(--el-color-success-light-5);
+  --el-tag-text-color: var(--el-color-success);
+}
+
+:deep(.el-tag--warning) {
+  --el-tag-bg-color: var(--el-color-warning-light-9);
+  --el-tag-border-color: var(--el-color-warning-light-5);
+  --el-tag-text-color: var(--el-color-warning);
+}
+
+.card-number-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-number-text {
+  font-size: 12px;
+  line-height: 1.2;
+  color: #606266;
+  word-break: break-all;
+}
+
+:deep(.el-table__row) {
+  height: auto !important;
+  padding: 8px 0;
+}
+
+:deep(.el-table__cell) {
+  padding: 8px 0 !important;
+}
+
+:deep(.el-table .cell) {
+  padding: 0 8px;
+  line-height: 1.2;
+  word-break: break-all;
+  white-space: normal;
 }
 </style>

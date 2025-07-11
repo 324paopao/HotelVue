@@ -39,22 +39,7 @@ export function getCustomerTypeList() {
   });
 }
 
-/**
- * 批量修改客户等级/类型
- * @param ids 客户ID数组
- * @param customerType 客户类型ID
- * @returns Promise
- */
-export function updateCustomerLevel(ids: string[], customerType: string) {
-  return request.httpRequest({
-    url: "/api/app/customer/customer",
-    method: "put",
-    data: {
-      ids,
-      customerType,
-    },
-  });
-}
+
 
 /**
  * 导出客户数据
@@ -248,5 +233,58 @@ export function getTagById(id: string) {
         }
       },
     ],
+  });
+}
+
+/**
+ * 获取客户标签
+ * @param customerId 客户ID
+ * @returns Promise
+ */
+export function getCustomerLabels(customerId: string) {
+  return request.httpRequest({
+    url: `/api/app/customer/customer-labels/${customerId}`,
+    method: "get",
+  });
+}
+
+/**
+ * 获取标签列表
+ * @returns Promise
+ */
+export function getLabelList() {
+  return request.httpRequest({
+    url: "/api/app/customer/label-list",
+    method: "get",
+  });
+}
+
+/**
+ * 批量修改客户等级/类型
+ * @param ids 客户ID数组
+ * @param customerType 客户类型ID
+ * @returns Promise
+ */
+export function updateCustomerLevel(ids: string[], customerType: string) {
+  return request.httpRequest({
+    url: "/api/app/customer/customer",
+    method: "put",
+    data: {
+      ids,
+      customerType,
+    },
+  });
+}
+
+/**
+ * 添加客户标签
+ * @param data { customerId: string, labelIds: string[] }
+ * @returns Promise
+ */
+export function addCustomerLabels( customerIds: string[], labelIds: string[] ) {
+  return request.httpRequest({
+    url: "/api/app/customer/customer-labels",
+    method: "post",
+    data: {  customerIds,  labelIds,},
   });
 }
