@@ -103,14 +103,21 @@ export const constantRoutes: RouteRecordRaw[] = [
       {
         path: "customers/tag-edit",
         name: "CustomerTagEdit",
-        component: () => import("@/views/Customers/CustomerTag.vue"),
-        meta: { title: "创建标签", icon: "user", hidden: true },
+        component: () => import("@/views/Customers/CustomerTagEdit.vue"),
+        meta: { title: "编辑标签", icon: "user", hidden: true },
+      },
+      {
+        path: "customers/tag-detail",
+        name: "CustomerTagDetail",
+        component: () => import("@/views/Customers/CustomerTagEdit.vue"),
+        meta: { title: "标签详情", icon: "user", hidden: true },
       },
       {
         path: "customers/detail/:id",
         name: "CustomerDetail",
         component: () => import("@/views/Customers/CustomerDetailView.vue"),
-        meta: { title: "客户详情" },
+        meta: { title: "客户详情", icon: "user", hidden: true },
+
       },
       {
         path: "businessRoomtype",
@@ -178,6 +185,14 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/Setting/OperationLog.vue"),
         meta: { title: "操作日志管理", icon: "user", hidden: true },
       },
+
+      {
+        path: "storeview",
+        name: "storeview",
+        component: () => import("@/views/StoreManage/StoreView.vue"),
+        meta: { title: "门店管理", icon: "user", hidden: true },
+      },
+
     ],
   },
 ];

@@ -204,6 +204,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           .then(res => {
             console.log(res)
             ElMessage.success('添加成功')
+            getRole()
             dialogVisible.value = false
           })
       }
@@ -212,6 +213,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           console.log(res)
           ElMessage.success('修改成功')
           getRole()
+          dialogVisible.value = false
         })
       }
     } else {

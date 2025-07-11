@@ -253,6 +253,7 @@ const tableData = ref()
 import { useMenuStore } from '@/store';
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
+import { exportCustomerData } from '@/api/system/customer.api';
 const menuStore = useMenuStore();
 const route = useRoute();
 const actions = computed(() => menuStore.getActionsByPath(route.path));
@@ -303,9 +304,40 @@ async function load() {
   Seach1.totlePage = res.totlePage;
 
 }
-
-function exportDetail() {
-  // 导出明细逻辑
+//导出明细
+async function exportDetail() {
+  try {
+    // 构建导出参数，使用当前的查询条件
+    const params = {
+      Status: Seach1.Status,
+      Sdate: Seach1.Sdate,
+      Edate: Seach1.Edate,
+      Comman: Seach.Comman
+    };
+    
+    // 调用导出API
+    const response = await AuthAPI.Export(params);
+    
+    // 创建Blob对象
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+    
+    // 创建下载链接
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = `预订记录-${moment().format('YYYY-MM-DD')}.xlsx`;
+    
+    // 触发下载
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    
+    ElMessage.success('导出成功');
+  } catch (error) {
+    console.error('导出失败:', error);
+    ElMessage.error('导出失败，请重试');
+  }
 }
 //排房
 const roomList: any = reactive({

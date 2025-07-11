@@ -6,7 +6,7 @@ const AuthAPI1 = {
 
   ///支付
   paymoney(data: any) {
-    return request({
+    return request.httpRequest({
       url: `${AUTH_BASE_URL}/pay`,
       method: "post",
       params: data
