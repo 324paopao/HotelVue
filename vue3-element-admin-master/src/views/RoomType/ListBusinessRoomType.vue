@@ -10,8 +10,14 @@
         "
       >
         <div>
-          <el-button v-if="hasAction('新增房型')" type="primary" @click="openAddDrawer">新增房型</el-button>
-          <el-button v-if="hasAction('批量删除')" :disabled="multipleSelection.length === 0" @click="handleBatchDelete">
+          <el-button v-if="hasAction('新增房型')" type="primary" @click="openAddDrawer">
+            新增房型
+          </el-button>
+          <el-button
+            v-if="hasAction('批量删除')"
+            :disabled="multipleSelection.length === 0"
+            @click="handleBatchDelete"
+          >
             批量删除
           </el-button>
         </div>
@@ -50,12 +56,24 @@
         </el-table-column>
         <el-table-column label="操作" width="220">
           <template #default="scope">
-            <el-link v-if="hasAction('编辑')" type="primary" @click="onEdit(scope.row)">编辑</el-link>
-            <el-link v-if="hasAction('设置房号')" type="primary" style="margin-left: 8px" @click="openRoomNumDialog(scope.row)">
+            <el-link v-if="hasAction('编辑')" type="primary" @click="onEdit(scope.row)">
+              编辑
+            </el-link>
+            <el-link
+              v-if="hasAction('设置房号')"
+              type="primary"
+              style="margin-left: 8px"
+              @click="openRoomNumDialog(scope.row)"
+            >
               设置房号
             </el-link>
             <el-link type="primary" style="margin-left: 8px">投放</el-link>
-            <el-link v-if="hasAction('删除')" type="danger" style="margin-left: 8px" @click="handleDelete(scope.row.id)">
+            <el-link
+              v-if="hasAction('删除')"
+              type="danger"
+              style="margin-left: 8px"
+              @click="handleDelete(scope.row.id)"
+            >
               删除
             </el-link>
           </template>
@@ -216,7 +234,7 @@
           <el-form-item label="房型图片">
             <el-upload
               class="avatar-uploader"
-              action="https://localhost:44384/api/FileImg"
+              action="http://8.152.98.56:8080/api/FileImg"
               :show-file-list="true"
               :on-success="handleAvatarSuccess"
               :before-upload="beforeAvatarUpload"
@@ -319,21 +337,23 @@ import { ref, reactive, onMounted } from "vue";
 import RoomTypeAPI from "@/api/system/roomtype";
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
+import { uploadVideo } from "@/api/system/upload";
+
 onMounted(() => {
   GetListRoomType();
 });
 
 import axios from "axios";
 //#region 操作权限
-import { useMenuStore } from '@/store';
-import { useRoute } from 'vue-router';
-import { computed } from 'vue';
+import { useMenuStore } from "@/store";
+import { useRoute } from "vue-router";
+import { computed } from "vue";
 const menuStore = useMenuStore();
 const route = useRoute();
 const actions = computed(() => menuStore.getActionsByPath(route.path));
-console.log("actions", actions.value)
+console.log("actions", actions.value);
 function hasAction(actionName: string) {
-  return actions.value.some(a => a.name === actionName);
+  return actions.value.some((a) => a.name === actionName);
 }
 //#endregion
 //const videoUrl = ref("");
@@ -347,26 +367,17 @@ const handleFileChange = async (event: any) => {
   formData.append("file", file);
 
   try {
-    const response = await axios.post(
-      "https://localhost:44384/api/FileImg/UploadVideoAsync",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          uploadProgress.value = percent;
-        },
-      }
-    );
+    const response = await uploadVideo(formData, (progressEvent) => {
+      const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+      uploadProgress.value = percent;
+    });
     console.log("formData", response.data);
     form.videoUrl = response.data;
   } catch (error) {
     console.error("上传失败", error);
   }
 };
-// 21332121
+
 //删除房号
 function DeleteRoomNum(Row: any) {
   ElMessageBox.confirm("确认删除已选中的数据项?", "警告", {
@@ -734,7 +745,7 @@ function getImageUrl(path: string) {
   return "https://localhost:44384" + path;
 }
 
-const beforeAvatarUpload = (rawFile:any) => {
+const beforeAvatarUpload = (rawFile: any) => {
   const isImage = ["image/jpeg", "image/png", "image/bmp"].includes(rawFile.type);
   if (!isImage) {
     ElMessage.error("图片格式仅支持 JPG/PNG/BMP!");

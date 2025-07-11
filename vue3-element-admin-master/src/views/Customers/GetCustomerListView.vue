@@ -569,6 +569,37 @@
             <el-button type="primary" @click="submitConsume">确定</el-button>
           </div>
         </template>
+
+      </el-table-column>
+      <el-table-column label="标签" width="120">
+        <template #default="">
+          <el-link type="primary">添加标签</el-link>
+        </template>
+      </el-table-column>
+      <el-table-column label="卡号" prop="id" width="170" />
+      <el-table-column label="手机" prop="phoneNumber" align="center" />
+      <el-table-column label="可用余额" prop="availableBalance" align="center">
+        <template #default="scope">
+          <span>￥{{ scope.row.availableBalance }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="可用积分" prop="availablePoints" align="center">
+        <template #default="scope">￥{{ scope.row.availablePoints }}</template>
+      </el-table-column>
+      <el-table-column label="累计消费金额" prop="accumulativeconsumption" align="center" />
+      <el-table-column label="累计消费次数" prop="comsumerNumber" align="center" />
+      <el-table-column label="操作" width="260">
+        <template #default="scope">
+          <el-link type="primary">详情</el-link>
+          <el-divider direction="vertical" />
+          <el-link v-if="scope.row.status !== false" type="danger" @click="handleFreeze(scope.row)">
+            冻结
+          </el-link>
+          <el-link
+            v-if="scope.row.status === false"
+            type="success"
+            @click="handleUnfreeze(scope.row)"
+
       </el-dialog>
 
       <!-- 送积分弹窗 -->
@@ -592,6 +623,7 @@
               line-height: 22px;
               margin-top: 4px;
             "
+
           >
             余额：{{ Math.floor(givePointsForm.balance || 0) }}，积分：{{
               Math.floor(givePointsForm.availablePoints || 0)
@@ -1374,7 +1406,7 @@ const handleGivePoints = async () => {
 
 // ===================== 导入客户弹窗相关 =====================
 const showImportDialog = ref(false);
-const importCustomersUrl = "https://localhost:44384/api/Import/customers";
+const importCustomersUrl = "https://8.152.98.56/api/Import/customers";
 const uploadHeaders = {}; // 如需token可在此加上
 const handleImportSuccess = () => {
   ElMessage.success("导入成功！");
