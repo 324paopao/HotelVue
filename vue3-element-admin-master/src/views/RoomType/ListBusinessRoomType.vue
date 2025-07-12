@@ -248,7 +248,6 @@ onMounted(() => {
   GetListRoomType();
 });
 
-import axios from "axios";
 //#region 操作权限
 import { useMenuStore } from "@/store";
 import { useRoute } from "vue-router";

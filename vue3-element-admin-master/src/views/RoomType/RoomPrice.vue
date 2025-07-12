@@ -2,17 +2,23 @@
   <div>
     <el-row style="margin-bottom: 16px">
       <el-col :span="6">
-        <el-button type="primary" @click="onAdd">新增房价计划</el-button>
+        <el-button @click="onAdd">新增房价计划</el-button>
       </el-col>
       <el-col :span="6" :offset="12" style="text-align: right">
         <el-select
           v-model="query.TypeName"
           placeholder="全部房型"
-          style="width: 200px"
+          size="small"
+          style="width: 60%"
           @change="fetchData"
         >
-          <el-option label="全部房型" value="" />
-          <el-option v-for="item in typeNameOptions" :key="item" :label="item" :value="item" />
+          <el-option label="全部房型" :value="''" />
+          <el-option
+            v-for="group in roomGroups"
+            :key="group.typeName"
+            :label="group.typeName"
+            :value="group.typeName"
+          />
         </el-select>
       </el-col>
     </el-row>
@@ -37,8 +43,14 @@
       <el-table-column prop="sort" label="排序"></el-table-column>
       <el-table-column label="操作">
         <template #default="scope">
-          <el-link v-if="scope.row.calendarStatus" type="primary">停用</el-link>
-          <el-link v-else type="primary">启用</el-link>
+          <el-link
+            v-if="scope.row.calendarStatus"
+            type="primary"
+            @click="changeStatus(scope.row.id, false)"
+          >
+            停用
+          </el-link>
+          <el-link v-else type="primary" @click="changeStatus(scope.row.id, true)">启用</el-link>
           <el-link
             type="primary"
             style="margin-left: 8px"
@@ -47,9 +59,9 @@
             价格日历
           </el-link>
           <el-link type="primary" style="margin-left: 8px">编辑</el-link>
-          <el-link type="primary" style="margin-left: 8px">删除</el-link>
-          <el-link type="primary" style="margin-left: 8px">投放</el-link>
-          <el-link type="primary" style="margin-left: 8px">礼</el-link>
+          <el-link type="danger" style="margin-left: 8px" @click="deleteRoomPrice(scope.row.id)">
+            删除
+          </el-link>
         </template>
       </el-table-column>
     </el-table>
@@ -59,6 +71,9 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
 import { getRoomPrice } from "@/api/system/roomprice";
+import { getRoomStateList } from "@/api/system/roomstate";
+import { updateRoomPriceStatus, deleteRoomPriceCalendar } from "@/api/system/roomprice";
+import { ElMessage } from "element-plus";
 const router = useRouter();
 const query = reactive({
   TypeName: "",
@@ -67,13 +82,13 @@ const tableData = ref([]);
 
 const fetchData = async () => {
   const res = await getRoomPrice(query);
-  console.log("232323", res);
   tableData.value = res;
 };
 
 const onAdd = () => {
   // 新增房价计划逻辑
 };
+// 价格日历跳转
 const RoomPriceCalendars = (id: any) => {
   // 房价日历逻辑
   router.push({
@@ -83,9 +98,46 @@ const RoomPriceCalendars = (id: any) => {
     },
   });
 };
-
+// 房型列表
+const roomGroups = ref<any[]>([]);
+// 获取房型列表下拉
+function loadRoomGroups(params = {}) {
+  getRoomStateList(params).then((res: any) => {
+    if (res) {
+      roomGroups.value = res;
+    } else {
+      roomGroups.value = [];
+    }
+  });
+}
+// 修改房型状态
+const changeStatus = async (row: any, status: boolean) => {
+  await updateRoomPriceStatus(row, status);
+  console.log("22221", row, status);
+  ElMessage.success("启用成功");
+  fetchData(); // 刷新表格
+};
+const deleteRoomPrice = async (row: any) => {
+  ElMessageBox.confirm("确定删除吗?", "警告", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "error",
+  })
+    .then(async () => {
+      await deleteRoomPriceCalendar(row);
+      ElMessage.success("删除成功");
+      fetchData();
+    })
+    .catch(() => {
+      ElMessage({
+        type: "info",
+        message: "删除取消",
+      });
+    });
+};
 onMounted(() => {
   fetchData();
+  loadRoomGroups(); //房型列表下拉
 });
 </script>
 
