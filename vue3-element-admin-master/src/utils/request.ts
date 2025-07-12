@@ -12,6 +12,7 @@ import { number } from "echarts";
 const httpRequest = axios.create({
   baseURL: import.meta.env.VITE_APP_API_URL,
   timeout: 50000,
+  withCredentials: true,
   headers: { "Content-Type": "application/json;charset=utf-8" },
   paramsSerializer: (params) => qs.stringify(params),
 });
@@ -19,27 +20,30 @@ const httpRequest = axios.create({
 /**
  * 请求拦截器 - 不再添加 Authorization 头
  */
-httpRequest.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const accessToken = Auth.getAccessToken();
-    if (config.headers.Authorization !== "no-auth" && accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    } else {
-      delete config.headers.Authorization;
-    }
-    return config;
-  },
-  (error) => {
-    console.error("Request interceptor error:", error);
-    return Promise.reject(error);
-  }
-);
+// httpRequest.interceptors.request.use(
+//   (config: InternalAxiosRequestConfig) => {
+//     // const accessToken = Auth.getAccessToken();
+//     // if (config.headers.Authorization !== "no-auth" && accessToken) {
+//     //   config.headers.Authorization = `Bearer ${accessToken}`;
+//     // } else {
+//     //   delete config.headers.Authorization;
+//     // }
+//     // debugger
+//     return config;
+//   },
+//   (error) => {
+//     debugger
+//     console.error("Request interceptor error:", error);
+//     return Promise.reject(error);
+//   }
+// );
 
 /**
  * 响应拦截器 - 统一处理响应和错误
  */
 httpRequest.interceptors.response.use(
   (response: AxiosResponse<ApiResponse>) => {
+    debugger
     // 如果响应是二进制流，则直接返回（用于文件下载、Excel 导出等）
     if (response.config.responseType === "blob") {
       return response;
@@ -58,6 +62,7 @@ httpRequest.interceptors.response.use(
     return Promise.reject(new Error(msg || "Business Error"));
   },
   async (error) => {
+    debugger
     console.error("Response interceptor error:", error);
 
     const { config, response } = error;
@@ -152,9 +157,9 @@ httpRequest1.interceptors.response.use(
 
     // 业务错误
     // 在响应拦截器中修改
-   const errorMessage = `错误(${code}): ${msg || "系统出错"}`;
-   console.error("API响应详情:", response.data); // 添加详细日志
-   ElMessage.error(errorMessage);
+    const errorMessage = `错误(${code}): ${msg || "系统出错"}`;
+    console.error("API响应详情:", response.data); // 添加详细日志
+    ElMessage.error(errorMessage);
     return Promise.reject(new Error(msg || "Business Error"));
   },
   async (error) => {
