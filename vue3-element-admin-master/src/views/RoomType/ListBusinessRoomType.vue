@@ -337,13 +337,12 @@ import { ref, reactive, onMounted } from "vue";
 import RoomTypeAPI from "@/api/system/roomtype";
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
-import { uploadVideo } from "@/api/system/upload";
+//import { uploadVideo } from "@/api/system/upload";
 
 onMounted(() => {
   GetListRoomType();
 });
 
-import axios from "axios";
 //#region 操作权限
 import { useMenuStore } from "@/store";
 import { useRoute } from "vue-router";
