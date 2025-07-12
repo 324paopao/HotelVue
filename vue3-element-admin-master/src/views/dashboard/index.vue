@@ -7,7 +7,7 @@
         :key="action.id"
         type="primary"
         style="margin-right: 8px;"
-        @click="() => $message.success('点击了：' + action.name)"
+        @click="() => ElMessage.success('点击了：' + action.name)"
       >
         {{ action.name }}
       </el-button>
@@ -296,7 +296,8 @@
               </el-radio-group>
             </div>
           </template>
-          <ECharts :options="visitTrendChartOptions" height="400px" />
+          <div v-if="!isChartDataReady" class="text-center py-20 text-gray">加载中或暂无数据</div>
+          <ECharts v-else :options="visitTrendChartOptions" height="400px" />
         </el-card>
       </el-col>
       <!-- 最新动态 -->
@@ -318,7 +319,7 @@
           </template>
 
           <el-scrollbar height="400px">
-            <el-timeline class="p-3">
+            <el-timeline class="p-3" v-if="Array.isArray(vesionList) && vesionList.length > 0">
               <el-timeline-item
                 v-for="(item, index) in vesionList"
                 :key="index"
@@ -352,6 +353,7 @@
                 </div>
               </el-timeline-item>
             </el-timeline>
+            <div v-else class="text-center py-20 text-gray">暂无动态数据</div>
           </el-scrollbar>
         </el-card>
       </el-col>
@@ -365,7 +367,7 @@ defineOptions({
   inheritAttrs: false,
 });
 
-import { dayjs } from "element-plus";
+import { dayjs, ElMessage } from "element-plus";
 import LogAPI, { VisitStatsVO, VisitTrendVO } from "@/api/system/log.api";
 import { useStore } from "@/store/Usertinfo";
 const store = useStore();
@@ -376,6 +378,7 @@ import { Connection, Failed } from "@element-plus/icons-vue";
 import { useOnlineCount } from "@/composables/useOnlineCount";
 import { useMenuStore } from '@/store';
 import { useRoute } from 'vue-router';
+import { safeToArray } from "@/utils/polyfill";
 const menuStore = useMenuStore();
 const route = useRoute();
 
@@ -508,6 +511,8 @@ const transitionTotalPvCount = useTransition(
 const visitTrendDateRange = ref(7);
 // 访问趋势图表配置
 const visitTrendChartOptions = ref();
+// 图表数据是否准备好
+const isChartDataReady = ref(false);
 
 /**
  * 获取访客统计数据
@@ -526,17 +531,58 @@ const fetchVisitStatsData = () => {
  * 获取访问趋势数据，并更新图表配置
  */
 const fetchVisitTrendData = () => {
+  // 先设置为null，避免使用旧数据
+  visitTrendChartOptions.value = null;
+  isChartDataReady.value = false;
+  
   const startDate = dayjs()
     .subtract(visitTrendDateRange.value - 1, "day")
     .toDate();
   const endDate = new Date();
 
-  LogAPI.getVisitTrend({
-    startDate: dayjs(startDate).format("YYYY-MM-DD"),
-    endDate: dayjs(endDate).format("YYYY-MM-DD"),
-  }).then((data) => {
-    updateVisitTrendChartOptions(data);
-  });
+  try {
+    LogAPI.getVisitTrend({
+      startDate: dayjs(startDate).format("YYYY-MM-DD"),
+      endDate: dayjs(endDate).format("YYYY-MM-DD"),
+    })
+    .then((data) => {
+      if (data) {
+        updateVisitTrendChartOptions(data);
+        isChartDataReady.value = true;
+      } else {
+        // 如果没有数据，使用空数据初始化图表
+        updateVisitTrendChartOptions({
+          dates: [],
+          pvList: [],
+          uvList: [],
+          ipList: []
+        });
+        isChartDataReady.value = true;
+        console.warn('未获取到访问趋势数据');
+      }
+    })
+    .catch((error) => {
+      console.error('获取访问趋势数据失败:', error);
+      // 发生错误时，使用空数据初始化图表
+      updateVisitTrendChartOptions({
+        dates: [],
+        pvList: [],
+        uvList: [],
+        ipList: []
+      });
+      isChartDataReady.value = true;
+    });
+  } catch (error) {
+    console.error('请求访问趋势时发生异常:', error);
+    // 额外的错误处理
+    updateVisitTrendChartOptions({
+      dates: [],
+      pvList: [],
+      uvList: [],
+      ipList: []
+    });
+    isChartDataReady.value = true;
+  }
 };
 
 /**
@@ -545,66 +591,81 @@ const fetchVisitTrendData = () => {
  * @param data - 访问趋势数据
  */
 const updateVisitTrendChartOptions = (data: VisitTrendVO) => {
-  visitTrendChartOptions.value = {
-    tooltip: {
-      trigger: "axis",
-    },
-    legend: {
-      data: ["浏览量(PV)", "访客数(UV)"],
-      bottom: 0,
-    },
-    grid: {
-      left: "1%",
-      right: "5%",
-      bottom: "10%",
-      containLabel: true,
-    },
-    xAxis: {
-      type: "category",
-      data: data.dates,
-    },
-    yAxis: {
-      type: "value",
-      splitLine: {
-        show: true,
-        lineStyle: {
-          type: "dashed",
+  try {
+    // 确保数据存在且格式正确
+    const dates = safeToArray(data?.dates);
+    const pvList = safeToArray(data?.pvList);
+    const ipList = safeToArray(data?.ipList);
+    // 处理uvList可能为null的情况
+    const uvList = safeToArray(data?.uvList);
+    
+    visitTrendChartOptions.value = {
+      tooltip: {
+        trigger: "axis",
+      },
+      legend: {
+        data: ["浏览量(PV)", "访客数(UV)"],
+        bottom: 0,
+      },
+      grid: {
+        left: "1%",
+        right: "5%",
+        bottom: "10%",
+        containLabel: true,
+      },
+      xAxis: {
+        type: "category",
+        data: dates,
+      },
+      yAxis: {
+        type: "value",
+        splitLine: {
+          show: true,
+          lineStyle: {
+            type: "dashed",
+          },
         },
       },
-    },
-    series: [
-      {
-        name: "浏览量(PV)",
-        type: "line",
-        data: data.pvList,
-        areaStyle: {
-          color: "rgba(64, 158, 255, 0.1)",
+      series: [
+        {
+          name: "浏览量(PV)",
+          type: "line",
+          data: pvList,
+          areaStyle: {
+            color: "rgba(64, 158, 255, 0.1)",
+          },
+          smooth: true,
+          itemStyle: {
+            color: "#4080FF",
+          },
+          lineStyle: {
+            color: "#4080FF",
+          },
         },
-        smooth: true,
-        itemStyle: {
-          color: "#4080FF",
+        {
+          name: "访客数(UV)",
+          type: "line",
+          data: ipList, // 使用ipList替代可能为null的uvList
+          areaStyle: {
+            color: "rgba(103, 194, 58, 0.1)",
+          },
+          smooth: true,
+          itemStyle: {
+            color: "#67C23A",
+          },
+          lineStyle: {
+            color: "#67C23A",
+          },
         },
-        lineStyle: {
-          color: "#4080FF",
-        },
-      },
-      {
-        name: "访客数(UV)",
-        type: "line",
-        data: data.ipList,
-        areaStyle: {
-          color: "rgba(103, 194, 58, 0.1)",
-        },
-        smooth: true,
-        itemStyle: {
-          color: "#67C23A",
-        },
-        lineStyle: {
-          color: "#67C23A",
-        },
-      },
-    ],
-  };
+      ],
+    };
+  } catch (error) {
+    console.error('创建图表配置时出错:', error);
+    // 提供一个最小可用的配置
+    visitTrendChartOptions.value = {
+      series: []
+    };
+  }
 };
 
 /**
