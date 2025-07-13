@@ -345,7 +345,7 @@
                 </div>
               </el-timeline-item>
             </el-timeline>
-            <div v-else class="text-center py-20 text-gray">暂无动态数据</div>
+           <!--  <div v-else class="text-center py-20 text-gray">暂无动态数据</div> -->
           </el-scrollbar>
         </el-card>
       </el-col>

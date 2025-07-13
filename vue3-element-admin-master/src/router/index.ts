@@ -117,7 +117,12 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "CustomerDetail",
         component: () => import("@/views/Customers/CustomerDetailView.vue"),
         meta: { title: "客户详情", icon: "user", hidden: true },
-
+      },
+      {
+        path: "customers/balance-record",
+        name: "CustomerBalanceRecord",
+        component: () => import("@/views/Customers/CustomerBalanceRecordView.vue"),
+        meta: { title: "余额记录", icon: "user", hidden: true },
       },
       {
         path: "businessRoomtype",
@@ -192,7 +197,6 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/StoreManage/StoreView.vue"),
         meta: { title: "门店管理", icon: "user", hidden: true },
       },
-
     ],
   },
 ];
