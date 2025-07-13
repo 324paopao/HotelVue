@@ -2,371 +2,377 @@
   <div>
     <el-card>
       <div class="header-row">
-        <el-avatar :size="100" :src="customer.avatar || defaultAvatar" class="avatar" />
-      <div class="header-info">
-        <div class="info-row">
-          <div class="header-top">
-            <div class="header-item">
-              <div>微信昵称：{{ customer.customerNickName || "--" }}</div>
-              <div>卡号：{{ customer.id || "--" }}</div>
-            </div>
-            <div class="header-item">
-              <div>等级：{{ customer.customerTypeName || "--" }}</div>
-              <div>
-                成为会员时间：{{ customer.birthday ? customer.birthday.slice(0, 10) : "--" }}
+        <el-avatar :size="100" :src="getRandomAvatar(customer.id)" class="avatar" />
+        <div class="header-info">
+          <div class="info-row">
+            <div class="header-top">
+              <div class="header-item">
+                <div>微信昵称：{{ customer.customerNickName || "--" }}</div>
+                <div>卡号：{{ customer.id || "--" }}</div>
+              </div>
+              <div class="header-item">
+                <div>等级：{{ customer.customerTypeName || "--" }}</div>
+                <div>
+                  成为会员时间：{{ customer.birthday ? customer.birthday.slice(0, 10) : "--" }}
+                </div>
+              </div>
+              <div class="header-item">
+                <div>会员状态：{{ customer.status === false ? "冻结" : "正常" }}</div>
+                <div>成长值：{{ customer.growthValue || 0 }}</div>
               </div>
             </div>
-            <div class="header-item">
-              <div>会员状态：{{ customer.status === false ? "冻结" : "正常" }}</div>
-              <div>成长值：{{ customer.growthValue || 0 }}</div>
+          </div>
+          <div class="header-bottom">
+            <div class="balance-info">
+              <div>剩余积分：{{ Math.floor(Number(customer.availablePoints || 0)) }}</div>
+              <div>可用余额：{{ Math.floor(Number(customer.availableBalance || 0)) }}</div>
+            </div>
+          </div>
+          <div class="action-row">
+            <el-button
+              size="small"
+              :disabled="customer.status === false"
+              :title="customer.status === false ? '会员已冻结' : ''"
+              @click="openGivePointsDialog"
+            >
+              送积分
+            </el-button>
+            <el-button
+              size="small"
+              :disabled="customer.status === false"
+              :title="customer.status === false ? '会员已冻结' : ''"
+              @click="openEditLevelDialog"
+            >
+              修改等级
+            </el-button>
+            <el-button
+              size="small"
+              :disabled="customer.status === false"
+              :title="customer.status === false ? '会员已冻结' : ''"
+              @click="openRechargeDialog"
+            >
+              充值
+            </el-button>
+            <el-button
+              size="small"
+              :disabled="customer.status === false"
+              :title="customer.status === false ? '会员已冻结' : ''"
+              @click="openConsumeDialog"
+            >
+              消费
+            </el-button>
+            <!-- 移除修改余额按钮 -->
+          </div>
+        </div>
+      </div>
+      <el-divider />
+
+      <!-- 个人信息部分，类似截图中的布局 -->
+      <div class="info-section">
+        <h3 class="info-title">个人信息</h3>
+        <div class="info-row">
+          <div class="info-column">
+            <div class="info-item">
+              <span class="info-label">姓名：</span>
+              <span class="info-value">{{ customer.customerName || "--" }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">性别：</span>
+              <span class="info-value">
+                {{
+                  customer.gender === 0
+                    ? "未知"
+                    : customer.gender === 1
+                      ? "男"
+                      : customer.gender === 2
+                        ? "女"
+                        : "--"
+                }}
+              </span>
+            </div>
+          </div>
+          <div class="info-column">
+            <div class="info-item">
+              <span class="info-label">手机号：</span>
+              <span class="info-value">{{ customer.phoneNumber || "--" }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">生日：</span>
+              <span class="info-value">
+                {{ customer.birthday ? (customer.birthday + "").slice(0, 10) : "--" }}
+              </span>
+            </div>
+          </div>
+          <div class="info-column">
+            <div class="info-item address-item">
+              <span class="info-label">详细地址：</span>
+              <span class="info-value">{{ customer.address || "--" }}</span>
             </div>
           </div>
         </div>
-        <div class="header-bottom">
-          <div class="balance-info">
-            <div>剩余积分：{{ Math.floor(Number(customer.availablePoints || 0)) }}</div>
-            <div>可用余额：{{ Math.floor(Number(customer.availableBalance || 0)) }}</div>
-          </div>
-        </div>
-        <div class="action-row">
-          <el-button
-            size="small"
-            :disabled="customer.status === false"
-            :title="customer.status === false ? '会员已冻结' : ''"
-            @click="openGivePointsDialog"
-          >
-            送积分
-          </el-button>
-          <el-button
-            size="small"
-            :disabled="customer.status === false"
-            :title="customer.status === false ? '会员已冻结' : ''"
-            @click="openEditLevelDialog"
-          >
-            修改等级
-          </el-button>
-          <el-button
-            size="small"
-            :disabled="customer.status === false"
-            :title="customer.status === false ? '会员已冻结' : ''"
-            @click="openRechargeDialog"
-          >
-            充值
-          </el-button>
-          <el-button
-            size="small"
-            :disabled="customer.status === false"
-            :title="customer.status === false ? '会员已冻结' : ''"
-            @click="openConsumeDialog"
-          >
-            消费
-          </el-button>
-          <el-button
-            size="small"
-            :disabled="customer.status === false"
-            :title="customer.status === false ? '会员已冻结' : ''"
-          >
-            修改余额
-          </el-button>
-        </div>
       </div>
-    </div>
-    <el-divider />
 
-    <!-- 个人信息部分，类似截图中的布局 -->
-    <div class="info-section">
-      <h3 class="info-title">个人信息</h3>
-      <div class="info-grid">
-        <div class="info-item">
-          <span class="info-label">姓名：</span>
-          <span class="info-value">{{ customer.customerName || "--" }}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">手机号：</span>
-          <span class="info-value">{{ customer.phoneNumber || "--" }}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">性别：</span>
-          <span class="info-value">
-            {{
-              customer.gender === 0
-                ? "未知"
-                : customer.gender === 1
-                  ? "男"
-                  : customer.gender === 2
-                    ? "女"
-                    : "--"
-            }}
-          </span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">生日：</span>
-          <span class="info-value">
-            {{ customer.birthday ? (customer.birthday + "").slice(0, 10) : "--" }}
-          </span>
-        </div>
-        <div class="info-item address-item">
-          <span class="info-label">详细地址：</span>
-          <span class="info-value">{{ customer.address || "--" }}</span>
-        </div>
-      </div>
-    </div>
-
-    <el-divider />
-    <div class="info-blocks">
-      <div>
-        <h4>消费信息</h4>
-        <div>消费次数：{{ customer.comsumerNumber || 0 }}</div>
-        <div>累计消费金额：{{ Math.floor(Number(customer.accumulativeconsumption || 0)) }}</div>
+      <el-divider />
+      <div class="info-blocks">
         <div>
-          平均消费金额：{{
-            customer.comsumerNumber
-              ? Math.floor(
-                  Number(customer.accumulativeconsumption) / Number(customer.comsumerNumber)
-                )
-              : 0
-          }}
+          <h4>消费信息</h4>
+          <div>消费次数：{{ customer.comsumerNumber || 0 }}</div>
+          <div>
+            累计消费金额：{{ Math.floor(Math.abs(Number(customer.accumulativeconsumption || 0))) }}
+          </div>
+          <div>
+            平均消费金额：{{
+              customer.comsumerNumber
+                ? Math.floor(
+                    Math.abs(Number(customer.accumulativeconsumption)) /
+                      Number(customer.comsumerNumber)
+                  )
+                : 0
+            }}
+          </div>
+          <!--  <div>上次消费时间：{{ customer.lastConsumerTime || '--' }}</div> -->
         </div>
-        <!--  <div>上次消费时间：{{ customer.lastConsumerTime || '--' }}</div> -->
+        <div>
+          <h4>储值账户</h4>
+          <div>账户余额：￥{{ Math.floor(Number(customer.availableBalance || 0)) }}</div>
+          <div>累计充值次数：{{ customer.comsumerNumber || 0 }}</div>
+          <div>
+            累计充值金额：￥{{
+              Math.floor(Math.abs(Number(customer.accumulativeconsumption || 0)))
+            }}
+          </div>
+        </div>
+        <div>
+          <h4>积分</h4>
+          <div>剩余积分：{{ Math.floor(Number(customer.availablePoints || 0)) }}</div>
+          <div>累计积分：{{ Math.floor(Number(customer.accumulativeintegral || 0)) }}</div>
+        </div>
       </div>
-      <div>
-        <h4>储值账户</h4>
-        <div>账户余额：￥{{ Math.floor(Number(customer.availableBalance || 0)) }}</div>
-        <div>累计充值次数：{{ customer.comsumerNumber || 0 }}</div>
-        <div>累计充值金额：￥{{ Math.floor(Number(customer.accumulativeconsumption || 0)) }}</div>
-      </div>
-      <div>
-        <h4>积分</h4>
-        <div>剩余积分：{{ Math.floor(Number(customer.availablePoints || 0)) }}</div>
-        <div>累计积分：{{ Math.floor(Number(customer.accumulativeintegral || 0)) }}</div>
-      </div>
-    </div>
-  </el-card>
+    </el-card>
 
-  <!-- 送积分弹窗 -->
-  <el-dialog
-    v-model="showGivePointsDialog"
-    title="手动修改积分"
-    width="700px"
-    :close-on-click-modal="false"
-    align-center
-  >
-    <div style="margin-bottom: 16px">
-      <div style="padding-left: 65px; font-size: 14px; color: #606266; margin-bottom: 8px">
-        客户信息： 客户：{{ givePointsForm.customerName }}，等级：{{ givePointsForm.level }}
-      </div>
-
-      <div
-        style="
-          padding-left: 140px;
-          font-size: 12px;
-          color: #606266;
-          line-height: 22px;
-          margin-top: 4px;
-        "
-      >
-        余额：{{ Math.floor(Number(givePointsForm.balance || 0)) }}，积分：{{
-          Math.floor(Number(givePointsForm.availablePoints || 0))
-        }}
-      </div>
-    </div>
-    <el-form :model="givePointsForm" label-width="140px">
-      <!-- 调整 label-width -->
-      <el-form-item label="修改积分(增减)" required>
-        <!-- 确保 required 存在以显示红星 -->
-        <el-input
-          v-model="givePointsForm.accumulativeintegral"
-          type="number"
-          style="width: 200px"
-        />
-      </el-form-item>
-      <div style="color: #909399; margin-bottom: 12px; padding-left: 160px">
-        <!-- 调整 margin-left -->
-        可用积分{{ givePointsForm.availablePoints }},输入500，表示增加500，输入-500，表示减少500
-      </div>
-      <el-form-item label="操作员">
-        <span>{{ givePointsForm.operator }}</span>
-      </el-form-item>
-      <el-form-item label="备注：">
-        <el-input
-          v-model="givePointsForm.pointsmodifydesc"
-          type="textarea"
-          maxlength="100"
-          show-word-limit
-          style="width: 200px"
-        />
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <el-button @click="showGivePointsDialog = false">取消</el-button>
-      <el-button type="primary" :loading="givePointsLoading" @click="handleGivePoints">
-        确定
-      </el-button>
-    </template>
-  </el-dialog>
-
-  <!-- 修改等级弹窗 -->
-  <el-dialog
-    v-model="showEditLevelDialog"
-    title="会员等级"
-    width="600px"
-    :close-on-click-modal="false"
-    :show-close="true"
-    align-center
-  >
-    <el-form
-      ref="editLevelFormRef"
-      :model="editLevelForm"
-      :rules="editLevelRules"
-      label-width="160px"
-      style="margin: 40px 0 20px 0; display: flex; flex-direction: column; align-items: center"
+    <!-- 送积分弹窗 -->
+    <el-dialog
+      v-model="showGivePointsDialog"
+      title="手动修改积分"
+      width="700px"
+      :close-on-click-modal="false"
+      align-center
     >
-      <el-form-item
-        label="请选择会员等级："
-        prop="customerType"
-        required
-        style="width: 100%; justify-content: center"
-      >
-        <el-select
-          v-model="editLevelForm.customerType"
-          placeholder="请选择"
-          style="width: 300px"
-          filterable
-          clearable
+      <div style="margin-bottom: 16px">
+        <div style="padding-left: 65px; font-size: 14px; color: #606266; margin-bottom: 8px">
+          客户信息： 客户：{{ givePointsForm.customerName }}，等级：{{ givePointsForm.level }}
+        </div>
+
+        <div
+          style="
+            padding-left: 140px;
+            font-size: 12px;
+            color: #606266;
+            line-height: 22px;
+            margin-top: 4px;
+          "
         >
-          <el-option
-            v-for="item in customerTypeOptions"
-            :key="item.id"
-            :label="item.customerTypeName"
-            :value="item.id"
-          />
-        </el-select>
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <div class="dialog-footer center-footer">
-        <el-button @click="showEditLevelDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitEditLevel()">确定</el-button>
-      </div>
-    </template>
-  </el-dialog>
-
-  <!-- 充值弹窗 -->
-  <el-dialog
-    v-model="showRechargeDialog"
-    title="充值"
-    width="750px"
-    :close-on-click-modal="false"
-    align-center
-  >
-    <div class="simple-form-item">
-      <div class="simple-form-label">客户信息：</div>
-      <div class="simple-form-content customer-info">{{ rechargeForm.customerName }}</div>
-    </div>
-
-    <div class="simple-form-item">
-      <div class="simple-form-label required">充值金额：</div>
-      <div class="simple-form-content">
-        <div class="input-wrapper">
-          <el-input v-model="rechargeForm.amount" placeholder="0" class="amount-input">
-            <template #suffix>元</template>
-          </el-input>
-          <div v-show="invalidRechargeAmount" class="validation-message">
-            请输入0.01-950000之间的数，最多两位小数
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="simple-form-item">
-      <div class="simple-form-label">备注：</div>
-      <div class="simple-form-content">
-        <el-input
-          v-model="rechargeForm.remark"
-          type="textarea"
-          :maxlength="30"
-          show-word-limit
-          placeholder="最多30个字"
-          class="remark-textarea"
-        />
-      </div>
-    </div>
-
-    <div class="simple-form-item">
-      <div class="simple-form-label">操作员：</div>
-      <div class="simple-form-content operator-info">{{ rechargeForm.operatorId }}</div>
-    </div>
-
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="showRechargeDialog = false">取 消</el-button>
-        <el-button type="primary" @click="submitRecharge">确 定</el-button>
-      </div>
-    </template>
-  </el-dialog>
-
-  <!-- 消费弹窗 -->
-  <el-dialog
-    v-model="showConsumeDialog"
-    title="客户消费"
-    width="750px"
-    :close-on-click-modal="false"
-    align-center
-  >
-    <div class="simple-form-item">
-      <div class="simple-form-label">客户信息：</div>
-      <div class="simple-form-content customer-info">
-        {{ consumeForm.customerName }}
-        <span class="balance-info">
-          （可用实充金额{{
-            Math.floor(Number(consumeForm.availableBalance || 0))
+          余额：{{ Math.floor(Number(givePointsForm.balance || 0)) }}，积分：{{
+            Math.floor(Number(givePointsForm.availablePoints || 0))
           }}
-          元，可用赠送余额{{ Math.floor(Number(consumeForm.giftBalance || 0)) }}
-          元）
-        </span>
-      </div>
-    </div>
-    <div class="simple-form-item">
-      <div class="simple-form-label required">消费金额：</div>
-      <div class="simple-form-content">
-        <div class="input-wrapper">
-          <el-input v-model="consumeForm.sumofconsume" placeholder="0" class="amount-input">
-            <template #suffix>元</template>
-          </el-input>
-          <div v-show="invalidAmount" class="validation-message">
-            请输入0.01-950000之间的数，最多两位小数
-          </div>
-          <div v-show="insufficientBalance" class="insufficient-balance">会员余额不足</div>
         </div>
       </div>
-    </div>
-    <div class="simple-form-item">
-      <div class="simple-form-label">备注：</div>
-      <div class="simple-form-content">
-        <el-input
-          v-model="consumeForm.consumerDesc"
-          type="textarea"
-          :maxlength="30"
-          show-word-limit
-          placeholder="最多30个字"
-          class="remark-textarea"
-        />
-      </div>
-    </div>
-    <div class="simple-form-item">
-      <div class="simple-form-label">操作员：</div>
-      <div class="simple-form-content operator-info">
-        {{ consumeForm.operatorId || "17376144917" }}
-      </div>
-    </div>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="showConsumeDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitConsume">确定</el-button>
-      </div>
-    </template>
-  </el-dialog>
+      <el-form :model="givePointsForm" label-width="140px">
+        <!-- 调整 label-width -->
+        <el-form-item label="修改积分(增减)" required>
+          <!-- 确保 required 存在以显示红星 -->
+          <el-input
+            v-model="givePointsForm.accumulativeintegral"
+            type="number"
+            style="width: 200px"
+          />
+        </el-form-item>
+        <div style="color: #909399; margin-bottom: 12px; padding-left: 160px">
+          <!-- 调整 margin-left -->
+          可用积分{{ givePointsForm.availablePoints }},输入500，表示增加500，输入-500，表示减少500
+        </div>
+        <el-form-item label="操作员">
+          <span>{{ givePointsForm.operator }}</span>
+        </el-form-item>
+        <el-form-item label="备注：">
+          <el-input
+            v-model="givePointsForm.pointsmodifydesc"
+            type="textarea"
+            maxlength="100"
+            show-word-limit
+            style="width: 200px"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showGivePointsDialog = false">取消</el-button>
+        <el-button type="primary" :loading="givePointsLoading" @click="handleGivePoints">
+          确定
+        </el-button>
+      </template>
+    </el-dialog>
 
+    <!-- 修改等级弹窗 -->
+    <el-dialog
+      v-model="showEditLevelDialog"
+      title="会员等级"
+      width="600px"
+      :close-on-click-modal="false"
+      :show-close="true"
+      align-center
+    >
+      <el-form
+        ref="editLevelFormRef"
+        :model="editLevelForm"
+        :rules="editLevelRules"
+        label-width="160px"
+        style="margin: 40px 0 20px 0; display: flex; flex-direction: column; align-items: center"
+      >
+        <el-form-item
+          label="请选择会员等级："
+          prop="customerType"
+          required
+          style="width: 100%; justify-content: center"
+        >
+          <el-select
+            v-model="editLevelForm.customerType"
+            placeholder="请选择"
+            style="width: 300px"
+            filterable
+            clearable
+          >
+            <el-option
+              v-for="item in customerTypeOptions"
+              :key="item.id"
+              :label="item.customerTypeName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer center-footer">
+          <el-button @click="showEditLevelDialog = false">取消</el-button>
+          <el-button type="primary" @click="submitEditLevel()">确定</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- 充值弹窗 -->
+    <el-dialog
+      v-model="showRechargeDialog"
+      title="充值"
+      width="750px"
+      :close-on-click-modal="false"
+      align-center
+    >
+      <div class="simple-form-item">
+        <div class="simple-form-label">客户信息：</div>
+        <div class="simple-form-content customer-info">{{ rechargeForm.customerName }}</div>
+      </div>
+
+      <div class="simple-form-item">
+        <div class="simple-form-label required">充值金额：</div>
+        <div class="simple-form-content">
+          <div class="input-wrapper">
+            <el-input v-model="rechargeForm.amount" placeholder="0" class="amount-input">
+              <template #suffix>元</template>
+            </el-input>
+            <div v-show="invalidRechargeAmount" class="validation-message">
+              请输入0.01-950000之间的数，最多两位小数
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="simple-form-item">
+        <div class="simple-form-label">备注：</div>
+        <div class="simple-form-content">
+          <el-input
+            v-model="rechargeForm.remark"
+            type="textarea"
+            :maxlength="30"
+            show-word-limit
+            placeholder="最多30个字"
+            class="remark-textarea"
+          />
+        </div>
+      </div>
+
+      <div class="simple-form-item">
+        <div class="simple-form-label">操作员：</div>
+        <div class="simple-form-content operator-info">{{ rechargeForm.operatorId }}</div>
+      </div>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="showRechargeDialog = false">取 消</el-button>
+          <el-button type="primary" @click="submitRecharge">确 定</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- 消费弹窗 -->
+    <el-dialog
+      v-model="showConsumeDialog"
+      title="客户消费"
+      width="750px"
+      :close-on-click-modal="false"
+      align-center
+    >
+      <div class="simple-form-item">
+        <div class="simple-form-label">客户信息：</div>
+        <div class="simple-form-content customer-info">
+          {{ consumeForm.customerName }}
+          <span class="balance-info">
+            （可用实充金额{{
+              Math.floor(Number(consumeForm.availableBalance || 0))
+            }}
+            元，可用赠送余额{{ Math.floor(Number(consumeForm.giftBalance || 0)) }}
+            元）
+          </span>
+        </div>
+      </div>
+      <div class="simple-form-item">
+        <div class="simple-form-label required">消费金额：</div>
+        <div class="simple-form-content">
+          <div class="input-wrapper">
+            <el-input v-model="consumeForm.sumofconsume" placeholder="0" class="amount-input">
+              <template #suffix>元</template>
+            </el-input>
+            <div v-show="invalidAmount" class="validation-message">
+              请输入0.01-950000之间的数，最多两位小数
+            </div>
+            <div v-show="insufficientBalance" class="insufficient-balance">会员余额不足</div>
+          </div>
+        </div>
+      </div>
+      <div class="simple-form-item">
+        <div class="simple-form-label">备注：</div>
+        <div class="simple-form-content">
+          <el-input
+            v-model="consumeForm.consumerDesc"
+            type="textarea"
+            :maxlength="30"
+            show-word-limit
+            placeholder="最多30个字"
+            class="remark-textarea"
+          />
+        </div>
+      </div>
+      <div class="simple-form-item">
+        <div class="simple-form-label">操作员：</div>
+        <div class="simple-form-content operator-info">
+          {{ consumeForm.operatorId || "17376144917" }}
+        </div>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="showConsumeDialog = false">取消</el-button>
+          <el-button type="primary" @click="submitConsume">确定</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -383,9 +389,19 @@ import {
   getCustomerTypeList,
 } from "@/api/system/customer.api";
 
+// 获取头像背景颜色
+const getRandomAvatar = (id: string) => {
+  // 使用客户ID作为种子，确保同一客户每次显示相同的随机头像
+  const seed = id
+    ? id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    : Math.floor(Math.random() * 1000);
+
+  // 使用Picsum提供的风景图片
+  return `https://picsum.photos/seed/${seed}/150/150`;
+};
+
 const route = useRoute();
 const customer = ref<any>({});
-const defaultAvatar = "/default-avatar.png"; // 可替换为你的默认头像
 
 // 客户类型选项
 const customerTypeOptions = ref<any[]>([]);
@@ -768,16 +784,25 @@ watch(
   color: #333;
 }
 
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px 80px; /* 增加列间距 */
+.info-row {
+  display: flex;
+  justify-content: space-between;
   padding: 0 10px;
+}
+
+.info-column {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.info-column:last-child {
+  margin-right: 0;
 }
 
 .info-item {
   display: flex;
   align-items: center;
+  margin-bottom: 10px;
 }
 
 .info-label {
@@ -794,10 +819,9 @@ watch(
   font-size: 14px;
 }
 
-/* 详细地址样式，占据整行 */
+/* 详细地址样式 */
 .address-item {
-  grid-column: span 3;
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 /* 原有的info-blocks样式 */

@@ -116,6 +116,7 @@
                   <el-button v-if="hasAction('标签管理')" @click="goToTagManagement">
                     标签管理
                   </el-button>
+                  <el-button @click="goToBalanceRecord">余额记录</el-button>
                   <!--  <el-button v-if="hasAction('同步粉丝')">同步粉丝</el-button> -->
                 </div>
               </div>
@@ -145,7 +146,7 @@
           <el-table-column label="客户信息" width="180">
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <el-avatar :size="40" :src="scope.row.avatar" />
+                <el-avatar :size="40" :src="getRandomAvatar(scope.row.id)" />
                 <div style="margin-left: 8px">
                   <div>昵称：{{ scope.row.customerNickName || "--" }}</div>
                   <div>
@@ -206,7 +207,7 @@
             width="120"
           >
             <template #default="scope">
-              ￥{{ Number(scope.row.accumulativeconsumption || 0).toFixed(2) }}
+              ￥{{ Math.abs(Number(scope.row.accumulativeconsumption || 0)).toFixed(2) }}
             </template>
           </el-table-column>
           <el-table-column label="累计消费次数" prop="comsumerNumber" align="center" width="120" />
@@ -468,7 +469,7 @@
                 <template #suffix>元</template>
               </el-input>
               <div v-show="invalidRechargeAmount" class="validation-message">
-                请输入0.01-950000之间的数，最多两位小数
+                请输入最大为950000的数，最多两位小数
               </div>
             </div>
           </div>
@@ -529,7 +530,7 @@
                 <template #suffix>元</template>
               </el-input>
               <div v-show="invalidAmount" class="validation-message">
-                请输入0.01-950000之间的数，最多两位小数
+                请输入最大为-950000的数，最多两位小数
               </div>
               <div v-show="insufficientBalance" class="insufficient-balance">会员余额不足</div>
             </div>
@@ -733,6 +734,17 @@ import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import { Search, Plus } from "@element-plus/icons-vue";
 
+// 添加随机头像函数
+const getRandomAvatar = (id: string) => {
+  // 使用客户ID作为种子，确保同一客户每次显示相同的随机头像
+  const seed = id
+    ? id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    : Math.floor(Math.random() * 1000);
+
+  // 使用Picsum提供的风景图片
+  return `https://picsum.photos/seed/${seed}/150/150`;
+};
+
 const router = useRouter();
 // #region 操作权限相关
 import { useMenuStore } from "@/store";
@@ -822,7 +834,7 @@ const fetchCustomerList = async () => {
         try {
           const labelsResponse = await getCustomerLabels(customer.id);
           customer.labels = labelsResponse.data || [];
-        } catch  {
+        } catch {
           customer.labels = [];
         }
       }
@@ -1101,6 +1113,13 @@ const goToTagManagement = () => {
   router.push("/customers/tags-management");
 };
 
+/**
+ * 跳转到余额记录页面
+ */
+const goToBalanceRecord = () => {
+  router.push("/customers/balance-record");
+};
+
 // ===================== 充值弹窗相关 =====================
 // 控制充值弹窗显示
 const showRechargeDialog = ref(false);
@@ -1193,7 +1212,7 @@ watch(
       const giftBalance = parseFloat(consumeForm.value.giftBalance || "0");
       invalidAmount.value = !!(
         newValue &&
-        (isNaN(amount) || amount < 0.01 || amount > 950000 || !/^\d+(\.\d{1,2})?$/.test(newValue))
+        (isNaN(amount) || Math.abs(amount) > 950000 || !/^-?\d+(\.\d{1,2})?$/.test(newValue))
       );
       if (!invalidAmount.value) {
         insufficientBalance.value =
@@ -1226,26 +1245,34 @@ const submitConsume = async () => {
     return;
   }
   const amount = parseFloat(consumeForm.value.sumofconsume);
-  if (isNaN(amount) || amount < 0.01 || amount > 950000) {
-    ElMessage.warning("请输入0.01-950000之间的数");
+  if (isNaN(amount) || Math.abs(amount) > 950000) {
+    ElMessage.warning("请输入最大为950000的数(可为负数)");
     return;
   }
-  if (!/^\d+(\.\d{1,2})?$/.test(consumeForm.value.sumofconsume)) {
+  if (!/^-?\d+(\.\d{1,2})?$/.test(consumeForm.value.sumofconsume)) {
     ElMessage.warning("金额最多支持两位小数");
     return;
   }
-  const availableBalance = parseFloat(consumeForm.value.availableBalance || "0");
-  const giftBalance = parseFloat(consumeForm.value.giftBalance || "0");
-  if (amount > availableBalance + giftBalance) {
-    ElMessage.warning("会员余额不足");
-    return;
+
+  // 如果是正数金额，需要检查余额是否足够
+  if (amount > 0) {
+    const availableBalance = parseFloat(consumeForm.value.availableBalance || "0");
+    const giftBalance = parseFloat(consumeForm.value.giftBalance || "0");
+    if (amount > availableBalance + giftBalance) {
+      ElMessage.warning("会员余额不足");
+      return;
+    }
   }
+
   try {
+    // 使用负数金额表示消费
+    const consumptionAmount = amount < 0 ? amount : -amount; // 确保金额为负数
+
     await customerConsume({
       id: consumeForm.value.customerId,
-      availableBalance,
-      availableGiftBalance: giftBalance,
-      sumofconsumption: amount,
+      availableBalance: parseFloat(consumeForm.value.availableBalance || "0"),
+      availableGiftBalance: parseFloat(consumeForm.value.giftBalance || "0"),
+      sumofconsumption: consumptionAmount, // 使用负数金额
       consumerNumber: 0,
       consumerDesc: consumeForm.value.consumerDesc || "",
       accumulativeconsumption: 0, // 或实际累计金额
@@ -1580,8 +1607,6 @@ onActivated(() => {
     needRefresh.value = false;
   }
 });
-
-
 </script>
 
 <style scoped>

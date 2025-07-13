@@ -39,8 +39,6 @@ export function getCustomerTypeList() {
   });
 }
 
-
-
 /**
  * 导出客户数据
  * @param params 查询参数（筛选条件等）
@@ -125,6 +123,7 @@ export function customerConsume(data: {
   consumerNumber: number;
   consumerDesc: string;
   accumulativeconsumption: number;
+  orderNumber?: string; // 添加可选的订单号参数
 }) {
   return request.httpRequest({
     url: "/api/app/customer/up-sumofconsumption",
@@ -281,10 +280,37 @@ export function updateCustomerLevel(ids: string[], customerType: string) {
  * @param data { customerId: string, labelIds: string[] }
  * @returns Promise
  */
-export function addCustomerLabels( customerIds: string[], labelIds: string[] ) {
+export function addCustomerLabels(customerIds: string[], labelIds: string[]) {
   return request.httpRequest({
     url: "/api/app/customer/customer-labels",
     method: "post",
-    data: {  customerIds,  labelIds,},
+    data: { customerIds, labelIds },
+  });
+}
+
+/**
+ * 获取客户余额记录列表
+ * @param params 查询参数（如 { PageIndex: number, PageSize: number, Phone?: string, Ordernumber?: string, StartTime?: string, EndTime?: string, Id?: string }）
+ * @returns Promise
+ */
+export function getBalanceRecordList(params: any) {
+  return request.httpRequest({
+    url: "/api/app/customer/balancerecord-list",
+    method: "get",
+    params,
+  });
+}
+
+/**
+ * 导出客户余额记录
+ * @param params 查询参数（筛选条件等）
+ * @returns Promise 文件下载流
+ */
+export function exportBalanceRecordData(params?: any) {
+  return request.httpRequest({
+    url: "/api/app/customer/export-all-balancerecord",
+    method: "post",
+    data: params,
+    responseType: "blob",
   });
 }
