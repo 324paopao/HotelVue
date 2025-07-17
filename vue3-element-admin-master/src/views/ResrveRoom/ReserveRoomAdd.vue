@@ -153,7 +153,35 @@ function handleSelectionChange(selection: any) {
 }
 
 const save = () => {
-  form.roomNum = route.query.num;
+  if (!form.aaa || form.aaa.length === 0) {
+    ElMessage.warning("请选择房型");
+    return;
+  }
+  if (!form.infomation) {
+    ElMessage.warning("请选择客源信息");
+    return;
+  }
+  if (!form.ordersource) {
+    ElMessage.warning("请选择订单来源");
+    return;
+  }
+  if (!form.reserveName) {
+    ElMessage.warning("请输入预订姓名");
+    return;
+  }
+  if (!form.phone) {
+    ElMessage.warning("请输入手机号");
+    return;
+  }
+  if (!form.sdate) {
+    ElMessage.warning("请选择入住日期");
+    return;
+  }
+  if (!form.edate) {
+    ElMessage.warning("请选择离店日期");
+    return;
+  }
+  form.roomNum = typeof route.query.num === 'string' ? route.query.num : '';
   const res = AuthAPI.RoomAdd(form);
   console.log("qweqw", res);
   ElMessage.success("添加成功");

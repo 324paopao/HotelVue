@@ -314,25 +314,25 @@ async function exportDetail() {
       Edate: Seach1.Edate,
       Comman: Seach.Comman
     };
-    
+
     // 调用导出API
     const response = await AuthAPI.Export(params);
-    
+
     // 创建Blob对象
-    const blob = new Blob([response.data], { 
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
-    
+
     // 创建下载链接
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = `预订记录-${moment().format('YYYY-MM-DD')}.xlsx`;
-    
+
     // 触发下载
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
-    
+
     ElMessage.success('导出成功');
   } catch (error) {
     console.error('导出失败:', error);
